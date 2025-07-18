@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\Language;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -30,6 +31,7 @@ class UserPreferences extends Model
     protected function casts(): array
     {
         return [
+            'language' => Language::class,
             'id' => 'integer',
             'email_notifications' => 'boolean',
             'push_notifications' => 'boolean',

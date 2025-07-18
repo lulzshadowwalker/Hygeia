@@ -3,17 +3,23 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Illuminate\Support\Str;
 
-class User extends Authenticatable
+class User extends Authenticatable implements HasMedia
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasApiTokens;
+    use HasFactory, Notifiable, HasApiTokens, InteractsWithMedia;
 
     /**
      * The attributes that are mass assignable.
@@ -77,5 +83,37 @@ class User extends Authenticatable
     public function supportTickets(): HasMany
     {
         return $this->hasMany(SupportTicket::class);
+    }
+
+    const MEDIA_COLLECTION_AVATAR = 'avatar';
+
+    public function registerMediaConversions(?Media $media = null): void
+    {
+        $name = Str::replace(" ", "+", $this->name);
+
+        $this->registerMediaCollection(self::MEDIA_COLLECTION_AVATAR)
+            ->singleFile()
+            ->useFallbackUrl("https://ui-avatars.com/api/?name={$name}");
+    }
+
+    /**
+     * Get the user's avatar URL.
+     */
+    public function avatar(): Attribute
+    {
+        return Attribute::get(
+            fn() => $this->getFirstMediaUrl(self::MEDIA_COLLECTION_AVATAR) ?:
+            null
+        );
+    }
+
+    /**
+     * Get the user's avatar file.
+     */
+    public function avatarFile(): Attribute
+    {
+        return Attribute::get(
+            fn() => $this->getFirstMedia(self::MEDIA_COLLECTION_AVATAR) ?: null
+        );
     }
 }

@@ -2,13 +2,18 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Illuminate\Support\Str;
 
-class Cleaner extends Model
+class Cleaner extends Model implements HasMedia
 {
-    use HasFactory;
+    use HasFactory, InteractsWithMedia;
 
     /**
      * The attributes that are mass assignable.
@@ -53,5 +58,38 @@ class Cleaner extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    const MEDIA_COLLECTION_ID_CARD = 'id-card';
+
+    public function registerMediaConversions(?Media $media = null): void
+    {
+        $name = Str::replace(" ", "+", $this->fullName);
+
+        $this->registerMediaCollection(self::MEDIA_COLLECTION_ID_CARD)
+            ->singleFile()
+            ->useFallbackUrl("https://ui-avatars.com/api/?name={$name}");
+            // ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp']);
+    }
+
+    /**
+     * Get the cleaner's id card URL.
+     */
+    public function idCard(): Attribute
+    {
+        return Attribute::get(
+            fn() => $this->getFirstMediaUrl(self::MEDIA_COLLECTION_ID_CARD) ?:
+            null
+        );
+    }
+
+    /**
+     * Get the cleaner's id card file.
+     */
+    public function idCardFile(): Attribute
+    {
+        return Attribute::get(
+            fn() => $this->getFirstMedia(self::MEDIA_COLLECTION_ID_CARD) ?: null
+        );
     }
 }
