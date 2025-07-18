@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\SupportTicketStatus;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -16,7 +17,7 @@ return new class extends Migration
             $table->string('number');
             $table->string('subject');
             $table->text('message');
-            $table->enum('status', ["open","in_progress","resolved"]);
+            $table->enum('status', SupportTicketStatus::values())->default(SupportTicketStatus::Open->value);
             $table->foreignId('user_id');
             $table->timestamps();
         });

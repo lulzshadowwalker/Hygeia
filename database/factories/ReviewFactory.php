@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Cleaner;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 use App\Models\Review;
@@ -22,10 +23,10 @@ class ReviewFactory extends Factory
     public function definition(): array
     {
         return [
-            'rating' => fake()->numberBetween(-10000, 10000),
+            'rating' => fake()->numberBetween(1, 5),
             'comment' => fake()->text(),
-            'reviewable_type' => fake()->word(),
-            'reviewable_id' => fake()->numberBetween(-10000, 10000),
+            'reviewable_type' => fake()->randomElement([Cleaner::class]),
+            'reviewable_id' => Cleaner::factory(),
             'user_id' => User::factory(),
         ];
     }

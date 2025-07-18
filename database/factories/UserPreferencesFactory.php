@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\Language;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 use App\Models\User;
@@ -22,7 +23,7 @@ class UserPreferencesFactory extends Factory
     public function definition(): array
     {
         return [
-            'language' => fake()->randomElement(["en","hu"]),
+            'language' => fake()->randomElement(Language::values()),
             'email_notifications' => fake()->boolean(),
             'push_notifications' => fake()->boolean(),
             'user_id' => User::factory(),

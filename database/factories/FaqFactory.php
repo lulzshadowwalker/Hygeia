@@ -2,11 +2,9 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
 use App\Models\Faq;
 
-class FaqFactory extends Factory
+class FaqFactory extends BaseFactory
 {
     /**
      * The name of the factory's corresponding model.
@@ -21,8 +19,8 @@ class FaqFactory extends Factory
     public function definition(): array
     {
         return [
-            'question' => '{}',
-            'answer' => '{}',
+            'question' => $this->localized(fn(): string => $this->faker->sentence(6, true)),
+            'answer' => $this->localized(fn(): string => $this->faker->paragraph(3, true)),
         ];
     }
 }

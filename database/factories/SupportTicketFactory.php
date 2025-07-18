@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Enums\SupportTicketStatus;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
 use App\Models\SupportTicket;
 use App\Models\User;
 
@@ -25,7 +25,7 @@ class SupportTicketFactory extends Factory
             'number' => fake()->word(),
             'subject' => fake()->word(),
             'message' => fake()->text(),
-            'status' => fake()->randomElement(["open","in_progress","resolved"]),
+            'status' => fake()->randomElement(SupportTicketStatus::values()),
             'user_id' => User::factory(),
         ];
     }
