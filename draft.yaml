@@ -1,0 +1,55 @@
+models:
+  Client:
+    relationships:
+      belongsTo: User
+
+  Cleaner:
+    #  TODO: Avatar, Rating, ID-Card,
+    service_area: string
+    available_days: json
+    max_hours_per_week: integer nullable
+    time_slots: json
+    years_of_experience: integer
+    has_cleaning_supplies: boolean
+    comfortable_with_pets: boolean nullable
+    previous_job_types: json
+    service_radius: integer
+    preferred_job_types: json
+    agreed_to_terms: boolean
+    relationships:
+      belongsTo: User
+
+  UserPreferences:
+    language: enum:en,hu
+    email_notifications: boolean default:true
+    push_notifications: boolean default:true
+    relationships:
+      belongsTo: User
+
+  Faq:
+    question: json
+    answer: json
+
+  Review:
+    rating: integer
+    comment: text
+    reviewable_type: string
+    reviewable_id: integer
+    relationships:
+      belongsTo: User
+
+  Favorite:
+    favoriteable_type: string
+    favoriteable_id: integer
+    relationships:
+      belongsTo: User
+
+  SupportTicket:
+    number: string
+    subject: string
+    message: text
+    status: enum:open,in_progress,resolved
+    relationships:
+      belongsTo: User
+
+controllers:

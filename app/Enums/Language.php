@@ -11,4 +11,9 @@ enum Language: string
     {
         return array_map(fn(self $language) => $language->value, self::cases());
     }
+
+    public static function default(): string
+    {
+        return self::tryFrom(config('app.locale'))->value;
+    }
 }
