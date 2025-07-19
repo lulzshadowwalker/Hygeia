@@ -15,11 +15,12 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Illuminate\Support\Str;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements HasMedia
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasApiTokens, InteractsWithMedia;
+    use HasFactory, Notifiable, HasApiTokens, InteractsWithMedia, HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -103,7 +104,7 @@ class User extends Authenticatable implements HasMedia
     {
         return Attribute::get(
             fn() => $this->getFirstMediaUrl(self::MEDIA_COLLECTION_AVATAR) ?:
-            null
+                null
         );
     }
 
