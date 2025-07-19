@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\FaqController;
+use App\Http\Controllers\Api\V1\LoginController;
 use App\Http\Controllers\Api\V1\SupportTicketController;
 use Illuminate\Support\Facades\Route;
 
@@ -17,3 +18,6 @@ Route::get('/support-tickets/{supportTicket}', [SupportTicketController::class, 
 
 Route::post('/support-tickets', [SupportTicketController::class, 'store'])
     ->name('api.v1.support-tickets.store');
+
+Route::post('/auth/login', [LoginController::class, 'login'])
+    ->name('api.v1.auth.login');
