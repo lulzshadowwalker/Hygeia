@@ -6,6 +6,7 @@ use App\Enums\Role;
 use App\Enums\UserStatus;
 use App\Models\Cleaner;
 use App\Models\Client;
+use App\Models\Faq;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -70,5 +71,7 @@ class DatabaseSeeder extends Seeder
                 'status' => UserStatus::Banned,
             ])
             ->assignRole(Role::Cleaner->value);
+
+        Faq::factory()->count(7)->create();
     }
 }
