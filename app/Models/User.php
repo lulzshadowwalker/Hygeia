@@ -4,6 +4,8 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
+use App\Enums\Role;
+use App\Enums\UserStatus;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -31,6 +33,7 @@ class User extends Authenticatable implements HasMedia
         'name',
         'email',
         'password',
+        'status',
     ];
 
     /**
@@ -53,7 +56,23 @@ class User extends Authenticatable implements HasMedia
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'status' => UserStatus::class,
         ];
+    }
+
+    public function isClient(): Attribute
+    {
+        return Attribute::get(fn(): bool => $this->hasRole(Role::Client->value));
+    }
+
+    public function isCleaner(): Attribute
+    {
+        return Attribute::get(fn(): bool => $this->hasRole(Role::Cleaner->value));
+    }
+
+    public function isAdmin(): Attribute
+    {
+        return Attribute::get(fn(): bool => $this->hasRole(Role::Admin->value));
     }
 
     public function client(): HasOne
