@@ -24,6 +24,16 @@ class DatabaseSeeder extends Seeder
         User::factory()
             ->has(Client::factory())
             ->create([
+                'name' => 'Admin',
+                'username' => 'admin',
+                'email' => 'admin@example.com',
+                'status' => UserStatus::Active,
+            ])
+            ->assignRole(Role::Admin->value);
+
+        User::factory()
+            ->has(Client::factory())
+            ->create([
                 'name' => 'Active Client',
                 'username' => 'active_client',
                 'email' => 'active@client.com',
