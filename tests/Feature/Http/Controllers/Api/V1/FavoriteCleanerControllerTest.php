@@ -18,7 +18,7 @@ class FavoriteCleanerControllerTest extends TestCase
 
         $this->actingAs($client->user);
 
-        $this->post(route('api.v1.cleaners.favorite.store', ['cleaner' => $cleaner->id]))
+        $this->post(route('api.v1.cleaners.favorites.store', ['cleaner' => $cleaner->id]))
             ->assertNoContent(204);
 
         $this->assertTrue($client->fresh()->favoriteCleaners->contains($cleaner));
@@ -33,7 +33,7 @@ class FavoriteCleanerControllerTest extends TestCase
 
         $this->actingAs($client->user);
 
-        $this->delete(route('api.v1.cleaners.favorite.destroy', ['cleaner' => $cleaner->id]))
+        $this->delete(route('api.v1.cleaners.favorites.destroy', ['cleaner' => $cleaner->id]))
             ->assertNoContent(204);
 
         $this->assertFalse($client->fresh()->favoriteCleaners->contains($cleaner));

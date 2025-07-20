@@ -28,13 +28,13 @@ Route::post('/auth/login', [LoginController::class, 'login'])
 Route::get('/pages', [PageController::class, 'index'])->name('api.v1.page.index');
 Route::get('/pages/{page}', [PageController::class, 'show'])->name('api.v1.page.show');
 
-Route::post('/cleaners/{cleaner}/favorite', [FavoriteCleanerController::class, 'store'])
+Route::post('/cleaners/{cleaner}/favorites', [FavoriteCleanerController::class, 'store'])
     ->middleware('auth:sanctum')
-    ->name('api.v1.cleaners.favorite.store');
+    ->name('api.v1.cleaners.favorites.store');
 
-Route::delete('/cleaners/{cleaner}/favorite', [FavoriteCleanerController::class, 'destroy'])
+Route::delete('/cleaners/{cleaner}/favorites', [FavoriteCleanerController::class, 'destroy'])
     ->middleware('auth:sanctum')
-    ->name('api.v1.cleaners.favorite.destroy');
+    ->name('api.v1.cleaners.favorites.destroy');
 
 Route::get('/notifications', [NotificationController::class, 'index'])->name('api.v1.notifications.index')->middleware('auth:sanctum');
 Route::get('/notifications/{notification}', [NotificationController::class, 'show'])->name('api.v1.notifications.show')->middleware('auth:sanctum');
