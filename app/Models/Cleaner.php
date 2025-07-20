@@ -94,7 +94,7 @@ class Cleaner extends Model implements HasMedia
     }
 
     /**
-     * Get the client who have favorited this cleaner.
+     * Get the clients who have favorited this cleaner.
      */
     public function favoriteClients()
     {
