@@ -29,6 +29,8 @@ class InitializeApp extends Command
 
         $this->call(UpsertRoles::class);
 
+        $this->call(UpsertPages::class);
+
         $this->info('Application initialized successfully');
     }
 }
