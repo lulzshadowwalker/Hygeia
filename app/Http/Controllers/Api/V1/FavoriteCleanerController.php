@@ -9,6 +9,8 @@ class FavoriteCleanerController extends Controller
 {
     public function store(Cleaner $cleaner)
     {
+        //  TODO: It would be better if we simply used a client_favorites table with
+        //  a polymorphic relation to Cleaner, so that we can favorite any model.
         auth()->user()->client->favoriteCleaners()
             ->syncWithoutDetaching([$cleaner->id]);
 
