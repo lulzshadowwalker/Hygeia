@@ -69,7 +69,7 @@ class Cleaner extends Model implements HasMedia
         $this->registerMediaCollection(self::MEDIA_COLLECTION_ID_CARD)
             ->singleFile()
             ->useFallbackUrl("https://ui-avatars.com/api/?name={$name}");
-            // ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp']);
+        // ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp']);
     }
 
     /**
@@ -79,7 +79,7 @@ class Cleaner extends Model implements HasMedia
     {
         return Attribute::get(
             fn() => $this->getFirstMediaUrl(self::MEDIA_COLLECTION_ID_CARD) ?:
-            null
+                null
         );
     }
 
@@ -91,5 +91,14 @@ class Cleaner extends Model implements HasMedia
         return Attribute::get(
             fn() => $this->getFirstMedia(self::MEDIA_COLLECTION_ID_CARD) ?: null
         );
+    }
+
+    /**
+     * Get the client who have favorited this cleaner.
+     */
+    public function favoriteClients()
+    {
+        return $this->belongsToMany(Client::class, 'client_favorite_cleaners')
+            ->withTimestamps();
     }
 }

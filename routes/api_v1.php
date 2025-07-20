@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\FaqController;
+use App\Http\Controllers\Api\V1\FavoriteCleanerController;
 use App\Http\Controllers\Api\V1\LoginController;
 use App\Http\Controllers\Api\V1\SupportTicketController;
 use App\Http\Controllers\Api\V1\PageController;
@@ -23,6 +24,13 @@ Route::post('/support-tickets', [SupportTicketController::class, 'store'])
 Route::post('/auth/login', [LoginController::class, 'login'])
     ->name('api.v1.auth.login');
 
-
 Route::get('/pages', [PageController::class, 'index'])->name('api.v1.page.index');
 Route::get('/pages/{page}', [PageController::class, 'show'])->name('api.v1.page.show');
+
+Route::post('/cleaners/{cleaner}/favorite', [FavoriteCleanerController::class, 'store'])
+    ->middleware('auth:sanctum')
+    ->name('api.v1.cleaners.favorite.store');
+
+Route::delete('/cleaners/{cleaner}/favorite', [FavoriteCleanerController::class, 'destroy'])
+    ->middleware('auth:sanctum')
+    ->name('api.v1.cleaners.favorite.destroy');

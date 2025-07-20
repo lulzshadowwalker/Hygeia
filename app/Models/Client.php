@@ -36,4 +36,10 @@ class Client extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function favoriteCleaners()
+    {
+        return $this->belongsToMany(Cleaner::class, 'client_favorite_cleaners')
+            ->withTimestamps();
+    }
 }
