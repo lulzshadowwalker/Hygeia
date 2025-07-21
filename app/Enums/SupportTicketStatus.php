@@ -5,7 +5,7 @@ namespace App\Enums;
 enum SupportTicketStatus: string
 {
     case Open = 'open';
-    case InProgress = 'in_progress';
+    case InProgress = 'in-progress';
     case Resolved = 'resolved';
 
     public static function values(): array

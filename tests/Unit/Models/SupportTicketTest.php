@@ -3,6 +3,7 @@
 namespace Tests\Unit\Models;
 
 use App\Events\SupportTicketReceived;
+use App\Models\Client;
 use App\Models\SupportTicket;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
@@ -20,7 +21,10 @@ class SupportTicketTest extends TestCase
 
     public function test_it_starts_with_open_status_if_status_is_not_specified(): void
     {
-        $ticket = SupportTicket::create(['message' => 'Test message', 'phone' => '+1234567890', 'name' => 'John Doe',]);
+        $client = Client::factory()->create();
+        $this->actingAs($client->user);
+
+        $ticket = $client->user->supportTickets()->create(['subject' => 'hello', 'message' => 'Test message']);
 
         $this->assertTrue($ticket->isOpen);
         $this->assertFalse($ticket->isInProgress);
@@ -29,7 +33,14 @@ class SupportTicketTest extends TestCase
 
     public function test_status_can_be_specified(): void
     {
-        $ticket = SupportTicket::create(['message' => 'Test message', 'phone' => '+1234567890', 'name' => 'John Doe', 'status' => 'IN_PROGRESS']);
+        $client = Client::factory()->create();
+        $this->actingAs($client->user);
+
+        $ticket = $client->user->supportTickets()->create([
+            'subject' => 'hello',
+            'message' => 'Test message',
+            'status' => 'in-progress',
+        ]);
 
         $this->assertFalse($ticket->isOpen);
         $this->assertTrue($ticket->isInProgress);
