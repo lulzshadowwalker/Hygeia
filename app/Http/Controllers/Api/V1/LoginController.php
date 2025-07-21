@@ -22,7 +22,7 @@ class LoginController extends Controller
         }
 
         $user = auth()->user();
-        $accessToken = $user->createToken(config('app.name'))->accessToken->token;
+        $accessToken = $user->createToken(config('app.name'))->plainTextToken;
 
         return AuthTokenResource::make(
             new AccessToken($accessToken),
