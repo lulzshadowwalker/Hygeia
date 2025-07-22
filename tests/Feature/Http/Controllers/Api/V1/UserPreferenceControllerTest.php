@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Http\Controllers\Api\V1;
+namespace Tests\Feature\Http\Controllers\Api\V1;
 
 use App\Enums\Language;
 use App\Http\Resources\V1\UserPreferenceResource;
