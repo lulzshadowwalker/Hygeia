@@ -11,7 +11,9 @@ class UserPreferenceController extends Controller
 {
     public function index()
     {
-        return UserPreferenceResource::make(Auth::user()->preferences);
+        return UserPreferenceResource::make(Auth::user()->preferences()->firstOrCreate([
+            'user_id' => Auth::user()->id,
+        ]));
     }
 
     public function update(UpdateUserPreferenceRequest $request)
