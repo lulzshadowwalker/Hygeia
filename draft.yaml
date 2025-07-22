@@ -19,7 +19,7 @@ models:
     relationships:
       belongsTo: User
 
-  UserPreferences:
+  UserPreference:
     language: enum:en,hu
     email_notifications: boolean default:true
     push_notifications: boolean default:true
