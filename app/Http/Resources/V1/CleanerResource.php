@@ -5,7 +5,7 @@ namespace App\Http\Resources\V1;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ReviewResource extends JsonResource
+class CleanerResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -14,17 +14,16 @@ class ReviewResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        //  TODO: Implement cleaner resource with real data
         return [
-            'type' => 'review',
+            'type' => 'cleaner',
             'id' => (string) $this->id,
             'attributes' => [
-                'rating' => $this->rating,
-                'comment' => $this->comment,
-                'createdAt' => $this->created_at,
-            ],
-            'includes' => (object) [
-                'cleaner' => CleanerResource::make($this->reviewable),
-                'client' => ClientResource::make($this->user->client),
+                'name' => 'John Doe',
+                'phone' => '+962791234567',
+                'email' => 'email@example.com',
+                'avatar' => "https://ui-avatars.com/api/?name=John+Doe",
+                'status' => 'active',
             ],
         ];
     }
