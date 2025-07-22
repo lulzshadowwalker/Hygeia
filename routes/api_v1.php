@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\V1\CleanerController;
 use App\Http\Controllers\Api\V1\FaqController;
 use App\Http\Controllers\Api\V1\FavoriteCleanerController;
 use App\Http\Controllers\Api\V1\LoginController;
@@ -11,6 +12,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/auth/login', [LoginController::class, 'login'])
     ->name('api.v1.auth.login');
+
+Route::get('/cleaners', [CleanerController::class, 'index'])
+    ->name('api.v1.cleaner.index');
+Route::get('/cleaners/{cleaner}', [CleanerController::class, 'show'])
+    ->name('api.v1.cleaner.show');
 
 Route::get('/faqs', [FaqController::class, 'index'])
     ->name('api.v1.faq.index');
