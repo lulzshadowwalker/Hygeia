@@ -17,6 +17,9 @@ class CleanerReviewController extends Controller
 
     public function show(Cleaner $cleaner, Review $review)
     {
+        if (!$cleaner->reviews->contains($review)) {
+            abort(404, 'Review not found for the specified cleaner.');
+        }
         return ReviewResource::make($review);
     }
 
