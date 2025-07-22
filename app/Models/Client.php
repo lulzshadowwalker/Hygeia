@@ -37,6 +37,7 @@ class Client extends Model
         return $this->belongsTo(User::class);
     }
 
+    //  TODO: This should be depracated .. since favorites is a polymorphic relationship
     public function favoriteCleaners()
     {
         return $this->belongsToMany(Cleaner::class, 'client_favorite_cleaners')
