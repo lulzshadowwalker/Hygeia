@@ -38,4 +38,9 @@ class Favorite extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function favoriteable(): BelongsTo
+    {
+        return $this->morphTo();
+    }
 }

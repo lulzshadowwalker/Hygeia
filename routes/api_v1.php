@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\LoginController;
 use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\SupportTicketController;
 use App\Http\Controllers\Api\V1\PageController;
+use App\Http\Controllers\Api\V1\CleanerReviewController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/auth/login', [LoginController::class, 'login'])
@@ -29,6 +30,16 @@ Route::get('/support-tickets/{supportTicket}', [SupportTicketController::class, 
     ->name('api.v1.support-tickets.show');
 Route::post('/support-tickets', [SupportTicketController::class, 'store'])
     ->name('api.v1.support-tickets.store');
+
+Route::get('/cleaners/{cleaner}/reviews', [CleanerReviewController::class, 'index'])
+    ->middleware('auth:sanctum')
+    ->name('api.v1.cleaners.reviews.index');
+Route::get('/cleaners/{cleaner}/reviews/{review}', [CleanerReviewController::class, 'show'])
+    ->middleware('auth:sanctum')
+    ->name('api.v1.cleaners.reviews.show');
+Route::post('/cleaners/{cleaner}/reviews', [CleanerReviewController::class, 'store'])
+    ->middleware('auth:sanctum')
+    ->name('api.v1.cleaners.reviews.store');
 
 Route::post('/cleaners/{cleaner}/favorites', [FavoriteCleanerController::class, 'store'])
     ->middleware('auth:sanctum')
