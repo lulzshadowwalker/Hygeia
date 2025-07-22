@@ -8,10 +8,14 @@ use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\SupportTicketController;
 use App\Http\Controllers\Api\V1\PageController;
 use App\Http\Controllers\Api\V1\CleanerReviewController;
+use App\Http\Controllers\Api\V1\UserPreferenceController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/auth/login', [LoginController::class, 'login'])
     ->name('api.v1.auth.login');
+
+Route::get('/me/preferences', [UserPreferenceController::class, 'index'])->middleware('auth:sanctum')->name('api.v1.profile.preferences.index');
+Route::patch('/me/preferences', [UserPreferenceController::class, 'update'])->middleware('auth:sanctum')->name('api.v1.profile.preferences.update');
 
 Route::get('/cleaners', [CleanerController::class, 'index'])
     ->name('api.v1.cleaner.index');
