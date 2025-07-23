@@ -19,6 +19,7 @@ class AuthTokenResource extends JsonResource
             'id' => $this->accessToken,
             'attributes' => [
                 'token' => $this->accessToken,
+                'role' => $this->role->value,
             ],
         ];
     }
