@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\SupportTicketController;
 use App\Http\Controllers\Api\V1\PageController;
 use App\Http\Controllers\Api\V1\CleanerReviewController;
+use App\Http\Controllers\Api\V1\DistrictController;
 use App\Http\Controllers\Api\V1\UserPreferenceController;
 use App\Http\Controllers\Api\V1\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -79,3 +80,8 @@ Route::delete('/notifications/{notification}', [NotificationController::class, '
 Route::delete('/notifications', [NotificationController::class, 'destroyAll'])
     ->middleware('auth:sanctum')
     ->name('api.v1.notifications.destroy.all');
+
+Route::get('/districts', [DistrictController::class, 'index'])
+    ->name('api.v1.districts.index');
+Route::get('/districts/{district}', [DistrictController::class, 'show'])
+    ->name('api.v1.districts.show');

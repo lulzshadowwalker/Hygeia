@@ -4,8 +4,10 @@ namespace Database\Seeders;
 
 use App\Enums\Role;
 use App\Enums\UserStatus;
+use App\Models\City;
 use App\Models\Cleaner;
 use App\Models\Client;
+use App\Models\District;
 use App\Models\Faq;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -73,5 +75,6 @@ class DatabaseSeeder extends Seeder
             ->assignRole(Role::Cleaner->value);
 
         Faq::factory()->count(7)->create();
+        City::factory()->count(5)->has(District::factory()->count(3))->create();
     }
 }
