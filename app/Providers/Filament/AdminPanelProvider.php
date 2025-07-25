@@ -56,14 +56,14 @@ class AdminPanelProvider extends PanelProvider
                     ->group('Monitor')
                     ->visible(fn(): bool => !app()->environment('testing') && app()->environment(['local', 'staging']) && Auth::user()->isAdmin),
 
-                // NavigationItem::make('pulse')
-                //     ->label('Pulse')
-                //     ->badge(fn(): string => '●')
-                //     ->badgeTooltip('Pulse provides real-time insights into your application\'s performance and health.')
-                //     ->url(fn(): string => route('pulse'), shouldOpenInNewTab: true)
-                //     ->icon('heroicon-o-heart')
-                //     ->group('Monitor')
-                //     ->visible(fn(): bool => !app()->environment('testing') && Auth::user()->isAdmin),
+                NavigationItem::make('pulse')
+                    ->label('Pulse')
+                    ->badge(fn(): string => '●')
+                    ->badgeTooltip('Pulse provides real-time insights into your application\'s performance and health.')
+                    ->url(fn(): string => route('pulse'), shouldOpenInNewTab: true)
+                    ->icon('heroicon-o-heart')
+                    ->group('Monitor')
+                    ->visible(fn(): bool => !app()->environment('testing') && Auth::user()->isAdmin),
 
                 // NavigationItem::make('horizon')
                 //     ->label('Horizon')
