@@ -6,6 +6,8 @@ namespace App\Models;
 
 use App\Enums\Role;
 use App\Enums\UserStatus;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -20,7 +22,7 @@ use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Notifications\Notification;
 
-class User extends Authenticatable implements HasMedia
+class User extends Authenticatable implements HasMedia, FilamentUser
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, HasApiTokens, InteractsWithMedia, HasRoles;
@@ -147,5 +149,10 @@ class User extends Authenticatable implements HasMedia
     public function routeNotificationForPush(Notification $notification): array
     {
         return $this->deviceTokens->pluck("token")->toArray();
+    }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return $this->isAdmin;
     }
 }
