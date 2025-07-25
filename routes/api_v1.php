@@ -19,6 +19,7 @@ Route::post('/auth/login', [LoginController::class, 'store'])
     ->name('api.v1.auth.login');
 
 Route::post('/auth/logout', [LogoutController::class, 'store'])
+    ->middleware('auth:sanctum')
     ->name('api.v1.auth.logout');
 
 Route::post('/auth/register/client', [RegisterClientController::class, 'store'])
