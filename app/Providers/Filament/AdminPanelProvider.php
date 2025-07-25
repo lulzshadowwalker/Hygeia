@@ -65,14 +65,14 @@ class AdminPanelProvider extends PanelProvider
                     ->group('Monitor')
                     ->visible(fn(): bool => !app()->environment('testing') && Auth::user()->isAdmin),
 
-                // NavigationItem::make('horizon')
-                //     ->label('Horizon')
-                //     ->badge(fn(): string => '●')
-                //     ->badgeTooltip('Horizon gives you a simple way to manage and monitor background tasks.')
-                //     ->url(fn(): string => route('horizon.index'), shouldOpenInNewTab: true)
-                //     ->icon('heroicon-o-lifebuoy')
-                //     ->group('Monitor')
-                //     ->visible(fn(): bool => !app()->environment('testing') && Auth::user()->isAdmin),
+                NavigationItem::make('horizon')
+                    ->label('Horizon')
+                    ->badge(fn(): string => '●')
+                    ->badgeTooltip('Horizon gives you a simple way to manage and monitor background tasks.')
+                    ->url(fn(): string => route('horizon.index'), shouldOpenInNewTab: true)
+                    ->icon('heroicon-o-lifebuoy')
+                    ->group('Monitor')
+                    ->visible(fn(): bool => !app()->environment('testing') && Auth::user()->isAdmin),
             ])
             ->middleware([
                 EncryptCookies::class,
