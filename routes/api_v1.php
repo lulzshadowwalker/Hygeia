@@ -11,10 +11,14 @@ use App\Http\Controllers\Api\V1\CleanerReviewController;
 use App\Http\Controllers\Api\V1\DistrictController;
 use App\Http\Controllers\Api\V1\UserPreferenceController;
 use App\Http\Controllers\Api\V1\ProfileController;
+use App\Http\Controllers\Api\V1\RegisterClientController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/auth/login', [LoginController::class, 'login'])
     ->name('api.v1.auth.login');
+
+Route::post('/auth/register/client', [RegisterClientController::class, 'store'])
+    ->name('api.v1.auth.register.client');
 
 Route::get('/me/preferences', [UserPreferenceController::class, 'index'])->middleware('auth:sanctum')->name('api.v1.profile.preferences.index');
 Route::patch('/me/preferences', [UserPreferenceController::class, 'update'])->middleware('auth:sanctum')->name('api.v1.profile.preferences.update');

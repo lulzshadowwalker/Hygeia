@@ -32,6 +32,7 @@ class User extends Authenticatable implements HasMedia
      */
     protected $fillable = [
         'name',
+        'username',
         'email',
         'password',
         'status',
@@ -108,11 +109,11 @@ class User extends Authenticatable implements HasMedia
 
     const MEDIA_COLLECTION_AVATAR = 'avatar';
 
-    public function registerMediaConversions(?Media $media = null): void
+    public function registerMediaCollections(): void
     {
         $name = Str::replace(" ", "+", $this->name);
 
-        $this->registerMediaCollection(self::MEDIA_COLLECTION_AVATAR)
+        $this->addMediaCollection(self::MEDIA_COLLECTION_AVATAR)
             ->singleFile()
             ->useFallbackUrl("https://ui-avatars.com/api/?name={$name}");
     }
