@@ -15,7 +15,7 @@ class PushNotificationTest extends TestCase
 
     public function test_it_renders_the_page(): void
     {
-        $this->get(route('filament.dashboard.pages.push-notification'))
+        $this->get(route('filament.admin.pages.push-notification'))
             ->assertOk();
     }
 

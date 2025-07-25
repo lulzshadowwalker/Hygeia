@@ -16,7 +16,7 @@ class TermsAndConditionsTest extends TestCase
 
     public function test_it_renders_the_page(): void
     {
-        $this->get(route('filament.panel.pages.terms-and-conditions'))
+        $this->get(route('filament.admin.pages.terms-and-conditions'))
             ->assertOk();
     }
 
@@ -32,4 +32,3 @@ class TermsAndConditionsTest extends TestCase
         $this->assertEquals('Test Content', $page->content);
     }
 }
-
