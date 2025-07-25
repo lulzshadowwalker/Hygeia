@@ -9,6 +9,7 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Exceptions\PostTooLargeException;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -36,6 +37,10 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions): void {
         if (!request()->is('api/*')) return;
         if (config('app.debug')) return;
+
+        $exceptions->render(function (HttpResponseException $exception, Request $request) {
+            return $exception->getResponse();
+        });
 
         $exceptions->render(function (AuthenticationException $exception, Request $request) {
             $builder = new JsonResponseBuilder();
