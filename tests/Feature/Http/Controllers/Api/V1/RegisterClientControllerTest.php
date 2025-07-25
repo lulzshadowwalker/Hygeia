@@ -66,7 +66,7 @@ class RegisterClientControllerTest extends TestCase
 
         $response->assertStatus(201);
 
-        $user = User::first();
+        $user = User::where('email', 'john@example.com')->first();
         $this->assertNotNull($user->deviceTokens()->where('token', $deviceToken)->first());
     }
 
