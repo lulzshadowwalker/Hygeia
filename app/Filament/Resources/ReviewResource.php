@@ -63,7 +63,7 @@ class ReviewResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('comment')
                     ->limit(50)
-                    ->tooltip(fn (string $state): string => $state)
+                    ->tooltip(fn(string $state): string => $state)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -98,6 +98,7 @@ class ReviewResource extends Resource
     {
         return [
             'index' => Pages\ListReviews::route('/'),
+            'edit' => Pages\EditReview::route('/{record}/edit'),
         ];
     }
 
