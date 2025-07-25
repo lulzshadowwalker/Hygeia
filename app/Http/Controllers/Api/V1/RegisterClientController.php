@@ -27,6 +27,10 @@ class RegisterClientController extends Controller
                     ->toMediaCollection(User::MEDIA_COLLECTION_AVATAR);
             }
 
+            if ($deviceToken = $request->deviceToken()) {
+                $user->deviceTokens()->firstOrCreate(['token' => $deviceToken]);
+            }
+
             $user->assignRole(Role::Client->value);
             $user->client()->create();
 

@@ -23,6 +23,7 @@ class StoreRegisterClientRequest extends BaseFormRequest
             'data.attributes.email' => ['required', 'email', 'max:255', new UniqueEmailRule()],
             'data.attributes.password' => 'required|string|min:8',
             'data.attributes.avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:4048',
+            'data.relationships.deviceTokens.data.attributes.token' => 'nullable|string',
         ];
     }
 
@@ -61,5 +62,10 @@ class StoreRegisterClientRequest extends BaseFormRequest
     public function avatar()
     {
         return $this->file('data.attributes.avatar');
+    }
+
+    public function deviceToken(): ?string
+    {
+        return $this->input('data.relationships.deviceTokens.data.attributes.token');
     }
 }

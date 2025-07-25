@@ -40,6 +40,36 @@ class RegisterClientControllerTest extends TestCase
         $this->assertFileExists($user->avatarFile?->getPath() ?? '');
     }
 
+    public function test_client_can_send_device_token_in_registration()
+    {
+        $deviceToken = 'example-device-token';
+        $response = $this->postJson(route('api.v1.auth.register.client'), [
+            'data' => [
+                'attributes' => [
+                    'name' => 'John Doe',
+                    'username' => 'username',
+                    'email' => 'john@example.com',
+                    'password' => 'password',
+                ],
+                'relationships' => [
+                    'deviceTokens' => [
+                        'data' => [
+                            'type' => 'device_tokens',
+                            'attributes' => [
+                                'token' => $deviceToken,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $response->assertStatus(201);
+
+        $user = User::where('email', 'john@example.com')->first();
+        $this->assertNotNull($user->deviceTokens()->where('token', $deviceToken)->first());
+    }
+
     public function test_client_cannot_register_with_invalid_data()
     {
         $response = $this->postJson(route('api.v1.auth.register.client'), [
