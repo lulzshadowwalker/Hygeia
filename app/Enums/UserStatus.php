@@ -2,9 +2,11 @@
 
 namespace App\Enums;
 
-//  TODO: Add Filament's HasColor, HasIcon, and HasLabel interfaces to this enum
+use Filament\Support\Contracts\HasColor;
+use Filament\Support\Contracts\HasIcon;
+use Filament\Support\Contracts\HasLabel;
 
-enum UserStatus: string
+enum UserStatus: string implements HasLabel, HasColor, HasIcon
 {
     case Active = 'active';
     case Banned = 'banned';
@@ -12,14 +14,6 @@ enum UserStatus: string
     public static function values(): array
     {
         return array_column(self::cases(), 'value');
-    }
-
-    public function color(): string
-    {
-        return match ($this) {
-            self::Active => 'success',
-            self::Banned => 'danger',
-        };
     }
 
     public function label(): string
@@ -30,7 +24,20 @@ enum UserStatus: string
         };
     }
 
-    public function icon(): string
+    public function getLabel(): string|null
+    {
+        return $this->label();
+    }
+
+    public function getColor(): string | array | null
+    {
+        return match ($this) {
+            self::Active => 'success',
+            self::Banned => 'danger',
+        };
+    }
+
+    public function getIcon(): ?string
     {
         return match ($this) {
             self::Active => 'heroicon-o-check-circle',
