@@ -13,8 +13,9 @@ class LogoutController extends ApiController
             $request->user()->deviceTokens()->whereToken($deviceToken)?->delete();
         }
 
-        $request->user()->currentAccessToken()?->delete();
-
+        if (method_exists($request->user()->currentAccessToken(), 'delete')) {
+            $request->user()->currentAccessToken()?->delete();
+        }
         return $this->response->message('Logged out successfully')->build(200);
     }
 }
