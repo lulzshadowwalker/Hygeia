@@ -14,7 +14,7 @@ class LogoutControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_it_logsout()
+    public function test_it_logs_out()
     {
         $user = User::factory()->has(DeviceToken::factory())->create();
         $this->actingAs($user);
