@@ -13,6 +13,7 @@
         "filament/spatie-laravel-media-library-plugin": "^3.2",
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.0",
+        "laravel/telescope": "^5.10",
         "laravel/tinker": "^2.10.1",
         "outerweb/filament-translatable-fields": "^2.1",
         "propaganistas/laravel-phone": "^6.0",
