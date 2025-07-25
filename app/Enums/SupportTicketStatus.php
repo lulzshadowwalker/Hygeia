@@ -2,7 +2,11 @@
 
 namespace App\Enums;
 
-enum SupportTicketStatus: string
+use Filament\Support\Contracts\HasColor;
+use Filament\Support\Contracts\HasIcon;
+use Filament\Support\Contracts\HasLabel;
+
+enum SupportTicketStatus: string implements HasLabel, HasColor, HasIcon
 {
     case Open = 'open';
     case InProgress = 'in-progress';
@@ -13,30 +17,35 @@ enum SupportTicketStatus: string
         return array_column(self::cases(), 'value');
     }
 
-    // public function color(): string
-    // {
-    //     return match ($this) {
-    //         self::OPEN => 'info',
-    //         self::IN_PROGRESS => 'warning',
-    //         self::RESOLVED => 'success',
-    //     };
-    // }
+    public function label(): string
+    {
+        return match ($this) {
+            self::Open => 'Open',
+            self::InProgress => 'In Progress',
+            self::Resolved => 'Resolved',
+        };
+    }
 
-    // public function label(): string
-    // {
-    //     return match ($this) {
-    //         self::OPEN => __('enums.support-ticket-status.open'),
-    //         self::IN_PROGRESS => __('enums.support-ticket-status.in-progress'),
-    //         self::RESOLVED => __('enums.support-ticket-status.resolved'),
-    //     };
-    // }
+    public function getLabel(): ?string
+    {
+        return $this->label();
+    }
 
-    // public function icon(): string
-    // {
-    //     return match ($this) {
-    //         self::OPEN => 'far-folder-open',
-    //         self::IN_PROGRESS => 'fas-arrows-rotate',
-    //         self::RESOLVED => 'far-folder',
-    //     };
-    // }
+    public function getColor(): string | array | null
+    {
+        return match ($this) {
+            self::Open => 'info',
+            self::InProgress => 'warning',
+            self::Resolved => 'success',
+        };
+    }
+
+    public function getIcon(): ?string
+    {
+        return match ($this) {
+            self::Open => 'far-folder-open',
+            self::InProgress => 'fas-arrows-rotate',
+            self::Resolved => 'far-folder',
+        };
+    }
 }
