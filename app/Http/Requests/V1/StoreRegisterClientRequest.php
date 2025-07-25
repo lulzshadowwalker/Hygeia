@@ -19,23 +19,8 @@ class StoreRegisterClientRequest extends BaseFormRequest
     {
         return [
             'data.attributes.name' => 'required|string|max:255',
-
-            // 'data.attributes.username' => 'required|string|max:255|unique:users,username',
-            // 'data.attributes.email' => 'required|email|max:255|unique:users,email',
-
-            'data.attributes.username' => [
-                'required',
-                'string',
-                'max:255',
-                'unique:users,username',
-                new UniqueUsernameRule(),
-            ],
-            'data.attributes.email' => [
-                'required',
-                'email',
-                'max:255',
-                new UniqueEmailRule(),
-            ],
+            'data.attributes.username' => ['required', 'string', 'max:255', 'unique:users,username', new UniqueUsernameRule()],
+            'data.attributes.email' => ['required', 'email', 'max:255', new UniqueEmailRule()],
             'data.attributes.password' => 'required|string|min:8',
             'data.attributes.avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:4048',
         ];
@@ -44,7 +29,6 @@ class StoreRegisterClientRequest extends BaseFormRequest
     public function messages(): array
     {
         return [
-
             'data.attributes.name.required' => 'The name field is required.',
             'data.attributes.username.required' => 'The username field is required.',
             'data.attributes.email.required' => 'The email field is required.',
