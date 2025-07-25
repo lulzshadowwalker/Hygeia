@@ -4,9 +4,9 @@ namespace Tests\Traits;
 
 use Database\Seeders\PageSeeder;
 
-trait WithPage
+trait WithPages
 {
-    public function setUpWithPage(): void
+    public function setUpWithPages(): void
     {
         $this->seed(PageSeeder::class);
     }
