@@ -36,7 +36,7 @@ class UserNotificationStrategy implements NotificationStrategy
                         ],
                     ]);
 
-                if ($response->ok()) return;
+                if ($response->ok()) continue;
 
                 Log::error('Failed to send notification', [
                     'status' => $response->status(),
