@@ -10,7 +10,7 @@ use App\Support\AccessToken;
 
 class LoginController extends Controller
 {
-    public function login(LoginRequest $request)
+    public function store(LoginRequest $request)
     {
         $identifier = $request->identifier();
         $password = $request->password();

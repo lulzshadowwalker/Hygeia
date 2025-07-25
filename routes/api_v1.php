@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\V1\CleanerController;
 use App\Http\Controllers\Api\V1\FaqController;
 use App\Http\Controllers\Api\V1\FavoriteCleanerController;
 use App\Http\Controllers\Api\V1\LoginController;
+use App\Http\Controllers\Api\V1\LogoutController;
 use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\SupportTicketController;
 use App\Http\Controllers\Api\V1\PageController;
@@ -14,8 +15,12 @@ use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\Api\V1\RegisterClientController;
 use Illuminate\Support\Facades\Route;
 
-Route::post('/auth/login', [LoginController::class, 'login'])
+Route::post('/auth/login', [LoginController::class, 'store'])
     ->name('api.v1.auth.login');
+
+Route::post('/auth/logout', [LogoutController::class, 'store'])
+    ->middleware('auth:sanctum')
+    ->name('api.v1.auth.logout');
 
 Route::post('/auth/register/client', [RegisterClientController::class, 'store'])
     ->name('api.v1.auth.register.client');
@@ -23,7 +28,6 @@ Route::post('/auth/register/client', [RegisterClientController::class, 'store'])
 Route::get('/me/preferences', [UserPreferenceController::class, 'index'])->middleware('auth:sanctum')->name('api.v1.profile.preferences.index');
 Route::patch('/me/preferences', [UserPreferenceController::class, 'update'])->middleware('auth:sanctum')->name('api.v1.profile.preferences.update');
 Route::get('/me', [ProfileController::class, 'index'])->middleware('auth:sanctum')->name('api.v1.profile.index');
-
 
 Route::get('/cleaners', [CleanerController::class, 'index'])
     ->name('api.v1.cleaner.index');
