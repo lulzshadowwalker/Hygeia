@@ -62,7 +62,36 @@ class RegisterClientControllerTest extends TestCase
             ]);
     }
 
-    public function test_client_cannot_register_with_existing_email_and_username()
+    public function test_client_cannot_register_with_existing_email()
+    {
+        $user = User::factory()->create();
+
+        $response = $this->postJson(route('api.v1.auth.register.client'), [
+            'data' => [
+                'attributes' => [
+                    'name' => 'Jane Doe',
+                    'username' => 'jane_doe',
+                    'email' => $user->email,
+                    'password' => 'password',
+                ],
+            ],
+        ], ['Accept-Language' => 'hu']);
+
+        $response->assertStatus(409)
+            ->assertJson([
+                'errors' => [
+                    [
+                        'status' => '409',
+                        'code' => 'Conflict',
+                        'title' => 'Email already exists',
+                        'detail' => 'An account with this email address already exists',
+                        'indicator' => 'EMAIL_ALREADY_EXISTS',
+                    ],
+                ],
+            ]);
+    }
+
+    public function test_client_cannot_register_with_existing_username()
     {
         $user = User::factory()->create();
 
@@ -71,16 +100,23 @@ class RegisterClientControllerTest extends TestCase
                 'attributes' => [
                     'name' => 'Jane Doe',
                     'username' => $user->username,
-                    'email' => $user->email,
+                    'email' => 'jane@example.com',
                     'password' => 'password',
                 ],
             ],
-        ], ['Accept-Language' => 'hu']);
+        ]);
 
-        $response->assertStatus(422)
-            ->assertJsonValidationErrors([
-                'data.attributes.email',
-                'data.attributes.username'
+        $response->assertStatus(409)
+            ->assertJson([
+                'errors' => [
+                    [
+                        'status' => '409',
+                        'code' => 'Conflict',
+                        'title' => 'Username already exists',
+                        'detail' => 'This username is already taken',
+                        'indicator' => 'USERNAME_ALREADY_EXISTS',
+                    ],
+                ],
             ]);
     }
 }

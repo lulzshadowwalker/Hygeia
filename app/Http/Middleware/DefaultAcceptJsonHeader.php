@@ -15,7 +15,10 @@ class DefaultAcceptJsonHeader
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (! $request->headers->has('Accept')) {
+        if (
+            ! $request->headers->has('Accept') ||
+            $request->header('Accept') === '*/*'
+        ) {
             $request->headers->set('Accept', 'application/json');
         }
 
