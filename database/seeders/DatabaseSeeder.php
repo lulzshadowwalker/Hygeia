@@ -9,6 +9,7 @@ use App\Models\Cleaner;
 use App\Models\Client;
 use App\Models\District;
 use App\Models\Faq;
+use App\Models\Review;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -76,5 +77,7 @@ class DatabaseSeeder extends Seeder
 
         Faq::factory()->count(7)->create();
         City::factory()->count(5)->has(District::factory()->count(3))->create();
+
+        Review::factory()->count(10)->create();
     }
 }
