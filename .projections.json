@@ -1,0 +1,17 @@
+{
+    "app/*.php": {
+        "type": "source",
+        "alternate": [
+            "tests/Unit/{}Test.php",
+            "tests/Feature/{}Test.php"
+        ]
+    },
+    "tests/Feature/*Test.php": {
+        "type": "test",
+        "alternate": "app/{}.php"
+    },
+    "tests/Unit/*Test.php": {
+        "type": "test",
+        "alternate": "app/{}.php"
+    }
+}
