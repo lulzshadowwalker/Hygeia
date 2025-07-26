@@ -37,7 +37,7 @@ return [
 
     'firebase' => [
         'base_url' => env('FIREBASE_BASE_URL', 'https://fcm.googleapis.com/v1/projects/'),
-        'service_file' => env('FIREBASE_SERVICE_FILE', storage_path('../firebase/dev.json')),
+        'service_file' => storage_path('../' . env('FIREBASE_SERVICE_FILE', '../firebase/dev.json')),
         'project_id' => env('FIREBASE_PROJECT_ID'),
         'messaging' => [],
     ],
