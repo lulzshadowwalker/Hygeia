@@ -8,6 +8,7 @@ use App\Enums\Role;
 use App\Enums\UserStatus;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -77,6 +78,27 @@ class User extends Authenticatable implements HasMedia, FilamentUser
     public function isAdmin(): Attribute
     {
         return Attribute::get(fn(): bool => $this->hasRole(Role::Admin->value));
+    }
+
+    public function scopeClients(Builder $query): Builder
+    {
+        return $query->whereHas('roles', function (Builder $query) {
+            $query->where('name', Role::Client->value);
+        });
+    }
+
+    public function scopeCleaners(Builder $query): Builder
+    {
+        return $query->whereHas('roles', function (Builder $query) {
+            $query->where('name', Role::Cleaner->value);
+        });
+    }
+
+    public function scopeAdmins(Builder $query): Builder
+    {
+        return $query->whereHas('roles', function (Builder $query) {
+            $query->where('name', Role::Admin->value);
+        });
     }
 
     public function client(): HasOne
