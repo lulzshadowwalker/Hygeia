@@ -17,6 +17,7 @@ class LoginRequest extends BaseFormRequest
             //  NOTE: Could be either email or username
             'data.attributes.identifier' => 'required|string|max:255',
             'data.attributes.password' => 'required|string|min:8|max:255',
+            'data.relationships.deviceTokens.data.attributes.token' => 'nullable|string',
         ];
     }
 
@@ -37,5 +38,10 @@ class LoginRequest extends BaseFormRequest
     public function password(): string
     {
         return $this->input('data.attributes.password');
+    }
+
+    public function deviceToken(): ?string
+    {
+        return $this->input('data.relationships.deviceTokens.data.attributes.token');
     }
 }

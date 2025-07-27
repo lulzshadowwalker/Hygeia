@@ -38,6 +38,45 @@ class LoginControllerTest extends TestCase
             ]);
     }
 
+    public function test_user_can_send_device_token_with_login_request()
+    {
+        $user = User::factory()->create([
+            'username' => 'username',
+            'password' => bcrypt('password'),
+        ]);
+
+        $response = $this->postJson(route('api.v1.auth.login'), [
+            'data' => [
+                'attributes' => [
+                    'identifier' => 'username',
+                    'password' => 'password',
+                ],
+                'relationships' => [
+                    'deviceTokens' => [
+                        'data' => [
+                            'attributes' => [
+                                'token' => 'example-device-token',
+                            ],
+                        ]
+                    ]
+                ],
+            ],
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'data' => [
+                    'type',
+                    'id',
+                    'attributes' => [
+                        'token',
+                    ],
+                ],
+            ]);
+
+        $this->assertNotNull($user->deviceTokens()->where('token', 'example-device-token')->first());
+    }
+
     public function test_user_can_login_with_email_and_password()
     {
         User::factory()->create([
