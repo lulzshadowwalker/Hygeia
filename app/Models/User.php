@@ -11,6 +11,7 @@ use Filament\Panel;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -176,5 +177,23 @@ class User extends Authenticatable implements HasMedia, FilamentUser
     public function canAccessPanel(Panel $panel): bool
     {
         return $this->isAdmin;
+    }
+
+    //  NOTE: this method is unused, but notice how nicely it is implemented ..
+    // public function createdChatRooms(): HasMany
+    // {
+    //     return $this->hasMany(ChatRoom::class, 'created_by');
+    // }
+
+    public function chatRooms(): BelongsToMany
+    {
+        return $this->belongsToMany(ChatRoom::class, 'chat_room_participants')
+            ->withPivot(columns: ['last_seen_at'])
+            ->withTimestamps();
+    }
+
+    public function messages(): HasMany
+    {
+        return $this->hasMany(Message::class);
     }
 }
