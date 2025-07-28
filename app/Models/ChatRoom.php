@@ -17,10 +17,7 @@ class ChatRoom extends Model
 
     public function name(): Attribute
     {
-        return Attribute::get(function (): string {
-            //  TODO: Localization
-            return 'Support';
-        });
+        return Attribute::get(fn(): string => __('chat.support'));
     }
 
     public function participants(): BelongsToMany
