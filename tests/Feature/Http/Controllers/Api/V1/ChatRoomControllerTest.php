@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Http\Controllers\Api\V1;
 
+use App\Enums\ChatRoomRole;
 use App\Enums\Role;
 use App\Models\ChatRoom;
 use App\Models\Client;
@@ -27,7 +28,7 @@ class ChatRoomControllerTest extends TestCase
 
         // Create additional chat room for this user
         $anotherChatRoom = ChatRoom::factory()->create();
-        $anotherChatRoom->addParticipant($this->client);
+        $anotherChatRoom->addParticipant($this->client, ChatRoomRole::Member);
 
         $expectedChatRooms = $this->client->chatRooms()
             ->with(['latestMessage.user', 'participants'])
@@ -93,7 +94,7 @@ class ChatRoomControllerTest extends TestCase
                                     'type',
                                     'id',
                                     'attributes' => [
-                                        'name'
+                                        'name',
                                     ]
                                 ]
                             ]
@@ -231,7 +232,8 @@ class ChatRoomControllerTest extends TestCase
         // Assert user is no longer a participant
         $this->assertDatabaseMissing('chat_room_participants', [
             'chat_room_id' => $this->chatRoom->id,
-            'user_id' => $this->client->id
+            'user_id' => $this->client->id,
+            'role' => ChatRoomRole::Member->value
         ]);
     }
 
@@ -249,20 +251,90 @@ class ChatRoomControllerTest extends TestCase
             ]);
     }
 
-    public function test_it_returns_reverb_configuration(): void
+    public function test_it_returns_existing_support_chat_room(): void
     {
+        // Create an admin user
+        $admin = User::factory()->create();
+        $admin->assignRole(Role::Admin->value);
+
+        // Create a support chat room with admin participant
+        $supportChatRoom = ChatRoom::factory()->create([
+            'name' => 'Support',
+            'description' => 'Support chat room'
+        ]);
+        $supportChatRoom->addParticipant($admin, ChatRoomRole::Admin);
+
         $this->actingAs($this->client);
 
-        $response = $this->getJson(route('api.v1.chat.reverb-config'));
+        $response = $this->getJson(route('api.v1.chat.rooms.support'));
 
         $response->assertStatus(Response::HTTP_OK)
             ->assertJsonStructure([
-                'reverb' => [
-                    'key',
-                    'host',
-                    'port',
-                    'scheme'
+                'data' => [
+                    'type',
+                    'id',
+                    'attributes' => [
+                        'name',
+                        'created_at',
+                        'updated_at',
+                    ],
+                    'relationships' => [
+                        'participants'
+                    ]
+                ]
+            ])
+            ->assertJson([
+                'data' => [
+                    'id' => $supportChatRoom->id,
+                    'type' => 'chat_room',
+                    'attributes' => [
+                        'name' => 'Support'
+                    ]
                 ]
             ]);
+    }
+
+    public function test_it_creates_support_chat_room_when_none_exists(): void
+    {
+        $this->actingAs($this->client);
+
+        // Ensure no support chat room with admin participants exists initially
+        $supportChatRoomsWithAdmins = ChatRoom::whereHas('participants', function ($query) {
+            $query->where('role', ChatRoomRole::Admin);
+        })->count();
+        
+        $this->assertEquals(0, $supportChatRoomsWithAdmins);
+
+        $response = $this->getJson(route('api.v1.chat.rooms.support'));
+
+        $response->assertStatus(Response::HTTP_OK)
+            ->assertJsonStructure([
+                'data' => [
+                    'type',
+                    'id',
+                    'attributes' => [
+                        'name',
+                        'created_at',
+                        'updated_at',
+                    ],
+                    'relationships' => [
+                        'participants'
+                    ]
+                ]
+            ])
+            ->assertJson([
+                'data' => [
+                    'type' => 'chat_room',
+                    'attributes' => [
+                        'name' => 'Support'
+                    ]
+                ]
+            ]);
+
+        // Assert the support chat room was created in database
+        $this->assertDatabaseHas('chat_rooms', [
+            'name' => 'Support',
+            'description' => 'Support chat room'
+        ]);
     }
 }

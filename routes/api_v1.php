@@ -103,6 +103,9 @@ Route::get('/chat/rooms', [ChatRoomController::class, 'index'])
 Route::post('/chat/rooms', action: [ChatRoomController::class, 'store'])
     ->middleware('auth:sanctum')
     ->name('api.v1.chat.rooms.store');
+Route::get('/chat/rooms/support', [ChatRoomController::class, 'support'])
+    ->middleware('auth:sanctum')
+    ->name('api.v1.chat.rooms.support');
 Route::get('/chat/rooms/{chatRoom}', action: [ChatRoomController::class, 'show'])
     ->middleware('auth:sanctum')
     ->name('api.v1.chat.rooms.show');

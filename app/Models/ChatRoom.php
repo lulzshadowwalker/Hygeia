@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ChatRoomRole;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -24,7 +25,7 @@ class ChatRoom extends Model
     public function participants(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'chat_room_participants')
-            ->withPivot(['last_seen_at'])
+            ->withPivot(['role', 'last_seen_at'])
             ->withTimestamps();
     }
 
@@ -49,9 +50,9 @@ class ChatRoom extends Model
     }
 
     //  TODO: Refactor this to use an Action class instead
-    public function addParticipant(User $user): void
+    public function addParticipant(User $user, ChatRoomRole $role): void
     {
-        $this->participants()->attach($user->id);
+        $this->participants()->attach($user->id, ['role' => $role->value]);
     }
 
     //  TODO: Refactor this to use an Action class instead

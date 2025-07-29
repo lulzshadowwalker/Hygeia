@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Enums\ChatRoomRole;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\ChatRoomResource;
 use App\Models\ChatRoom;
@@ -66,7 +67,8 @@ class ChatRoomController extends Controller
             'created_by' => $user->id,
         ]);
 
-        $chatRoom->participants()->attach($participantIds);
+        // TODO: This should be moved into an action class with unit testing
+        $chatRoom->participants()->attach($participantIds, ['role' => $user->isAdmin ? ChatRoomRole::Admin : ChatRoomRole::Member]);
         $chatRoom->load('participants');
 
         return response()->json([
@@ -74,6 +76,25 @@ class ChatRoomController extends Controller
         ], 201);
     }
 
+    // Todo: Remove name and description from chat room model
+    public function support() 
+    {
+        // get or create chat room with name "Support" and description "Support chat room"
+        $chatRoom = ChatRoom::whereHas('participants', function ($query) {
+            $query->where('role', ChatRoomRole::Admin);
+        })->first();
+
+        if (!$chatRoom) {
+            $chatRoom = ChatRoom::create([
+                'name' => 'Support',
+                'description' => 'Support chat room'
+            ]);
+        }
+
+        return response()->json([
+            'data' => new ChatRoomResource($chatRoom)
+        ]);
+    }
 
     public function join(Request $request, ChatRoom $chatRoom)
     {
@@ -83,7 +104,7 @@ class ChatRoomController extends Controller
             return response()->json(['message' => 'User is already a participant'], 200);
         }
 
-        $chatRoom->participants()->attach($user->id);
+        $chatRoom->participants()->attach($user->id, ['role' => $user->isAdmin ? ChatRoomRole::Admin : ChatRoomRole::Member]);
         $chatRoom->load('participants');
 
         return response()->json([

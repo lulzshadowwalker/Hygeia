@@ -23,6 +23,8 @@ class ChatRoomResource extends JsonResource
                 'updatedAt' => $this->updated_at,
             ],
             'relationships' => [
+                // TODO: We might want to either make the participants return a collection of both cleaners and clients
+                // and on the frontend we can rely on the type of the resource.
                 'participants' => UserResource::collection($this->whenLoaded('participants')),
                 'latestMessage' => MessageResource::make($this->whenLoaded('latestMessage')),
             ],
