@@ -15,12 +15,11 @@ class ChatRoom extends Model
     /** @use HasFactory<\Database\Factories\ChatRoomFactory> */
     use HasFactory;
 
-    protected $fillable = [];
-
-    public function name(): Attribute
-    {
-        return Attribute::get(fn(): string => __('chat.support'));
-    }
+    protected $fillable = [
+        'name',
+        'description',
+        'created_by'
+    ];
 
     public function participants(): BelongsToMany
     {

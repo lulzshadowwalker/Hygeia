@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\Api\V1\ChatController;
+use App\Http\Controllers\Api\V1\ChatMessageController;
+use App\Http\Controllers\Api\V1\ChatRoomController;
 use App\Http\Controllers\Api\V1\CleanerController;
 use App\Http\Controllers\Api\V1\FaqController;
 use App\Http\Controllers\Api\V1\FavoriteCleanerController;
@@ -93,3 +96,28 @@ Route::get('/districts', [DistrictController::class, 'index'])
     ->name('api.v1.districts.index');
 Route::get('/districts/{district}', [DistrictController::class, 'show'])
     ->name('api.v1.districts.show');
+
+Route::get('/chat/rooms', [ChatRoomController::class, 'index'])
+    ->middleware('auth:sanctum')
+    ->name('api.v1.chat.rooms.index');
+Route::post('/chat/rooms', action: [ChatRoomController::class, 'store'])
+    ->middleware('auth:sanctum')
+    ->name('api.v1.chat.rooms.store');
+Route::get('/chat/rooms/{chatRoom}', action: [ChatRoomController::class, 'show'])
+    ->middleware('auth:sanctum')
+    ->name('api.v1.chat.rooms.show');
+Route::post('/chat/rooms/{chatRoom}/join', [ChatRoomController::class, 'join'])
+    ->middleware('auth:sanctum')
+    ->name('api.v1.chat.rooms.join');
+Route::delete('/chat/rooms/{chatRoom}/leave', [ChatRoomController::class, 'leave'])
+    ->middleware('auth:sanctum')
+    ->name('api.v1.chat.rooms.leave');
+Route::get('/chat/rooms/{chatRoom}/messages', [ChatMessageController::class, 'index'])
+    ->middleware('auth:sanctum')
+    ->name('api.v1.chat.rooms.messages.index');
+Route::post('/chat/rooms/{chatRoom}/messages', [ChatMessageController::class, 'store'])
+    ->middleware('auth:sanctum')
+    ->name('api.v1.chat.rooms.messages.store');
+Route::get('/chat/reverb-config', [ChatController::class, 'getReverbConfig'])
+    ->middleware('auth:sanctum')
+    ->name('api.v1.chat.reverb-config');
