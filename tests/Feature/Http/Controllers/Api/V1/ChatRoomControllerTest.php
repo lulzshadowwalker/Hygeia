@@ -247,6 +247,7 @@ class ChatRoomControllerTest extends TestCase
     public function test_it_returns_existing_support_chat_room(): void
     {
         $client = Client::factory()->create();
+        $client->user->assignRole(Role::Client->value);
 
         // Create a support chat room with client participant
         $supportChatRoom = ChatRoom::factory()->create([

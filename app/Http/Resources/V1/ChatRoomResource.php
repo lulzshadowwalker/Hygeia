@@ -29,7 +29,7 @@ class ChatRoomResource extends JsonResource
                 'latestMessage' =>
                 $this->when(
                     $this->messages->isNotEmpty(),
-                    fn() => new MessageResource($this->messages->first())
+                    fn() => MessageResource::make($this->messages->first())
                 )
             ]
         ];

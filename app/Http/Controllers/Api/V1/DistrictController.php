@@ -16,6 +16,6 @@ class DistrictController extends Controller
 
     public function show(District $district)
     {
-        return new DistrictResource($district);
+        return DistrictResource::make($district);
     }
 }

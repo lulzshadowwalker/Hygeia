@@ -25,7 +25,7 @@ class MessageResource extends JsonResource
                 'updatedAt' => $this->updated_at,
             ],
             'relationships' => [
-                'sender' =>  new ParticipantResource($this->user),
+                'sender' =>  ParticipantResource::make($this->user),
             ]
         ];
     }

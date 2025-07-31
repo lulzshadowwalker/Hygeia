@@ -63,8 +63,6 @@ class ChatMessageController extends Controller
 
         MessageSent::dispatch($message);
 
-        return response()->json([
-            'data' => new MessageResource($message)
-        ], 201);
+        return MessageResource::make($message);
     }
 }

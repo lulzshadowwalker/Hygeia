@@ -33,7 +33,7 @@ class ChatRoomController extends ApiController
             $query->latest()->limit(1);
         }]);
 
-        return new ChatRoomResource($chatRoom);
+        return ChatRoomResource::make($chatRoom);
     }
 
     public function store(StoreChatRoomRequest $request)
@@ -55,21 +55,21 @@ class ChatRoomController extends ApiController
         $chatRoom->participants()->attach($participants);
         $chatRoom->load('participants');
 
-        return new ChatRoomResource($chatRoom);
+        return ChatRoomResource::make($chatRoom);
     }
 
     public function support()
     {
         $chatRoom = auth()->user()->chatRooms()
             ->where('type', ChatRoomType::Support)
-            ->with(['participants', 'messages' => function ($query) {
-                $query->latest()->limit(1);
-            }])
-            ->firstOrCreate();
+            ->with(['participants', 'messages' => fn($query) => $query->latest()->limit(1)])
+            ->firstOr(function () {
+                $chatRoom = ChatRoom::create(['type' => ChatRoomType::Support]);
+                $chatRoom->addParticipant(auth()->user());
+                return $chatRoom;
+            });
 
-        return ChatRoomResource::make($chatRoom)
-            ->response()
-            ->setStatusCode(200);
+        return ChatRoomResource::make($chatRoom);
     }
 
     public function join(Request $request, ChatRoom $chatRoom)
@@ -81,7 +81,9 @@ class ChatRoomController extends ApiController
         $chatRoom->participants()->attach(auth()->user()->id);
         $chatRoom->load('participants');
 
-        return (new ChatRoomResource($chatRoom))->response()->setStatusCode(200);
+        return ChatRoomResource::make($chatRoom)
+            ->response()
+            ->setStatusCode(200);
     }
 
     public function leave(ChatRoom $chatRoom)

@@ -16,9 +16,9 @@ class ParticipantResource extends JsonResource
     public function toArray(Request $request): array
     {
         $resource = match (true) {
-            $this->resource->isAdmin => new AdminResource($this->resource),
-            $this->resource->isClient => new ClientResource($this->resource),
-            $this->resource->isCleaner => new CleanerResource($this->resource),
+            $this->resource->isAdmin => AdminResource::make($this->resource),
+            $this->resource->isClient => ClientResource::make($this->resource),
+            $this->resource->isCleaner => CleanerResource::make($this->resource),
             default => throw new InvalidArgumentException('Invalid user type')
         };
 
