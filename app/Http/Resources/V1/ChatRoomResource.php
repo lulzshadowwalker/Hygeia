@@ -26,10 +26,9 @@ class ChatRoomResource extends JsonResource
                     fn() =>
                     ParticipantResource::collection($this->participants)
                 ),
-                'latestMessage' =>
-                $this->when(
-                    $this->messages->isNotEmpty(),
-                    fn() => MessageResource::make($this->messages->first())
+                'latestMessage' => $this->whenLoaded(
+                    'messages',
+                    fn() => $this->messages->isNotEmpty() ? MessageResource::make($this->messages->first()) : null
                 )
             ]
         ];

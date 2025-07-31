@@ -66,6 +66,8 @@ class ChatRoomController extends ApiController
                 return $chatRoom;
             });
 
+        $chatRoom->load('participants', 'messages');
+
         return ChatRoomResource::make($chatRoom)->response()->setStatusCode(200);
     }
 
