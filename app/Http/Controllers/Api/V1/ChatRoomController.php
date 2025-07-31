@@ -69,7 +69,7 @@ class ChatRoomController extends ApiController
                 return $chatRoom;
             });
 
-        return ChatRoomResource::make($chatRoom);
+        return ChatRoomResource::make($chatRoom)->response()->setStatusCode(200);
     }
 
     public function join(Request $request, ChatRoom $chatRoom)

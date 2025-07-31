@@ -188,7 +188,6 @@ class User extends Authenticatable implements HasMedia, FilamentUser
     public function chatRooms(): BelongsToMany
     {
         return $this->belongsToMany(ChatRoom::class, 'chat_room_participants')
-            ->withPivot(columns: ['last_seen_at'])
             ->withTimestamps();
     }
 

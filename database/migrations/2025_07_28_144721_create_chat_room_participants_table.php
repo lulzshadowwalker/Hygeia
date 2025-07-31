@@ -17,9 +17,6 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(ChatRoom::class)->constrained()->onDelete('cascade');
             $table->foreignIdFor(User::class)->constrained()->onDelete('restrict');
-
-            // TODO: Make sure we update the last seen at
-            $table->timestamp('last_seen_at')->nullable();
             $table->timestamps();
 
             $table->unique(['chat_room_id', 'user_id']);
