@@ -288,6 +288,7 @@ class ChatRoomControllerTest extends TestCase
     public function test_it_creates_support_chat_room_when_none_exists(): void
     {
         $client = Client::factory()->create();
+        $client->user->assignRole(Role::Client->value);
 
         $this->actingAs($client->user);
 
