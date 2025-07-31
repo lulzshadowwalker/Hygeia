@@ -3,20 +3,18 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\V1\ReverbConfig;
 use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
 
 class ChatController extends Controller
 {
-    public function getReverbConfig(Request $request): JsonResponse
+    public function getReverbConfig(Request $request)
     {
-        return response()->json([
-            'reverb' => [
-                'key' => config('reverb.key'),
-                'host' => config('reverb.host'),
-                'port' => config('reverb.port'),
-                'scheme' => config('reverb.scheme'),
-            ]
+        return ReverbConfig::make((object) [
+            'key' => config('reverb.key'),
+            'host' => config('reverb.host'),
+            'port' => config('reverb.port'),
+            'scheme' => config('reverb.scheme'),
         ]);
     }
 }

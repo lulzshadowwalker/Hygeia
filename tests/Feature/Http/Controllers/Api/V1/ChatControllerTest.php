@@ -25,11 +25,14 @@ class ChatControllerTest extends TestCase
 
         $response->assertStatus(Response::HTTP_OK)
             ->assertJsonStructure([
-                'reverb' => [
-                    'key',
-                    'host',
-                    'port',
-                    'scheme'
+                'data' => [
+                    'type',
+                    'attributes' => [
+                        'key',
+                        'host',
+                        'port',
+                        'scheme'
+                    ],
                 ]
             ]);
     }
