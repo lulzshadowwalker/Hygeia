@@ -2,7 +2,6 @@
 
 namespace Tests\Traits;
 
-use App\Enums\ChatRoomRole;
 use App\Enums\Role;
 use App\Models\ChatRoom;
 use App\Models\Client;
@@ -31,8 +30,8 @@ trait WithChat
 
         // Create a chat room with both participants
         $this->chatRoom = ChatRoom::factory()->create();
-        $this->chatRoom->addParticipant($this->client, ChatRoomRole::Member);
-        $this->chatRoom->addParticipant($this->admin, ChatRoomRole::Member);
+        $this->chatRoom->addParticipant($this->client);
+        $this->chatRoom->addParticipant($this->admin);
     }
 
     protected function createMessageForChatRoom(ChatRoom $chatRoom, User $user, string $content = 'Test message'): Message
@@ -50,7 +49,7 @@ trait WithChat
         $chatRoom = ChatRoom::factory()->create();
 
         foreach ($users as $user) {
-            $chatRoom->addParticipant($user, ChatRoomRole::Member);
+            $chatRoom->addParticipant($user);
         }
 
         return $chatRoom;

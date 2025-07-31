@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Http\Controllers\Api\V1;
 
-use App\Enums\ChatRoomRole;
+use App\Enums\ChatRoomType;
 use App\Enums\Role;
 use App\Models\ChatRoom;
 use App\Models\Client;
@@ -28,11 +28,11 @@ class ChatRoomControllerTest extends TestCase
 
         // Create additional chat room for this user
         $anotherChatRoom = ChatRoom::factory()->create();
-        $anotherChatRoom->addParticipant($this->client, ChatRoomRole::Member);
+        $anotherChatRoom->addParticipant($this->client);
 
         $expectedChatRooms = $this->client->chatRooms()
             ->with(['latestMessage.user', 'participants'])
-            ->orderBy('updated_at', 'desc')
+            ->orderBy('updatedAt', 'desc')
             ->get();
 
         $response = $this->getJson(route('api.v1.chat.rooms.index'));
@@ -44,9 +44,9 @@ class ChatRoomControllerTest extends TestCase
                         'type',
                         'id',
                         'attributes' => [
-                            'name',
-                            'created_at',
-                            'updated_at',
+                            'type',
+                            'createdAt',
+                            'updatedAt',
                         ],
                         'relationships' => [
                             'participants',
@@ -83,20 +83,15 @@ class ChatRoomControllerTest extends TestCase
                     'type',
                     'id',
                     'attributes' => [
-                        'name',
-                        'created_at',
-                        'updated_at',
+                        'type',
+                        'createdAt',
+                        'updatedAt',
                     ],
                     'relationships' => [
                         'participants' => [
-                            'data' => [
-                                '*' => [
-                                    'type',
-                                    'id',
-                                    'attributes' => [
-                                        'name',
-                                    ]
-                                ]
+                            '*' => [
+                                'id',
+                                'type',
                             ]
                         ]
                     ]
@@ -105,7 +100,7 @@ class ChatRoomControllerTest extends TestCase
             ->assertJson([
                 'data' => [
                     'id' => $this->chatRoom->id,
-                    'type' => 'chat_room',
+                    'type' => 'chat-room',
                 ]
             ]);
     }
@@ -120,7 +115,7 @@ class ChatRoomControllerTest extends TestCase
 
         $response->assertStatus(Response::HTTP_FORBIDDEN)
             ->assertJson([
-                'message' => 'Access denied'
+                'message' => 'You are not a participant of this chat room.'
             ]);
     }
 
@@ -132,9 +127,18 @@ class ChatRoomControllerTest extends TestCase
         $otherUser->assignRole(Role::Client->value);
 
         $chatRoomData = [
-            'name' => 'Test Chat Room',
-            'description' => 'Test description',
-            'participant_ids' => [$this->client->id, $otherUser->id]
+            'data' => [
+                'relationships' => [
+                    'participants' => [
+                        [
+                            'id' => $otherUser->id
+                        ],
+                        [
+                            'id' => $this->client->id
+                        ],
+                    ]
+                ]
+            ]
         ];
 
         $response = $this->postJson(route('api.v1.chat.rooms.store'), $chatRoomData);
@@ -145,9 +149,9 @@ class ChatRoomControllerTest extends TestCase
                     'type',
                     'id',
                     'attributes' => [
-                        'name',
-                        'created_at',
-                        'updated_at',
+                        'type',
+                        'createdAt',
+                        'updatedAt',
                     ],
                     'relationships' => [
                         'participants'
@@ -158,8 +162,8 @@ class ChatRoomControllerTest extends TestCase
         // Assert the chat room was created in database
         $chatRoomId = $response->json('data.id');
         $this->assertDatabaseHas('chat_rooms', [
+            'type' => ChatRoomType::Standard->value,
             'id' => $chatRoomId,
-            'name' => 'Test Chat Room'
         ]);
 
         // Assert the user is a participant
@@ -179,20 +183,16 @@ class ChatRoomControllerTest extends TestCase
 
         $response->assertStatus(Response::HTTP_OK)
             ->assertJsonStructure([
-                'message',
                 'data' => [
                     'type',
                     'id',
                     'attributes' => [
-                        'name',
+                        'type',
                     ],
                     'relationships' => [
                         'participants'
                     ]
                 ]
-            ])
-            ->assertJson([
-                'message' => 'Successfully joined chat room'
             ]);
 
         // Assert user is now a participant
@@ -208,10 +208,7 @@ class ChatRoomControllerTest extends TestCase
 
         $response = $this->postJson(route('api.v1.chat.rooms.join', ['chatRoom' => $this->chatRoom]));
 
-        $response->assertStatus(Response::HTTP_OK)
-            ->assertJson([
-                'message' => 'User is already a participant'
-            ]);
+        $response->assertStatus(Response::HTTP_CONFLICT);
 
         // Assert user is still a participant (no duplicates)
         $participantCount = $this->chatRoom->participants()->where('user_id', $this->client->id)->count();
@@ -224,16 +221,12 @@ class ChatRoomControllerTest extends TestCase
 
         $response = $this->deleteJson(route('api.v1.chat.rooms.leave', ['chatRoom' => $this->chatRoom]));
 
-        $response->assertStatus(Response::HTTP_OK)
-            ->assertJson([
-                'message' => 'Successfully left chat room'
-            ]);
+        $response->assertStatus(Response::HTTP_NO_CONTENT);
 
         // Assert user is no longer a participant
         $this->assertDatabaseMissing('chat_room_participants', [
             'chat_room_id' => $this->chatRoom->id,
             'user_id' => $this->client->id,
-            'role' => ChatRoomRole::Member->value
         ]);
     }
 
@@ -253,18 +246,15 @@ class ChatRoomControllerTest extends TestCase
 
     public function test_it_returns_existing_support_chat_room(): void
     {
-        // Create an admin user
-        $admin = User::factory()->create();
-        $admin->assignRole(Role::Admin->value);
+        $client = Client::factory()->create();
 
-        // Create a support chat room with admin participant
+        // Create a support chat room with client participant
         $supportChatRoom = ChatRoom::factory()->create([
-            'name' => 'Support',
-            'description' => 'Support chat room'
+            'type' => ChatRoomType::Support->value,
         ]);
-        $supportChatRoom->addParticipant($admin, ChatRoomRole::Admin);
+        $supportChatRoom->addParticipant($client->user);
 
-        $this->actingAs($this->client);
+        $this->actingAs($client->user);
 
         $response = $this->getJson(route('api.v1.chat.rooms.support'));
 
@@ -274,9 +264,9 @@ class ChatRoomControllerTest extends TestCase
                     'type',
                     'id',
                     'attributes' => [
-                        'name',
-                        'created_at',
-                        'updated_at',
+                        'type',
+                        'createdAt',
+                        'updatedAt',
                     ],
                     'relationships' => [
                         'participants'
@@ -285,10 +275,10 @@ class ChatRoomControllerTest extends TestCase
             ])
             ->assertJson([
                 'data' => [
-                    'id' => $supportChatRoom->id,
-                    'type' => 'chat_room',
+                    'id' => (string) $supportChatRoom->id,
+                    'type' => 'chat-room',
                     'attributes' => [
-                        'name' => 'Support'
+                        'type' => 'support'
                     ]
                 ]
             ]);
@@ -296,14 +286,9 @@ class ChatRoomControllerTest extends TestCase
 
     public function test_it_creates_support_chat_room_when_none_exists(): void
     {
-        $this->actingAs($this->client);
+        $client = Client::factory()->create();
 
-        // Ensure no support chat room with admin participants exists initially
-        $supportChatRoomsWithAdmins = ChatRoom::whereHas('participants', function ($query) {
-            $query->where('role', ChatRoomRole::Admin);
-        })->count();
-        
-        $this->assertEquals(0, $supportChatRoomsWithAdmins);
+        $this->actingAs($client->user);
 
         $response = $this->getJson(route('api.v1.chat.rooms.support'));
 
@@ -313,9 +298,9 @@ class ChatRoomControllerTest extends TestCase
                     'type',
                     'id',
                     'attributes' => [
-                        'name',
-                        'created_at',
-                        'updated_at',
+                        'type',
+                        'createdAt',
+                        'updatedAt',
                     ],
                     'relationships' => [
                         'participants'
@@ -324,17 +309,20 @@ class ChatRoomControllerTest extends TestCase
             ])
             ->assertJson([
                 'data' => [
-                    'type' => 'chat_room',
+                    'type' => 'chat-room',
                     'attributes' => [
-                        'name' => 'Support'
+                        'type' => 'support',
                     ]
                 ]
             ]);
 
         // Assert the support chat room was created in database
         $this->assertDatabaseHas('chat_rooms', [
-            'name' => 'Support',
-            'description' => 'Support chat room'
+            'type' => ChatRoomType::Support->value,
+        ]);
+        $this->assertDatabaseHas('chat_room_participants', [
+            'chat_room_id' => $response->json('data.id'),
+            'user_id' => $client->user->id
         ]);
     }
 }

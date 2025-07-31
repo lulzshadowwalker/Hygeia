@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Enums\ChatRoomRole;
 use App\Enums\Role;
 use App\Models\ChatRoom;
 use App\Models\Message;
@@ -28,8 +27,8 @@ class ChatSeeder extends Seeder
 
         // Create a chat room between client and admin
         $supportRoom = ChatRoom::create();
-        $supportRoom->addParticipant($client, ChatRoomRole::Member);
-        $supportRoom->addParticipant($admin, ChatRoomRole::Admin);
+        $supportRoom->addParticipant($client);
+        $supportRoom->addParticipant($admin);
 
         // Add some sample messages
         Message::create([
@@ -55,8 +54,8 @@ class ChatSeeder extends Seeder
 
         // Create a chat room between client and cleaner
         $serviceRoom = ChatRoom::create();
-        $serviceRoom->addParticipant($client, ChatRoomRole::Member);
-        $serviceRoom->addParticipant($cleaner, ChatRoomRole::Member);
+        $serviceRoom->addParticipant($client);
+        $serviceRoom->addParticipant($cleaner);
 
         Message::create([
             'chat_room_id' => $serviceRoom->id,
@@ -74,7 +73,7 @@ class ChatSeeder extends Seeder
 
         // Create an empty room for testing
         $emptyRoom = ChatRoom::create();
-        $emptyRoom->addParticipant($admin, ChatRoomRole::Admin);
+        $emptyRoom->addParticipant($admin);
 
         $this->command->info('Chat rooms and messages created successfully!');
         $this->command->info("Support Room ID: {$supportRoom->id}");

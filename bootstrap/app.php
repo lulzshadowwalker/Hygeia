@@ -14,6 +14,7 @@ use Illuminate\Http\Exceptions\PostTooLargeException;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Response;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -82,6 +83,16 @@ return Application::configure(basePath: dirname(__DIR__))
                 title: 'Not Found',
                 detail: 'The requested resource could not be found.',
                 code: Response::HTTP_NOT_FOUND,
+            );
+            return $builder->build();
+        });
+
+        $exceptions->render(function (AccessDeniedHttpException $exception, Request $request) {
+            $builder = new JsonResponseBuilder();
+            $builder->error(
+                title: 'Forbidden',
+                detail: $exception->getMessage() ?: 'Access to this resource is forbidden.',
+                code: Response::HTTP_FORBIDDEN,
             );
             return $builder->build();
         });

@@ -68,6 +68,6 @@ class JsonResponseBuilder implements ResponseBuilder
     public function build(int $code = Response::HTTP_OK): \Illuminate\Http\JsonResponse
     {
         $response = $this->errors ? ['errors' => $this->errors] : $this->data;
-        return response()->json($response, $this->statusCode);
+        return response()->json($response, $code);
     }
 }

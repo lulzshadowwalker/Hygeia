@@ -9,8 +9,6 @@ class ChatRoomResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
      */
     public function toArray(Request $request): array
     {
@@ -18,16 +16,22 @@ class ChatRoomResource extends JsonResource
             'type' => 'chat-room',
             'id' => (string) $this->id,
             'attributes' => [
-                'name' => $this->name,
+                'type' => $this->type->value,
                 'createdAt' => $this->created_at,
                 'updatedAt' => $this->updated_at,
             ],
-            'relationships' => [
-                // TODO: We might want to either make the participants return a collection of both cleaners and clients
-                // and on the frontend we can rely on the type of the resource.
-                'participants' => UserResource::collection($this->whenLoaded('participants')),
-                'latestMessage' => MessageResource::make($this->whenLoaded('latestMessage')),
-            ],
+            'relationships' => (object) [
+                'participants' => $this->whenLoaded(
+                    'participants',
+                    fn() =>
+                    ParticipantResource::collection($this->participants)
+                ),
+                'latestMessage' =>
+                $this->when(
+                    $this->messages->isNotEmpty(),
+                    fn() => new MessageResource($this->messages->first())
+                )
+            ]
         ];
     }
 }

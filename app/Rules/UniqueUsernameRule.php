@@ -21,7 +21,7 @@ class UniqueUsernameRule implements ValidationRule
                         detail: 'This username is already taken',
                         code: Response::HTTP_CONFLICT,
                         indicator: 'USERNAME_ALREADY_EXISTS'
-                    )->build()
+                    )->build(Response::HTTP_CONFLICT)
             );
         }
     }

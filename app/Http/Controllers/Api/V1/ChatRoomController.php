@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Enums\ChatRoomRole;
-use App\Http\Controllers\Controller;
-use App\Http\Resources\Api\V1\ChatRoomResource;
+use App\Enums\ChatRoomType;
+use App\Http\Controllers\Api\ApiController;
+use App\Http\Requests\V1\StoreChatRoomRequest;
+use App\Http\Resources\V1\ChatRoomResource;
 use App\Models\ChatRoom;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
-class ChatRoomController extends Controller
+class ChatRoomController extends ApiController
 {
-    public function index(Request $request)
+    public function index()
     {
-        $user = $request->user();
-        $chatRooms = $user->chatRooms()->with(['participants', 'messages' => function ($query) {
+        $chatRooms = auth()->user()->chatRooms()->with(['participants', 'messages' => function ($query) {
             $query->latest()->limit(1);
         }])->orderBy('updated_at', 'desc')->get();
 
@@ -23,106 +23,75 @@ class ChatRoomController extends Controller
         ]);
     }
 
-    public function show(Request $request, ChatRoom $chatRoom)
+    public function show(ChatRoom $chatRoom)
     {
-        $user = $request->user();
-
-        if (!$chatRoom->participants->contains($user)) {
-            return response()->json(['message' => 'Access denied'], 403);
+        if (!$chatRoom->participants->contains(auth()->user())) {
+            throw new AccessDeniedHttpException('You are not a participant of this chat room.');
         }
 
         $chatRoom->load(['participants', 'messages' => function ($query) {
             $query->latest()->limit(1);
         }]);
 
-        return response()->json([
-            'data' => new ChatRoomResource($chatRoom)
-        ]);
+        return new ChatRoomResource($chatRoom);
     }
 
-    public function store(Request $request)
+    public function store(StoreChatRoomRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string|max:1000',
-            'participant_ids' => 'required|array|min:1',
-            'participant_ids.*' => 'exists:users,id',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
         $user = $request->user();
-        $participantIds = $request->participant_ids;
 
-        // Add the creator to the participants
-        if (!in_array($user->id, $participantIds)) {
-            $participantIds[] = $user->id;
+        $participants = $request->participants();
+
+        // Add the creator participant to the participants
+        if (!in_array($user->id, $request->participants())) {
+            $participants[] = $user->id;
         }
 
         $chatRoom = ChatRoom::create([
-            'name' => $request->name,
-            'description' => $request->description,
-            'created_by' => $user->id,
+            'type' => ChatRoomType::Standard,
         ]);
 
         // TODO: This should be moved into an action class with unit testing
-        $chatRoom->participants()->attach($participantIds, ['role' => $user->isAdmin ? ChatRoomRole::Admin : ChatRoomRole::Member]);
+        $chatRoom->participants()->attach($participants);
         $chatRoom->load('participants');
 
-        return response()->json([
-            'data' => new ChatRoomResource($chatRoom)
-        ], 201);
+        return new ChatRoomResource($chatRoom);
     }
 
-    // Todo: Remove name and description from chat room model
-    public function support() 
+    public function support()
     {
-        // get or create chat room with name "Support" and description "Support chat room"
-        $chatRoom = ChatRoom::whereHas('participants', function ($query) {
-            $query->where('role', ChatRoomRole::Admin);
-        })->first();
+        $chatRoom = auth()->user()->chatRooms()
+            ->where('type', ChatRoomType::Support)
+            ->with(['participants', 'messages' => function ($query) {
+                $query->latest()->limit(1);
+            }])
+            ->firstOrCreate();
 
-        if (!$chatRoom) {
-            $chatRoom = ChatRoom::create([
-                'name' => 'Support',
-                'description' => 'Support chat room'
-            ]);
-        }
-
-        return response()->json([
-            'data' => new ChatRoomResource($chatRoom)
-        ]);
+        return ChatRoomResource::make($chatRoom)
+            ->response()
+            ->setStatusCode(200);
     }
 
     public function join(Request $request, ChatRoom $chatRoom)
     {
-        $user = $request->user();
-
-        if ($chatRoom->participants->contains($user)) {
-            return response()->json(['message' => 'User is already a participant'], 200);
+        if ($chatRoom->participants->contains(auth()->user())) {
+            return $this->response->message('User is already a participant')->build(409);
         }
 
-        $chatRoom->participants()->attach($user->id, ['role' => $user->isAdmin ? ChatRoomRole::Admin : ChatRoomRole::Member]);
+        $chatRoom->participants()->attach(auth()->user()->id);
         $chatRoom->load('participants');
 
-        return response()->json([
-            'message' => 'Successfully joined chat room',
-            'data' => new ChatRoomResource($chatRoom)
-        ], 200);
+        return (new ChatRoomResource($chatRoom))->response()->setStatusCode(200);
     }
 
-    public function leave(Request $request, ChatRoom $chatRoom)
+    public function leave(ChatRoom $chatRoom)
     {
-        $user = $request->user();
-
-        if (!$chatRoom->participants->contains($user)) {
+        if (!$chatRoom->participants->contains(auth()->user())) {
             return response()->json(['message' => 'Successfully left chat room'], 200);
         }
 
-        $chatRoom->participants()->detach($user->id);
+        $chatRoom->participants()->detach(auth()->user()->id);
 
-        return response()->json(['message' => 'Successfully left chat room'], 200);
+        return response()->noContent(204);
     }
 }

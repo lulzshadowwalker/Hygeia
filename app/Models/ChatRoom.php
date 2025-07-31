@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Enums\ChatRoomRole;
+use App\Enums\ChatRoomType;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -16,16 +16,19 @@ class ChatRoom extends Model
     /** @use HasFactory<\Database\Factories\ChatRoomFactory> */
     use HasFactory;
 
-    protected $fillable = [
-        'name',
-        'description',
-        'created_by'
-    ];
+    protected $fillable = ['type'];
+
+    protected function casts(): array
+    {
+        return [
+            'type' => ChatRoomType::class,
+        ];
+    }
 
     public function participants(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'chat_room_participants')
-            ->withPivot(['role', 'last_seen_at'])
+            ->withPivot(['last_seen_at'])
             ->withTimestamps();
     }
 
@@ -50,9 +53,9 @@ class ChatRoom extends Model
     }
 
     //  TODO: Refactor this to use an Action class instead
-    public function addParticipant(User $user, ChatRoomRole $role): void
+    public function addParticipant(User $user): void
     {
-        $this->participants()->attach($user->id, ['role' => $role->value]);
+        $this->participants()->attach($user->id);
     }
 
     //  TODO: Refactor this to use an Action class instead

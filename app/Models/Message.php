@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use App\Enums\MessageType;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Auth;
 
 class Message extends Model
 {
@@ -36,5 +38,10 @@ class Message extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function mine(): Attribute
+    {
+        return Attribute::get(fn(): bool => $this->user_id === Auth::id());
     }
 }

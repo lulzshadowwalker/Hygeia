@@ -42,7 +42,7 @@ class ChatMessageControllerTest extends TestCase
                         'attributes' => [
                             'content',
                             'type',
-                            'created_at'
+                            'createdAt'
                         ]
                     ]
                 ],
@@ -60,10 +60,7 @@ class ChatMessageControllerTest extends TestCase
 
         $response = $this->getJson(route('api.v1.chat.rooms.messages.index', ['chatRoom' => $this->chatRoom]));
 
-        $response->assertStatus(Response::HTTP_FORBIDDEN)
-            ->assertJson([
-                'message' => 'Access denied'
-            ]);
+        $response->assertStatus(Response::HTTP_FORBIDDEN);
     }
 
     public function test_it_sends_a_message_to_chat_room(): void
@@ -74,8 +71,12 @@ class ChatMessageControllerTest extends TestCase
         $messageContent = 'Hello, this is a test message!';
 
         $response = $this->postJson(route('api.v1.chat.rooms.messages.store', ['chatRoom' => $this->chatRoom]), [
-            'content' => $messageContent,
-            'type' => 'text'
+            'data' => [
+                'attributes' => [
+                    'content' => $messageContent,
+                    'type' => 'text'
+                ]
+            ]
         ]);
 
         $response->assertStatus(Response::HTTP_CREATED)
@@ -86,7 +87,7 @@ class ChatMessageControllerTest extends TestCase
                     'attributes' => [
                         'content',
                         'type',
-                        'created_at'
+                        'createdAt'
                     ]
                 ]
             ])
@@ -117,12 +118,16 @@ class ChatMessageControllerTest extends TestCase
         $this->actingAs($this->client);
 
         $response = $this->postJson(route('api.v1.chat.rooms.messages.store', ['chatRoom' => $this->chatRoom]), [
-            'content' => '', // Empty content
-            'type' => 'text'
+            'data' => [
+                'attributes' => [
+                    'content' => '', // Empty content
+                    'type' => 'text'
+                ]
+            ]
         ]);
 
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
-            ->assertJsonValidationErrors(['content']);
+            ->assertJsonValidationErrors(['data.attributes.content']);
     }
 
     public function test_it_validates_message_type_when_sending(): void
@@ -130,12 +135,16 @@ class ChatMessageControllerTest extends TestCase
         $this->actingAs($this->client);
 
         $response = $this->postJson(route('api.v1.chat.rooms.messages.store', ['chatRoom' => $this->chatRoom]), [
-            'content' => 'Test message',
-            'type' => 'invalid_type'
+            'data' => [
+                'attributes' => [
+                    'content' => 'Test message',
+                    'type' => 'invalid_type' // Invalid type
+                ]
+            ]
         ]);
 
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
-            ->assertJsonValidationErrors(['type']);
+            ->assertJsonValidationErrors(['data.attributes.type']);
     }
 
     public function test_it_denies_sending_message_to_non_participant(): void
@@ -145,13 +154,14 @@ class ChatMessageControllerTest extends TestCase
         $this->actingAs($nonParticipant);
 
         $response = $this->postJson(route('api.v1.chat.rooms.messages.store', ['chatRoom' => $this->chatRoom]), [
-            'content' => 'Test message',
-            'type' => 'text'
+            'data' => [
+                'attributes' => [
+                    'content' => 'This should not be allowed',
+                    'type' => 'text'
+                ]
+            ]
         ]);
 
-        $response->assertStatus(Response::HTTP_FORBIDDEN)
-            ->assertJson([
-                'message' => 'Access denied'
-            ]);
+        $response->assertStatus(Response::HTTP_FORBIDDEN);
     }
 }

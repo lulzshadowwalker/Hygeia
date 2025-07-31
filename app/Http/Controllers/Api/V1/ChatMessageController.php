@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\Api\V1\MessageResource;
+use App\Http\Requests\V1\StoreChatMessageRequest;
 use App\Models\ChatRoom;
 use Illuminate\Http\Request;
 use App\Events\MessageSent;
@@ -11,15 +11,16 @@ use App\Models\Message;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use App\Enums\MessageType;
+use App\Http\Resources\V1\MessageResource;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class ChatMessageController extends Controller
 {
-    public function index(Request $request, ChatRoom $chatRoom)
+    public function index(ChatRoom $chatRoom)
     {
-        $user = $request->user();
-
-        if (!$chatRoom->participants->contains($user)) {
-            return response()->json(['message' => 'Access denied'], 403);
+        //  TODO: Use policies instead
+        if (!$chatRoom->participants->contains(auth()->user())) {
+            throw new AccessDeniedHttpException('You are not a participant of this chat room.');
         }
 
         $messages = $chatRoom->messages()
@@ -44,41 +45,26 @@ class ChatMessageController extends Controller
         ]);
     }
 
-    public function store(Request $request, ChatRoom $chatRoom)
+    public function store(StoreChatMessageRequest $request, ChatRoom $chatRoom)
     {
-        $user = $request->user();
-
-        if (!$chatRoom->participants->contains($user)) {
-            return response()->json(['message' => 'Access denied'], 403);
-        }
-
-        $validator = Validator::make($request->all(), [
-            'content' => 'required|string|max:10000',
-            'type' => ['required', Rule::in(MessageType::cases())]
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+        // TODO: use policy instead
+        if (!$chatRoom->participants->contains(auth()->user())) {
+            throw new AccessDeniedHttpException('You are not a participant of this chat room.');
         }
 
         $message = Message::create([
             'chat_room_id' => $chatRoom->id,
-            'user_id' => $user->id,
-            'content' => $request->input('content'),
-            'type' => $request->input('type'),
+            'user_id' => auth()->id(),
+            'content' => $request->content(),
+            'type' => $request->type(),
         ]);
-
-        // Touch the chat room to update its updated_at timestamp
-        $chatRoom->touch();
 
         $message->load('user');
 
-        // Dispatch the event
         MessageSent::dispatch($message);
 
         return response()->json([
             'data' => new MessageResource($message)
         ], 201);
     }
-
 }
