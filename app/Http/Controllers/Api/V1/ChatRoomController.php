@@ -8,7 +8,6 @@ use App\Http\Requests\V1\StoreChatRoomRequest;
 use App\Http\Resources\V1\ChatRoomResource;
 use App\Models\ChatRoom;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class ChatRoomController extends ApiController
 {
@@ -25,9 +24,7 @@ class ChatRoomController extends ApiController
 
     public function show(ChatRoom $chatRoom)
     {
-        if (!$chatRoom->participants->contains(auth()->user())) {
-            throw new AccessDeniedHttpException('You are not a participant of this chat room.');
-        }
+        $this->authorize('view', $chatRoom);
 
         $chatRoom->load(['participants', 'messages' => function ($query) {
             $query->latest()->limit(1);
@@ -74,6 +71,8 @@ class ChatRoomController extends ApiController
 
     public function join(Request $request, ChatRoom $chatRoom)
     {
+        $this->authorize('join', $chatRoom);
+
         if ($chatRoom->participants->contains(auth()->user())) {
             return $this->response->message('User is already a participant')->build(409);
         }
@@ -88,6 +87,8 @@ class ChatRoomController extends ApiController
 
     public function leave(ChatRoom $chatRoom)
     {
+        $this->authorize('leave', $chatRoom);
+
         if (!$chatRoom->participants->contains(auth()->user())) {
             return response()->json(['message' => 'Successfully left chat room'], 200);
         }

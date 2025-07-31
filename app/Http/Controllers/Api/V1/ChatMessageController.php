@@ -2,26 +2,18 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\V1\StoreChatMessageRequest;
 use App\Models\ChatRoom;
-use Illuminate\Http\Request;
 use App\Events\MessageSent;
 use App\Models\Message;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
-use App\Enums\MessageType;
 use App\Http\Resources\V1\MessageResource;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
-class ChatMessageController extends Controller
+class ChatMessageController extends ApiController
 {
     public function index(ChatRoom $chatRoom)
     {
-        //  TODO: Use policies instead
-        if (!$chatRoom->participants->contains(auth()->user())) {
-            throw new AccessDeniedHttpException('You are not a participant of this chat room.');
-        }
+        $this->authorize('viewMessages', [Message::class, $chatRoom]);
 
         $messages = $chatRoom->messages()
             ->with('user')
@@ -47,10 +39,7 @@ class ChatMessageController extends Controller
 
     public function store(StoreChatMessageRequest $request, ChatRoom $chatRoom)
     {
-        // TODO: use policy instead
-        if (!$chatRoom->participants->contains(auth()->user())) {
-            throw new AccessDeniedHttpException('You are not a participant of this chat room.');
-        }
+        $this->authorize('sendMessage', [Message::class, $chatRoom]);
 
         $message = Message::create([
             'chat_room_id' => $chatRoom->id,
