@@ -11,7 +11,9 @@ Route::get('/', function () {
 // Admin Support Chat Routes
 Route::middleware(['auth', 'web'])->prefix('admin/support')->name('admin.support.')->group(function () {
     Route::get('/chat', [SupportChatController::class, 'index'])->name('chat.index');
+    Route::get('/chat/main/{chatRoom?}', [SupportChatController::class, 'main'])->name('chat.main');
     Route::get('/chat/{chatRoom}', [SupportChatController::class, 'show'])->name('chat.show');
+    Route::get('/chat/{chatRoom}/content', [SupportChatController::class, 'getChatContent'])->name('chat.content');
     Route::post('/chat/{chatRoom}/messages', [SupportChatController::class, 'sendMessage'])->name('chat.send-message');
     Route::get('/chat/{chatRoom}/messages', [SupportChatController::class, 'getMessages'])->name('chat.get-messages');
     Route::get('/chat-config/reverb', [SupportChatController::class, 'getReverbConfig'])->name('chat.reverb-config');

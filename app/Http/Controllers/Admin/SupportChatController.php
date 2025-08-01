@@ -28,7 +28,21 @@ class SupportChatController extends Controller
             ->orderBy('updated_at', 'desc')
             ->get();
 
-        return view('admin.support.chat.index', compact('supportRooms'));
+        return view('admin.support.chat.main', compact('supportRooms'));
+    }
+
+    public function main(ChatRoom $chatRoom = null)
+    {
+        // Use policy for authorization
+        $this->authorize('viewAny', ChatRoom::class);
+
+        $supportRooms = ChatRoom::where('type', ChatRoomType::Support)
+            ->with(['participants', 'latestMessage.user'])
+            ->withCount('messages')
+            ->orderBy('updated_at', 'desc')
+            ->get();
+
+        return view('admin.support.chat.main', compact('supportRooms'));
     }
 
     public function show(ChatRoom $chatRoom)
@@ -63,6 +77,40 @@ class SupportChatController extends Controller
         ];
 
         return view('admin.support.chat.show', compact('chatRoom', 'messages', 'reverbConfig'));
+    }
+
+    public function getChatContent(ChatRoom $chatRoom)
+    {
+        // Use policy for authorization - this will check if user can view this specific chat room
+        $this->authorize('view', $chatRoom);
+
+        // Ensure this is a support room
+        if ($chatRoom->type !== ChatRoomType::Support) {
+            abort(404);
+        }
+
+        // Add admin to room if not already a participant
+        if (!$chatRoom->isParticipant(Auth::user())) {
+            $chatRoom->addParticipant(Auth::user());
+        }
+
+        $chatRoom->load(['participants']);
+        
+        // Get messages for the view (oldest first for proper chat order)
+        $messages = Message::where('chat_room_id', $chatRoom->id)
+            ->with('user')
+            ->orderBy('created_at', 'asc')
+            ->get();
+        
+        // Get Reverb configuration for real-time features
+        $reverbConfig = [
+            'key' => config('broadcasting.connections.reverb.key'),
+            'host' => config('broadcasting.connections.reverb.options.host'),
+            'port' => config('broadcasting.connections.reverb.options.port'),
+            'scheme' => config('broadcasting.connections.reverb.options.scheme'),
+        ];
+
+        return view('admin.support.chat.content', compact('chatRoom', 'messages', 'reverbConfig'));
     }
 
     public function sendMessage(Request $request, ChatRoom $chatRoom)

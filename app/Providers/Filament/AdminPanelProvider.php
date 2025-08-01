@@ -53,7 +53,7 @@ class AdminPanelProvider extends PanelProvider
                         $query->where('created_at', '>=', now()->subHour());
                     })->count() ?: null)
                     ->badgeTooltip('Manage customer support conversations in real-time.')
-                    ->url(fn(): string => route('admin.support.chat.index'), shouldOpenInNewTab: true)
+                    ->url(fn(): string => route('admin.support.chat.main'), shouldOpenInNewTab: true)
                     ->icon('heroicon-o-chat-bubble-left-right')
                     ->group('Support')
                     ->visible(fn(): bool => Auth::user()->isAdmin),
