@@ -6,6 +6,7 @@ use App\Enums\ChatRoomType;
 use App\Enums\MessageType;
 use App\Events\MessageSent;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\V1\ChatRoomResource;
 use App\Http\Resources\V1\MessageResource;
 use App\Models\ChatRoom;
 use App\Models\Message;
@@ -22,10 +23,11 @@ class SupportChatController extends Controller
         $this->authorize('viewAny', ChatRoom::class);
 
         $supportRooms = ChatRoom::where('type', ChatRoomType::Support)
-            ->with(['participants', 'latestMessage.user'])
+            ->with(['participants', 'messages'])
             ->withCount('messages')
             ->orderBy('updated_at', 'desc')
-            ->get();
+            ->get()
+            ->map(fn ($room) => ChatRoomResource::make($room)->toArray(request()));
 
         return view('admin.support.chat.index', compact('supportRooms'));
     }
@@ -55,10 +57,11 @@ class SupportChatController extends Controller
             ->map(fn ($message) => MessageResource::make($message)->toArray(request()));
 
         $supportRooms = ChatRoom::where('type', ChatRoomType::Support)
-            ->with(['participants', 'latestMessage.user'])
+            ->with(['participants', 'messages'])
             ->withCount('messages')
             ->orderBy('updated_at', 'desc')
-            ->get();
+            ->get()
+            ->map(fn ($room) => ChatRoomResource::make($room)->toArray(request()));
 
         // Get Reverb configuration for real-time features
         $reverbConfig = [
@@ -93,9 +96,6 @@ class SupportChatController extends Controller
         ]);
 
         $message->load('user');
-
-        // Broadcast the message
-        MessageSent::dispatch($message);
 
         return redirect()->back();
     }

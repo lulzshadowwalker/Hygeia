@@ -65,7 +65,7 @@ class ChatMessageControllerTest extends TestCase
 
     public function test_it_sends_a_message_to_chat_room(): void
     {
-        Event::fake();
+        Event::fake(MessageSent::class);
         $this->actingAs($this->client);
 
         $messageContent = 'Hello, this is a test message!';

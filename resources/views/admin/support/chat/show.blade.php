@@ -41,7 +41,7 @@
             </template>
 
             <template x-for="message in messages" :key="message.id">
-                <div class="message-item flex justify-start" :class="{ 'justify-end': message.sender.isAdmin }">
+                <div class="message-item flex" :class="{ 'justify-end': message.sender.isAdmin }">
                     <div
                         class="flex w-max max-w-[75%] flex-col gap-2 rounded-lg px-3 py-2 text-sm bg-muted"
                         :class="{ 'bg-primary text-primary-foreground': message.sender.isAdmin }"
@@ -75,7 +75,7 @@
             init() {
                 this.scroll();
                 const room = '<?= $chatRoom->id ?>';
-                this.initializeChatRoom(room);
+                this.initializeSocket(room);
 
             },
 
@@ -89,17 +89,18 @@
                 })
             },
 
-            initializeChatRoom(roomId) {
+            initializeSocket(roomId) {
                 console.log('Initializing chat room:', roomId);
                 if (window.Echo) {
                     window.Echo.channel(`chat.room.${roomId}`)
-                        .listen('.message.sent', (data) => {
-                            console.log('New message received via Echo:', data);
-                            this.appendMessage(data);
-                        });
-                } else {
-                    console.warn('Echo is not initialized');
+                        .listen(
+                            '.message.sent',
+                            (data) => this.appendMessage(data)
+                        );
+                    return;
                 }
+
+                console.warn('Echo is not initialized');
             }
         }))
     });

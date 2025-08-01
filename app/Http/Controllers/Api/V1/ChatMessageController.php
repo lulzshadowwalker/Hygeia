@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\V1\StoreChatMessageRequest;
 use App\Models\ChatRoom;
 use App\Events\MessageSent;
+use App\Events\SupportChatRoomUpdated;
 use App\Models\Message;
 use App\Http\Resources\V1\MessageResource;
 
@@ -50,7 +51,7 @@ class ChatMessageController extends ApiController
 
         $message->load('user');
 
-        MessageSent::dispatch($message);
+        SupportChatRoomUpdated::dispatch($chatRoom);
 
         return MessageResource::make($message);
     }

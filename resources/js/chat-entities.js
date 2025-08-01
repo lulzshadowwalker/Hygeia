@@ -66,16 +66,22 @@ class ChatEntities {
             return null;
         }
 
-        return {
+        const t =  {
             id: roomResource.id,
             type: roomResource.attributes?.type || 'standard',
             createdAt: roomResource.attributes?.createdAt || null,
             updatedAt: roomResource.attributes?.updatedAt || null,
+            user: roomResource.relationships?.participants ? 
+                this.convertUser(roomResource.relationships.participants[0]) : null,
             participants: roomResource.relationships?.participants ? 
                 roomResource.relationships.participants.map(p => this.convertUser(p)) : [],
             latestMessage: roomResource.relationships?.latestMessage ? 
                 this.convertMessage(roomResource.relationships.latestMessage) : null
         };
+
+        console.log('Converting chat room resource:', t);
+
+        return t;
     }
 
     /**

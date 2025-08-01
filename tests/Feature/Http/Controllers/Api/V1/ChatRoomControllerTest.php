@@ -4,11 +4,14 @@ namespace Tests\Feature\Http\Controllers\Api\V1;
 
 use App\Enums\ChatRoomType;
 use App\Enums\Role;
+use App\Events\SupportChatRoomCreated;
 use App\Models\ChatRoom;
 use App\Models\Client;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use Tests\Traits\WithChat;
 
@@ -326,5 +329,51 @@ class ChatRoomControllerTest extends TestCase
             'chat_room_id' => $response->json('data.id'),
             'user_id' => $client->user->id
         ]);
+    }
+
+    public function test_it_creates_support_chat_room_with_correct_event_dispatch(): void
+    {
+        Event::fake(SupportChatRoomCreated::class);
+
+        $client = Client::factory()->create();
+        $client->user->assignRole(Role::Client->value);
+
+        $this->actingAs($client->user);
+
+        $response = $this->getJson(route('api.v1.chat.rooms.support'));
+
+        $response->assertStatus(Response::HTTP_OK);
+
+        Event::assertDispatched(SupportChatRoomCreated::class, function ($event) use ($response) {
+            return $event->room->id == $response->json('data.id');
+        });
+    }
+
+    // test it does not dispatch event when existing support room is returned
+    public function test_it_does_not_dispatch_event_when_existing_support_room(): void
+    {
+        Event::fake(SupportChatRoomCreated::class);
+
+        $client = Client::factory()->create();
+        $client->user->assignRole(Role::Client->value);
+
+        // Create a support chat room with client participant
+        $supportChatRoom = Model::withoutEvents(function () use ($client) {
+            $supportChatRoom = ChatRoom::factory()->create([
+                'type' => ChatRoomType::Support->value,
+            ]);
+            $supportChatRoom->addParticipant($client->user);
+
+            return $supportChatRoom; 
+        });
+
+        $this->actingAs($client->user);
+
+        $response = $this->getJson(route('api.v1.chat.rooms.support'));
+
+        $response->assertStatus(Response::HTTP_OK);
+
+        Event::assertNotDispatched(SupportChatRoomCreated::class);
+        $this->assertEquals($supportChatRoom->id, $response->json('data.id'));
     }
 }

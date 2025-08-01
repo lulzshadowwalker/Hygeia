@@ -2,21 +2,26 @@
 
 namespace Tests\Unit\Models;
 
+use App\Enums\Role;
+use App\Events\SupportChatRoomUpdated;
 use App\Models\ChatRoom;
 use App\Models\Message;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
+use Tests\Traits\WithRoles;
 
 class MessageTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, WithRoles;
 
     /** @test */
     public function it_touches_chat_room_when_message_is_created()
     {
         // Arrange
         $user = User::factory()->create();
+        $user->assignRole(Role::Client->value);
         $chatRoom = ChatRoom::factory()->create();
         $originalUpdatedAt = $chatRoom->updated_at;
 
@@ -40,6 +45,7 @@ class MessageTest extends TestCase
     {
         // Arrange
         $user = User::factory()->create();
+        $user->assignRole(Role::Client->value);
         $chatRoom = ChatRoom::factory()->create();
         $message = Message::factory()->create([
             'chat_room_id' => $chatRoom->id,
@@ -63,6 +69,7 @@ class MessageTest extends TestCase
     {
         // Arrange
         $user = User::factory()->create();
+        $user->assignRole(Role::Client->value);
         $chatRoom = ChatRoom::factory()->create();
         $message = Message::factory()->create([
             'chat_room_id' => $chatRoom->id,

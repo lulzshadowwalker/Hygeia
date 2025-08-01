@@ -22,30 +22,34 @@
                 </a>
             </header>
 
-            <section class="scrollbar">
+            <section x-data="rooms" class="scrollbar">
                 <div role="group" aria-labelledby="group-label-content-1">
                     <h3 id="group-label-content-1">Conversations</h3>
 
-                    @if ($supportRooms->isEmpty())
-                    <div class="p-8 text-center">
-                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.955 8.955 0 01-4.126-.98L3 20l1.98-5.874A8.955 8.955 0 013 12c0-4.418 3.582-8 8-8s8 3.582 8 8z"></path>
-                        </svg>
-                        <h3 class="mt-2 text-sm font-medium text-gray-900">No conversations</h3>
-                        <p class="mt-1 text-sm text-gray-500">No support conversations are currently active.</p>
-                    </div>
-                    @else
+                    <template x-if="rooms.length === 0">
+                        <div class="p-8 text-center">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.955 8.955 0 01-4.126-.98L3 20l1.98-5.874A8.955 8.955 0 013 12c0-4.418 3.582-8 8-8s8 3.582 8 8z"></path>
+                            </svg>
+                            <h3 class="mt-2 text-sm font-medium text-gray-900">No conversations</h3>
+                            <p class="mt-1 text-sm text-gray-500">No support conversations are currently active.</p>
+                        </div>
+                    </template>
+
                     <ul>
-                        @foreach ($supportRooms as $room)
-                        <li>
-                            <a href="{{ route('admin.support.chat.show', $room->id) }}">
-                                <img class="size-6 shrink-0 object-cover rounded-full" alt="@hunvreus" src="{{ $room->user->avatar }}">
-                                <span>{{ $room->user->name }}</span>
-                            </a>
-                        </li>
-                        @endforeach
+                        <template x-for="room in rooms" :key="room.id">
+                            <template x-if="room.latestMessage">
+                                <li>
+                                    <a :href="`/admin/support/chat/${room.id}`" class="flex items-center gap-2 p-2 hover:bg-gray-200 rounded">
+                                        <img :src="room.user.avatar" alt="" class="size-6 shrink-0 object-cover rounded-full">
+                                        <span x-text="room.user.name"></span>
+                                        <!-- 13 minutes ago -->
+                                        <span class="ms-auto text-xs text-gray-500" x-text="humanReadable(room.latestMessage.createdAt)"></span>
+                                    </a>
+                                </li>
+                            </template>
+                        </template>
                     </ul>
-                    @endif
                 </div>
             </section>
 
@@ -108,8 +112,68 @@
     </aside>
 
     <!-- Chat Area -->
-    <section class="flex-1 flex items-center justify-center bg-gray-100 relative" id="chat-area">
+    <section class="flex-1 flex items-center justify-center bg-gray-100 relative">
         @yield('chat-area')
     </section>
 </div>
+
+<script>
+    function humanReadable(dateString) {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diff = now - date;
+
+        const seconds = Math.floor(diff / 1000);
+        const minutes = Math.floor(seconds / 60);
+        const hours = Math.floor(minutes / 60);
+        const days = Math.floor(hours / 24);
+
+        if (days > 0) return `${days} day${days > 1 ? 's' : ''} ago`;
+        if (hours > 0) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+        if (minutes > 0) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+        return `${seconds} second${seconds > 1 ? 's' : ''} ago`;
+    }
+</script>
+
+<script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('rooms', () => ({
+            rooms: @json($supportRooms).map((room) => ChatEntities.convertChatRoom(room)),
+
+            init() {
+                this.initializeSocket('support');
+            },
+
+            prependRoom(room) {
+                this.rooms.unshift(ChatEntities.convertChatRoom(room));
+            },
+
+            initializeSocket(roomId) {
+                if (!window.Echo) {
+                    console.warn('Echo is not initialized');
+                    return;
+                }
+
+                window.Echo.channel('chat.rooms.support')
+                    .listen('.chat.rooms.support.created', (data) => {
+                        this.prependRoom(data)
+                        toast.info('New support chat room created', {
+                            description: 'A new support chat room has been created.'
+                        })
+                    })
+                    .listen('.chat.rooms.support.updated', (data) => {
+                        const index = this.rooms.findIndex(room => room.id === data.id)
+                        if (index !== -1) {
+                            console.log('Updating room:', data)
+                            this.rooms.splice(index, 1)
+                            this.rooms.unshift(ChatEntities.convertChatRoom(data))
+                            return;
+                        }
+
+                        console.warn('Room not found for update:', data.id);
+                    })
+            }
+        }));
+    });
+</script>
 @endsection
