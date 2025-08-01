@@ -1,10 +1,20 @@
 <?php
 
+use App\Http\Controllers\Admin\SupportChatController;
 use App\Http\Controllers\Web\ChatPlaygroundController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
+});
+
+// Admin Support Chat Routes
+Route::middleware(['auth', 'web'])->prefix('admin/support')->name('admin.support.')->group(function () {
+    Route::get('/chat', [SupportChatController::class, 'index'])->name('chat.index');
+    Route::get('/chat/{chatRoom}', [SupportChatController::class, 'show'])->name('chat.show');
+    Route::post('/chat/{chatRoom}/messages', [SupportChatController::class, 'sendMessage'])->name('chat.send-message');
+    Route::get('/chat/{chatRoom}/messages', [SupportChatController::class, 'getMessages'])->name('chat.get-messages');
+    Route::get('/chat-config/reverb', [SupportChatController::class, 'getReverbConfig'])->name('chat.reverb-config');
 });
 
 // Chat Playground Routes

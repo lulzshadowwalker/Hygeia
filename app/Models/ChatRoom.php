@@ -60,4 +60,18 @@ class ChatRoom extends Model
     {
         $this->participants()->detach($user->id);
     }
+
+    // Scopes
+    public function scopeSupport($query)
+    {
+        return $query->where('type', ChatRoomType::Support);
+    }
+
+    // Accessors & Mutators
+    protected function messagesCount(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->messages()->count(),
+        );
+    }
 }
