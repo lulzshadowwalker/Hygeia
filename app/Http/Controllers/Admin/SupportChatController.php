@@ -10,17 +10,17 @@ use App\Http\Resources\V1\MessageResource;
 use App\Models\ChatRoom;
 use App\Models\Message;
 use App\Models\User;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class SupportChatController extends Controller
 {
+    use AuthorizesRequests;
     public function index()
     {
-        // Check admin access
-        if (!Auth::user()->isAdmin) {
-            abort(403, 'Access denied. Admin privileges required.');
-        }
+        // Use policy for authorization
+        $this->authorize('viewAny', ChatRoom::class);
 
         $supportRooms = ChatRoom::where('type', ChatRoomType::Support)
             ->with(['participants', 'latestMessage.user'])
@@ -33,10 +33,8 @@ class SupportChatController extends Controller
 
     public function show(ChatRoom $chatRoom)
     {
-        // Check admin access
-        if (!Auth::user()->isAdmin) {
-            abort(403, 'Access denied. Admin privileges required.');
-        }
+        // Use policy for authorization - this will check if user can view this specific chat room
+        $this->authorize('view', $chatRoom);
 
         // Ensure this is a support room
         if ($chatRoom->type !== ChatRoomType::Support) {
@@ -69,18 +67,16 @@ class SupportChatController extends Controller
 
     public function sendMessage(Request $request, ChatRoom $chatRoom)
     {
-        // Check admin access
-        if (!Auth::user()->isAdmin) {
-            return response()->json(['error' => 'Access denied'], 403);
-        }
+        // Use policy for authorization - same as API controllers
+        $this->authorize('sendMessage', [Message::class, $chatRoom]);
 
         $request->validate([
             'content' => 'required|string|max:2000',
         ]);
 
-        // Ensure this is a support room and admin is a participant
-        if ($chatRoom->type !== ChatRoomType::Support || !$chatRoom->isParticipant(Auth::user())) {
-            return response()->json(['error' => 'Access denied to this chat room'], 403);
+        // Ensure this is a support room
+        if ($chatRoom->type !== ChatRoomType::Support) {
+            return response()->json(['error' => 'Invalid chat room type'], 403);
         }
 
         $message = Message::create([
@@ -103,13 +99,12 @@ class SupportChatController extends Controller
 
     public function getMessages(ChatRoom $chatRoom)
     {
-        // Check admin access
-        if (!Auth::user()->isAdmin) {
-            return response()->json(['error' => 'Access denied'], 403);
-        }
+        // Use policy for authorization - same as API controllers
+        $this->authorize('viewMessages', [Message::class, $chatRoom]);
 
-        if ($chatRoom->type !== ChatRoomType::Support || !$chatRoom->isParticipant(Auth::user())) {
-            return response()->json(['error' => 'Access denied to this chat room'], 403);
+        // Ensure this is a support room
+        if ($chatRoom->type !== ChatRoomType::Support) {
+            return response()->json(['error' => 'Invalid chat room type'], 403);
         }
 
         $messages = $chatRoom->messages()
@@ -127,7 +122,10 @@ class SupportChatController extends Controller
 
     public function getReverbConfig()
     {
-        // Check admin access
+        // Use policy for authorization - ensure admin access
+        $this->authorize('viewAny', ChatRoom::class);
+        
+        // Additional admin check for config access
         if (!Auth::user()->isAdmin) {
             return response()->json(['error' => 'Access denied'], 403);
         }
