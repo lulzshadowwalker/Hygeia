@@ -1,335 +1,125 @@
-<!-- Chat Content Area -->
-<div class="flex flex-col h-full bg-white">
+<!-- Active Chat View -->
+<div class="flex flex-col h-full bg-white w-full">
     <!-- Chat Header -->
-    <div class="border-b border-gray-200 p-4">
-        <div class="flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 font-semibold">
-                    @if($chatRoom->participants->first())
-                        {{ strtoupper(substr($chatRoom->participants->first()->name, 0, 1)) }}
+    <div class="border-b border-gray-200 p-4 sm:p-6">
+        <div class="flex items-center gap-4">
+            <!-- User Avatar -->
+            <div class="relative">
+                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                    @if($chatRoom->participants->where('isAdmin', '!=', true)->first())
+                        {{ strtoupper(substr($chatRoom->participants->where('isAdmin', '!=', true)->first()->name, 0, 1)) }}
                     @else
-                        ?
+                        C
                     @endif
                 </div>
-                <div>
-                    <h2 class="text-lg font-semibold text-gray-900">Chat Room #{{ $chatRoom->id }}</h2>
-                    <p class="text-sm text-gray-500">{{ $chatRoom->messages_count ?? 0 }} messages</p>
+            </div>
+            
+            <div>
+                <h2 class="text-xl font-bold text-gray-900">
+                    @if($chatRoom->participants->where('isAdmin', '!=', true)->first())
+                        {{ $chatRoom->participants->where('isAdmin', '!=', true)->first()->name }}
+                    @else
+                        Chat Room #{{ $chatRoom->id }}
+                    @endif
+                </h2>
+                <div class="flex items-center gap-3 mt-1">
+                    <p class="text-sm text-gray-500">
+                        {{ $messages->count() }} messages
+                    </p>
                 </div>
             </div>
-            <button type="button" onclick="refreshMessages()" 
-                    class="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                </svg>
-                Refresh
-            </button>
         </div>
     </div>
 
     <!-- Messages Area -->
-    <div class="flex-1 overflow-y-auto p-4" id="messages-container">
-        <div id="messages-list" class="space-y-4">
-            @foreach($messages as $message)
-                <div class="message-item flex items-start space-x-3" data-message-id="{{ $message->id }}">
-                    <!-- User Avatar -->
-                    <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 font-semibold text-sm shrink-0">
-                        {{ strtoupper(substr($message->user->name, 0, 1)) }}
+    <div class="flex-1 overflow-y-auto bg-gray-50 chat-scroll" id="messages-container">
+        <div id="messages-list" class="p-4 sm:p-6 space-y-4 sm:space-y-6">
+            @if($messages->isEmpty())
+                <!-- Empty State -->
+                <div class="text-center py-12">
+                    <div class="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.955 8.955 0 01-4.126-.98L3 20l1.98-5.874A8.955 8.955 0 013 12c0-4.418 3.582-8 8-8s8 3.582 8 8z"></path>
+                        </svg>
                     </div>
-                    
-                    <div class="flex-1 min-w-0">
-                        <div class="flex items-baseline space-x-2">
-                            <span class="text-sm font-medium text-gray-900">{{ $message->user->name }}</span>
-                            @if($message->user->isAdmin)
-                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
-                                    Admin
-                                </span>
-                            @endif
-                            <span class="text-xs text-gray-500">{{ $message->created_at->format('M j, g:i A') }}</span>
-                        </div>
-                        <div class="mt-1 text-sm text-gray-700">
-                            {{ $message->content }}
-                        </div>
-                    </div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">Start the conversation</h3>
+                    <p class="text-gray-500">Send a message to begin helping this customer.</p>
                 </div>
-            @endforeach
+            @else
+                @foreach($messages as $message)
+                    <div class="message-item flex {{ $message->user->isAdmin ? 'justify-end' : 'justify-start' }}" data-message-id="{{ $message->id }}">
+                        @if(!$message->user->isAdmin)
+                            <!-- Customer Message -->
+                            <div class="flex items-start space-x-3 max-w-sm sm:max-w-lg">
+                                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-semibold text-sm shrink-0">
+                                    {{ strtoupper(substr($message->user->name, 0, 1)) }}
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="bg-white rounded-2xl rounded-tl-md px-4 py-3 shadow-sm border border-gray-100">
+                                        <p class="text-gray-900 text-sm leading-relaxed">{{ $message->content }}</p>
+                                    </div>
+                                    <div class="flex items-center mt-1 ml-3">
+                                        <span class="text-xs text-gray-500">{{ $message->user->name }}</span>
+                                        <span class="text-xs text-gray-400 mx-2">•</span>
+                                        <span class="text-xs text-gray-500">{{ $message->created_at->format('g:i A') }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        @else
+                            <!-- Admin Message -->
+                            <div class="flex items-start space-x-3 max-w-sm sm:max-w-lg">
+                                <div class="flex flex-col items-end">
+                                    <div class="bg-green-600 rounded-2xl rounded-tr-md px-4 py-3 shadow-sm">
+                                        <p class="text-white text-sm leading-relaxed">{{ $message->content }}</p>
+                                    </div>
+                                    <div class="flex items-center mt-1 mr-3">
+                                        <span class="text-xs text-gray-500">{{ $message->created_at->format('g:i A') }}</span>
+                                        <span class="text-xs text-gray-400 mx-2">•</span>
+                                        <span class="text-xs text-gray-500">{{ $message->user->name }}</span>
+                                        <span class="inline-flex items-center ml-2 px-1.5 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700">
+                                            Admin
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center text-white font-semibold text-sm shrink-0">
+                                    {{ strtoupper(substr($message->user->name, 0, 1)) }}
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                @endforeach
+            @endif
         </div>
     </div>
 
-    <!-- Message Input -->
-    <div class="border-t border-gray-200 p-4">
-        <form id="message-form" class="flex space-x-3">
+    <!-- Message Composer -->
+    <div class="border-t border-gray-200 bg-white p-4 sm:p-6 relative">
+        <form id="message-form" class="flex items-end space-x-4" onsubmit="return false;">
             @csrf
             <div class="flex-1">
-                <textarea
-                    id="message-input"
-                    rows="2"
-                    class="block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm resize-none"
-                    placeholder="Type your message..."
-                    required
-                ></textarea>
+                <div class="relative">
+                    <textarea
+                        id="message-input"
+                        rows="1"
+                        class="outline-none block w-full rounded-2xl border-gray-300 shadow-sm focus:ring-2 focus:ring-green-600 focus:ring-opacity-50 resize-none py-3 px-4 text-sm placeholder-gray-500 bg-gray-50 focus:bg-white transition-all duration-200 ring-offset-2 border"
+                        placeholder="Type your message..."
+                        style="min-height: 44px; max-height: 120px;"
+                    ></textarea>
+                </div>
             </div>
+            
+            <!-- Send Button -->
             <div class="flex-shrink-0">
                 <button
                     id="send-button"
                     type="submit"
-                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="inline-flex items-center justify-center w-12 h-12 rounded-full text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105"
                 >
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
                     </svg>
-                    Send
                 </button>
             </div>
         </form>
     </div>
 </div>
-
-<!-- Chat JavaScript -->
-<script>
-/**
- * Chat Entities Converter
- * Converts JSON API resource responses into clean entity objects
- */
-class ChatEntities {
-    static convertMessage(messageResource) {
-        if (!messageResource || !messageResource.id) {
-            console.warn('Invalid message resource:', messageResource);
-            return null;
-        }
-
-        return {
-            id: messageResource.id,
-            content: messageResource.attributes?.content || '',
-            type: messageResource.attributes?.type || 'text',
-            mine: messageResource.attributes?.mine || false,
-            createdAt: messageResource.attributes?.createdAt || null,
-            updatedAt: messageResource.attributes?.updatedAt || null,
-            sender: messageResource.relationships?.sender ? 
-                this.convertUser(messageResource.relationships.sender) : null
-        };
-    }
-
-    static convertUser(userResource) {
-        if (!userResource || !userResource.id) {
-            console.warn('Invalid user resource:', userResource);
-            return null;
-        }
-
-        return {
-            id: userResource.id,
-            name: userResource.attributes?.name || 'Unknown User',
-            avatar: userResource.attributes?.avatar || null,
-            type: userResource.attributes?.type || 'user',
-            isAdmin: userResource.attributes?.type === 'admin',
-            isClient: userResource.attributes?.type === 'client',
-            isCleaner: userResource.attributes?.type === 'cleaner',
-            createdAt: userResource.attributes?.createdAt || null,
-            updatedAt: userResource.attributes?.updatedAt || null
-        };
-    }
-}
-
-// Initialize chat functionality
-(function() {
-    // Configuration from controller
-    const config = @json($reverbConfig);
-    const chatRoomId = {{ $chatRoom->id }};
-    const currentUserId = {{ auth()->id() }};
-    
-    // DOM elements
-    const messagesContainer = document.getElementById('messages-container');
-    const messagesList = document.getElementById('messages-list');
-    const messageForm = document.getElementById('message-form');
-    const messageInput = document.getElementById('message-input');
-    const sendButton = document.getElementById('send-button');
-
-    // Initialize Echo with configuration
-    let echo = null;
-    
-    try {
-        if (typeof window.Echo !== 'undefined') {
-            echo = window.Echo;
-        }
-    } catch (error) {
-        console.error('Failed to initialize Echo:', error);
-        // Continue without real-time features
-    }
-
-    // Listen for new messages
-    if (echo) {
-        echo.channel(`chat.room.${chatRoomId}`)
-            .listen('MessageSent', (e) => {
-                console.log('New message received:', e);
-                const message = ChatEntities.convertMessage(e.message);
-                if (message) {
-                    addMessageToChat(message);
-                    scrollToBottom();
-                }
-            });
-    }
-
-    // Handle form submission
-    messageForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const content = messageInput.value.trim();
-        if (!content) return;
-
-        // Disable form while sending
-        setSendingState(true);
-
-        const url = `{{ route('admin.support.chat.send-message', $chatRoom) }}`;
-
-        // Send message via API
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            },
-            body: JSON.stringify({ content: content })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                messageInput.value = '';
-                const message = ChatEntities.convertMessage(data.data);
-                if (message && !echo) { // Only add if echo is not handling it
-                    addMessageToChat(message);
-                    scrollToBottom();
-                }
-            } else {
-                throw new Error(data.message || 'Failed to send message');
-            }
-        })
-        .catch(error => {
-            console.error('Error sending message:', error);
-            alert('Failed to send message. Please try again.');
-        })
-        .finally(() => {
-            setSendingState(false);
-        });
-    });
-
-    // Handle Enter key (Shift+Enter for new line)
-    messageInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            messageForm.dispatchEvent(new Event('submit'));
-        }
-    });
-
-    // Helper functions
-    function addMessageToChat(message) {
-        const messageElement = createMessageElement(message);
-        messagesList.appendChild(messageElement);
-    }
-
-    function createMessageElement(message) {
-        const messageDiv = document.createElement('div');
-        messageDiv.className = 'message-item flex items-start space-x-3';
-        messageDiv.setAttribute('data-message-id', message.id);
-        
-        const isAdmin = message.sender && message.sender.isAdmin;
-        const adminBadge = isAdmin ? `
-            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
-                Admin
-            </span>
-        ` : '';
-
-        const senderName = message.sender ? message.sender.name : 'Unknown User';
-        const senderInitial = senderName.charAt(0).toUpperCase();
-
-        messageDiv.innerHTML = `
-            <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 font-semibold text-sm shrink-0">
-                ${senderInitial}
-            </div>
-            <div class="flex-1 min-w-0">
-                <div class="flex items-baseline space-x-2">
-                    <span class="text-sm font-medium text-gray-900">${escapeHtml(senderName)}</span>
-                    ${adminBadge}
-                    <span class="text-xs text-gray-500">${formatDate(message.createdAt)}</span>
-                </div>
-                <div class="mt-1 text-sm text-gray-700">
-                    ${escapeHtml(message.content)}
-                </div>
-            </div>
-        `;
-        
-        return messageDiv;
-    }
-
-    function setSendingState(sending) {
-        sendButton.disabled = sending;
-        messageInput.disabled = sending;
-        
-        if (sending) {
-            sendButton.innerHTML = `
-                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Sending...
-            `;
-        } else {
-            sendButton.innerHTML = `
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-                </svg>
-                Send
-            `;
-        }
-    }
-
-    function scrollToBottom() {
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    }
-
-    function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-
-    function formatDate(dateString) {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', { 
-            month: 'short',
-            day: 'numeric',
-            hour: 'numeric',
-            minute: '2-digit' 
-        });
-    }
-
-    // Make refreshMessages available globally
-    window.refreshMessages = function() {
-        fetch(`{{ route('admin.support.chat.get-messages', $chatRoom) }}`)
-            .then(response => response.json())
-            .then(data => {
-                messagesList.innerHTML = '';
-                if (data.data && data.data.length > 0) {
-                    data.data.forEach(messageResource => {
-                        const message = ChatEntities.convertMessage(messageResource);
-                        if (message) {
-                            addMessageToChat(message);
-                        }
-                    });
-                }
-                scrollToBottom();
-            })
-            .catch(error => {
-                console.error('Error refreshing messages:', error);
-            });
-    };
-
-    // Initial scroll to bottom
-    scrollToBottom();
-
-    // Connection status indicator
-    if (echo) {
-        window.addEventListener('beforeunload', function() {
-            echo.disconnect();
-        });
-    }
-})();
-</script>

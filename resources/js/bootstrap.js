@@ -1,6 +1,13 @@
+import ajax from '@imacrayon/alpine-ajax';
+import Alpine from 'alpinejs';
 import axios from 'axios';
-window.axios = axios;
+import './chat-entities.js';
+ 
+window.Alpine = Alpine
+Alpine.plugin(ajax)
+Alpine.start()
 
+window.axios = axios;
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 /**

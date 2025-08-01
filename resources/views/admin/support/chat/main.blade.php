@@ -2,19 +2,23 @@
 
 @section('title', 'Support Chat')
 
+@push('scripts')
+<script src="{{ asset('js/chat-entities.js') }}"></script>
+@endpush
+
 @section('content')
 <div class="h-screen bg-gray-100 flex overflow-hidden">
     <!-- Conversations Sidebar -->
-    <main class="chat-list flex flex-col w-96 shrink-0 bg-white border-r border-gray-300">
+    <main class="chat-list flex flex-col w-80 md:w-96 shrink-0 bg-white border-r border-gray-300">
         <!-- Header -->
         <div class="p-4 border-b border-gray-300">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">
-                    S
-                </div>
+            <div class="flex items-start gap-3">
+                <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name') }}" class="w-10 h-10 rounded-lg mt-2">
                 <div>
                     <h1 class="text-lg font-bold text-gray-900">Support HQ</h1>
-                    <p class="text-sm text-gray-600">Admin Panel</p>
+                    <p class="text-sm text-gray-600 text-pretty">
+                        Answer questions and resolve issues for your customers.
+                    </p>
                 </div>
             </div>
         </div>
@@ -158,8 +162,189 @@ function loadChatRoom(roomId) {
 }
 
 function initializeChatRoom(roomId) {
-    // This will be implemented when we add the chat functionality
-    console.log('Initializing chat room:', roomId);
+    // DOM elements - wait a moment for them to be available
+    setTimeout(() => {
+        const messagesContainer = document.getElementById('messages-container');
+        const messagesList = document.getElementById('messages-list');
+        const messageForm = document.getElementById('message-form');
+        const messageInput = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-button');
+        
+        // Initialize form submission if form exists
+        if (messageForm && messageInput && sendButton) {
+            initializeMessageForm();
+        }
+        
+        // Initialize Echo for real-time messaging
+        if (window.Echo) {
+            console.log('Initializing Echo for room:', roomId);
+            window.Echo.channel(`chat.room.${roomId}`)
+                .listen('.message.sent', (data) => {
+                    console.log('New message received via Echo:', data);
+                    addMessageToUI(data);
+                });
+        }
+        
+        // Add message to UI function
+        function addMessageToUI(messageData) {
+            console.log('Adding message to UI:', messageData);
+            
+            const messagesList = document.getElementById('messages-list');
+            if (!messagesList) return;
+            
+            
+            // Convert message data using ChatEntities
+            const message = window.ChatEntities ? 
+                window.ChatEntities.convertMessage(messageData) : 
+                messageData;
+            
+            if (!message) {
+                console.error('Failed to convert message data:', messageData);
+                return;
+            }
+            
+            console.log('Converted message:', message);
+            
+            // Get current user ID from auth
+            const currentUserId = {{ Auth::id() ?? 'null' }};
+            const isAdmin = message.sender?.isAdmin || false;
+            const isOwnMessage = message.sender?.id == currentUserId;
+            
+            // Create message element
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message-item flex ${isAdmin ? 'justify-end' : 'justify-start'}`;
+            messageDiv.setAttribute('data-message-id', message.id);
+            
+            const userName = message.sender?.name || 'Unknown';
+            const messageContent = message.content || '';
+            const createdAt = message.createdAt || new Date().toISOString();
+            
+            if (!isAdmin) {
+                // Customer Message
+                messageDiv.innerHTML = `
+                    <div class="flex items-start space-x-3 max-w-sm sm:max-w-lg">
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-semibold text-sm shrink-0">
+                            ${userName.charAt(0).toUpperCase()}
+                        </div>
+                        <div class="flex flex-col">
+                            <div class="bg-white rounded-2xl rounded-tl-md px-4 py-3 shadow-sm border border-gray-100">
+                                <p class="text-gray-900 text-sm leading-relaxed">${messageContent}</p>
+                            </div>
+                            <div class="flex items-center mt-1 ml-3">
+                                <span class="text-xs text-gray-500">${userName}</span>
+                                <span class="text-xs text-gray-400 mx-2">•</span>
+                                <span class="text-xs text-gray-500">${new Date(createdAt).toLocaleTimeString()}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                // Admin Message
+                messageDiv.innerHTML = `
+                    <div class="flex items-start space-x-3 max-w-sm sm:max-w-lg">
+                        <div class="flex flex-col items-end">
+                            <div class="bg-green-600 rounded-2xl rounded-tr-md px-4 py-3 shadow-sm">
+                                <p class="text-white text-sm leading-relaxed">${messageContent}</p>
+                            </div>
+                            <div class="flex items-center mt-1 mr-3">
+                                <span class="text-xs text-gray-500">${new Date(createdAt).toLocaleTimeString()}</span>
+                                <span class="text-xs text-gray-400 mx-2">•</span>
+                                <span class="text-xs text-gray-500">${userName}</span>
+                                <span class="inline-flex items-center ml-2 px-1.5 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700">
+                                    Admin
+                                </span>
+                            </div>
+                        </div>
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center text-white font-semibold text-sm shrink-0">
+                            ${userName.charAt(0).toUpperCase()}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            messagesList.appendChild(messageDiv);
+            
+            // Scroll to bottom
+            const messagesContainer = document.getElementById('messages-container');
+            if (messagesContainer) {
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+        }
+        
+        function insertTextIntoInput(text) {
+            if (!messageInput) return;
+            
+            const cursorPos = messageInput.selectionStart;
+            const currentValue = messageInput.value;
+            const newValue = currentValue.slice(0, cursorPos) + text + currentValue.slice(messageInput.selectionEnd);
+            
+            messageInput.value = newValue;
+            messageInput.focus();
+            
+            // Set cursor position after inserted text
+            const newCursorPos = cursorPos + text.length;
+            messageInput.setSelectionRange(newCursorPos, newCursorPos);
+        }
+
+        function initializeMessageForm() {
+            // Handle form submission
+            messageForm.addEventListener('submit', async (e) => {
+                console.log('Form submit event triggered');
+                e.preventDefault();
+                
+                const messageContent = messageInput.value.trim();
+                if (!messageContent) {
+                    console.log('Empty message, not sending');
+                    return;
+                }
+                
+                console.log('Sending message:', messageContent);
+                
+                // Disable form while sending
+                sendButton.disabled = true;
+                messageInput.disabled = true;
+                
+                try {
+                    const response = await fetch(`/admin/support/chat/${roomId}/messages`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        },
+                        body: JSON.stringify({
+                            content: messageContent
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        // Clear the input
+                        messageInput.value = '';
+                        // Message will be added via Echo real-time listener
+                        console.log('Message sent successfully, waiting for Echo update');
+                    } else {
+                        console.error('Failed to send message');
+                        alert('Failed to send message. Please try again.');
+                    }
+                } catch (error) {
+                    console.error('Error sending message:', error);
+                    alert('Error sending message. Please try again.');
+                } finally {
+                    // Re-enable form
+                    sendButton.disabled = false;
+                    messageInput.disabled = false;
+                    messageInput.focus();
+                }
+            });
+            
+            // Handle enter key (submit on Enter, new line on Shift+Enter)
+            messageInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    messageForm.dispatchEvent(new Event('submit'));
+                }
+            });
+        }
+    }, 100); // Small delay to ensure DOM elements are available
 }
 
 // Handle browser back/forward
