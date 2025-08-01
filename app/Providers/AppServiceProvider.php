@@ -10,6 +10,7 @@ use App\Services\FirebasePushNotification\FirebasePushNotificationService;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Blade;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -33,6 +34,10 @@ class AppServiceProvider extends ServiceProvider
 
         Gate::define('viewApiDocs', function (User $user) {
             return true;
+        });
+
+        Blade::directive('disabled', function ($expression) {
+            return "<?php echo ($expression) ? 'disabled' : ''; ?>";
         });
     }
 }

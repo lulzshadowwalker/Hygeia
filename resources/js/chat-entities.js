@@ -15,6 +15,8 @@ class ChatEntities {
             return null;
         }
 
+        console.log('Converting message resource:', messageResource);
+
         return {
             id: messageResource.id,
             content: messageResource.attributes?.content || '',
@@ -38,14 +40,16 @@ class ChatEntities {
             return null;
         }
 
+        console.log('Converting user resource:', userResource); 
+
         return {
             id: userResource.id,
             name: userResource.attributes?.name || 'Unknown User',
             avatar: userResource.attributes?.avatar || null,
-            type: userResource.attributes?.type || 'user',
-            isAdmin: userResource.attributes?.type === 'admin',
-            isClient: userResource.attributes?.type === 'client',
-            isCleaner: userResource.attributes?.type === 'cleaner',
+            type: userResource.type || 'user',
+            isAdmin: userResource.type === 'admin',
+            isClient: userResource.type === 'client',
+            isCleaner: userResource.type === 'cleaner',
             createdAt: userResource.attributes?.createdAt || null,
             updatedAt: userResource.attributes?.updatedAt || null
         };

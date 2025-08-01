@@ -75,4 +75,14 @@ class ChatRoom extends Model
             get: fn () => $this->messages()->count(),
         );
     }
+
+    /**
+     * Helper function only for support chat rooms.
+     *
+     * returns the other participant in the chat room.
+     */
+    public function user(): Attribute
+    {
+        return Attribute::get(fn() => $this->participants->firstWhere(fn ($user) => ! $user->isAdmin));
+    }
 }

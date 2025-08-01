@@ -18,6 +18,7 @@
     },
     "dependencies": {
         "@imacrayon/alpine-ajax": "^0.12.4",
-        "alpinejs": "^3.14.9"
+        "alpinejs": "^3.14.9",
+        "basecoat-css": "^0.3.0"
     }
 }
