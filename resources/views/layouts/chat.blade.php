@@ -26,11 +26,8 @@
                 <div role="group" aria-labelledby="group-label-content-1">
                     <h3 id="group-label-content-1">Conversations</h3>
 
-                    <template x-if="rooms.length === 0">
-                        <div class="p-8 text-center">
-                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.955 8.955 0 01-4.126-.98L3 20l1.98-5.874A8.955 8.955 0 013 12c0-4.418 3.582-8 8-8s8 3.582 8 8z"></path>
-                            </svg>
+                    <template x-if="rooms.filter(room => room.latestMessage).length === 0">
+                        <div class="p-8 flex flex-col items-center justify-center text-center">
                             <h3 class="mt-2 text-sm font-medium text-gray-900">No conversations</h3>
                             <p class="mt-1 text-sm text-gray-500">No support conversations are currently active.</p>
                         </div>
@@ -72,7 +69,7 @@
                             <div role="menuitem">
                                 <!--  back to admin panel -->
                                 <a href="{{ route('filament.admin.pages.dashboard') }}" class="flex items-center justify-start w-full">
-                                    Back to Admin Panel
+                                    Admin Panel
                                     <span class="text-muted-foreground ml-auto text-xs tracking-widest">⇧⌘D</span>
                                 </a>
                             </div>
