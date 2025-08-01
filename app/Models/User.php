@@ -35,6 +35,7 @@ class User extends Authenticatable implements HasMedia, FilamentUser
      * @var list<string>
      */
     protected $fillable = [
+        'phone',
         'name',
         'username',
         'email',
