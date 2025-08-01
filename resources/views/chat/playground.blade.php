@@ -100,7 +100,11 @@
                         @forelse($chatRooms as $room)
                         <div class="p-3 border rounded cursor-pointer hover:bg-gray-50 chat-room-item"
                             data-room-id="{{ $room->id }}">
-                            <div class="font-medium">{{ $room->name }}</div>
+                            <!-- Room Type -->
+                            <div class="text-xs text-gray-400">
+                                Type: {{ $room->type }}
+                            </div>
+                            <div class="font-medium">{{ $room->name }} ({{ $room->id }})</div>
                             <div class="text-sm text-gray-500">
                                 {{ $room->participants->count() }} participants
                             </div>
@@ -201,13 +205,10 @@
     @auth
     <script>
         const API_BASE = '/api/v1';
-        const CURRENT_USER_ID = {
-            {
-                Auth::id()
-            }
-        };
+        const CURRENT_USER_ID = {{ Auth::id() }};
         let currentRoomId = null;
-        let echoConnected = false;
+        // let echoConnected = false;
+        let echoConnected = true;
 
         // CSRF Token
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
@@ -225,6 +226,8 @@
             if (window.Echo && !echoConnected) {
                 console.log('Initializing Echo for real-time messaging...');
                 echoConnected = true;
+            } else {
+                console.warn('Echo is already initialized or not available.');
             }
         }
 
@@ -253,9 +256,9 @@
                 const roomData = await roomResponse.json();
 
                 // Update header
-                document.getElementById('chat-header').textContent = roomData.chat_room.name;
-                document.getElementById('chat-participants').textContent =
-                    `${roomData.chat_room.participants.length} participants: ${roomData.chat_room.participants.map(p => p.name).join(', ')}`;
+                // document.getElementById('chat-header').textContent = roomData.chat_room.name;
+                // document.getElementById('chat-participants').textContent =
+                //     `${roomData.chat_room.participants.length} participants: ${roomData.chat_room.participants.map(p => p.name).join(', ')}`;
 
                 // Get messages
                 const messagesResponse = await fetch(`${API_BASE}/chat/rooms/${roomId}/messages`, {
@@ -267,10 +270,10 @@
                 const container = document.getElementById('messages-container');
                 container.innerHTML = '';
 
-                if (messagesData.messages.data.length === 0) {
+                if (messagesData.data.length === 0) {
                     container.innerHTML = '<div class="text-center text-gray-500 py-8">No messages in this room yet</div>';
                 } else {
-                    messagesData.messages.data.reverse().forEach(message => {
+                    messagesData.data.reverse().forEach(message => {
                         addMessageToUI(message);
                     });
                 }
@@ -282,9 +285,10 @@
 
                 // Listen for new messages
                 if (window.Echo && echoConnected) {
-                    window.Echo.private(`chat.room.${roomId}`)
+                    // window.Echo.private(`chat.room.${roomId}`)
+                    window.Echo.channel(`chat.room.${roomId}`)
                         .listen('.message.sent', (data) => {
-                            addMessageToUI(data.message);
+                            addMessageToUI(data);
                         });
                 }
 
@@ -297,7 +301,17 @@
         // Add message to UI
         function addMessageToUI(message) {
             const container = document.getElementById('messages-container');
-            const isOwnMessage = message.user.id == CURRENT_USER_ID;
+            
+            console.log('Adding message to UI:', message);
+            
+            // when the message comes from Echo, it might be a json string
+            if (typeof message === "string") {
+                console.log('Parsing message from string:', message);
+                message = JSON.parse(message);
+                console.log('Parsed message:', message);
+            }
+
+            const isOwnMessage = message.relationships.sender.id == CURRENT_USER_ID;
 
             const messageDiv = document.createElement('div');
             messageDiv.className = `mb-4 ${isOwnMessage ? 'text-right' : 'text-left'}`;
@@ -308,9 +322,9 @@
                         ? 'bg-primary text-white' 
                         : 'bg-gray-200 text-gray-800'
                 }">
-                    <div class="text-xs opacity-75 mb-1">${message.user.name}</div>
-                    <div>${message.content}</div>
-                    <div class="text-xs opacity-75 mt-1">${formatTime(message.created_at)}</div>
+                    <div class="text-xs opacity-75 mb-1">${message.relationships.sender.attributes.name}</div>
+                    <div>${message.attributes.content}</div>
+                    <div class="text-xs opacity-75 mt-1">${formatTime(message.attributes.createdAt)}</div>
                 </div>
             `;
 
@@ -332,8 +346,12 @@
                     method: 'POST',
                     headers,
                     body: JSON.stringify({
+                        data: {
+                            attributes: {
                         content: content,
                         type: 'text'
+                    }
+                        }
                     })
                 });
 
@@ -343,7 +361,7 @@
                     input.value = '';
                     // Message will be added via Echo listener or manual refresh
                     if (!echoConnected) {
-                        addMessageToUI(data.message);
+                        addMessageToUI(data.data);
                     }
                 } else {
                     console.error('Error sending message:', data);

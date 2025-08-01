@@ -21,7 +21,7 @@ class MessagePolicy
     public function view(User $user, Message $message): bool
     {
         // User must be a participant in the chat room to view the message
-        return $message->chatRoom->isParticipant($user);
+        return $user->isAdmin || $message->chatRoom->isParticipant($user);
     }
 
     /**
@@ -94,7 +94,7 @@ class MessagePolicy
      */
     public function sendMessage(User $user, $chatRoom): bool
     {
-        return $chatRoom->isParticipant($user);
+        return $user->isAdmin || $chatRoom->isParticipant($user);
     }
 
     /**
@@ -103,6 +103,6 @@ class MessagePolicy
      */
     public function viewMessages(User $user, $chatRoom): bool
     {
-        return $chatRoom->isParticipant($user);
+        return $user->isAdmin || $chatRoom->isParticipant($user);
     }
 }

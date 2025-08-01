@@ -28,6 +28,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         //  NOTE: I think we can safely remove this line
+        // Broadcast::routes(['prefix' => 'api', 'middleware' => ['auth:sanctum']]);
         Broadcast::routes();
 
         Gate::define('viewApiDocs', function (User $user) {

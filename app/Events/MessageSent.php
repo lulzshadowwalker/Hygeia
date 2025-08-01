@@ -4,6 +4,7 @@ namespace App\Events;
 
 use App\Http\Resources\V1\MessageResource;
 use App\Models\Message;
+use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
@@ -22,7 +23,8 @@ class MessageSent implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel($this->message->chatRoom->getChannelName()),
+            // new PrivateChannel($this->message->chatRoom->getChannelName()),
+            new Channel($this->message->chatRoom->getChannelName()),
         ];
     }
 

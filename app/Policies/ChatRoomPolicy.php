@@ -22,6 +22,10 @@ class ChatRoomPolicy
      */
     public function view(User $user, ChatRoom $chatRoom): Response
     {
+        if ($user->isAdmin) {
+            return Response::allow();
+        }
+
         return $chatRoom->isParticipant($user)
             ? Response::allow()
             : Response::deny('You are not a participant of this chat room.');
