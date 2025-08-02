@@ -224,11 +224,11 @@
         // Initialize Echo for real-time messaging
         function initializeEcho() {
             if (window.Echo && !echoConnected) {
-                console.log('Initializing Echo for real-time messaging...');
                 echoConnected = true;
-            } else {
-                console.warn('Echo is already initialized or not available.');
-            }
+                return;
+            } 
+
+            console.warn('Echo is already initialized or not available.');
         }
 
         // Format timestamp
@@ -302,13 +302,9 @@
         function addMessageToUI(message) {
             const container = document.getElementById('messages-container');
             
-            console.log('Adding message to UI:', message);
-            
             // when the message comes from Echo, it might be a json string
             if (typeof message === "string") {
-                console.log('Parsing message from string:', message);
                 message = JSON.parse(message);
-                console.log('Parsed message:', message);
             }
 
             const isOwnMessage = message.relationships.sender.id == CURRENT_USER_ID;

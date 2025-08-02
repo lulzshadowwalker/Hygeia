@@ -90,7 +90,6 @@
             },
 
             initializeSocket(roomId) {
-                console.log('Initializing chat room:', roomId);
                 if (window.Echo) {
                     window.Echo.channel(`chat.room.${roomId}`)
                         .listen(
