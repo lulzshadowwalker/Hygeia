@@ -15,7 +15,9 @@ class ChatEntities {
             return null;
         }
 
-        console.log('Converting message resource:', messageResource);
+        const sender = messageResource.relationships?.sender
+            ? this.convertUser(messageResource.relationships.sender)
+            : null;
 
         return {
             id: messageResource.id,
@@ -39,8 +41,6 @@ class ChatEntities {
             console.warn('Invalid user resource:', userResource);
             return null;
         }
-
-        console.log('Converting user resource:', userResource); 
 
         return {
             id: userResource.id,
@@ -78,8 +78,6 @@ class ChatEntities {
             latestMessage: roomResource.relationships?.latestMessage ? 
                 this.convertMessage(roomResource.relationships.latestMessage) : null
         };
-
-        console.log('Converting chat room resource:', t);
 
         return t;
     }

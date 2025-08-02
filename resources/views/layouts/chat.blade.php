@@ -161,7 +161,6 @@
                     .listen('.chat.rooms.support.updated', (data) => {
                         const index = this.rooms.findIndex(room => room.id === data.id)
                         if (index !== -1) {
-                            console.log('Updating room:', data)
                             this.rooms.splice(index, 1)
                             this.rooms.unshift(ChatEntities.convertChatRoom(data))
                             return;
