@@ -7,8 +7,10 @@ use App\Contracts\ResponseBuilder;
 use App\Http\Response\JsonResponseBuilder;
 use App\Models\User;
 use App\Services\FirebasePushNotification\FirebasePushNotificationService;
+use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Blade;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -26,8 +28,16 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        //  NOTE: I think we can safely remove this line
+        // Broadcast::routes(['prefix' => 'api', 'middleware' => ['auth:sanctum']]);
+        Broadcast::routes();
+
         Gate::define('viewApiDocs', function (User $user) {
             return true;
+        });
+
+        Blade::directive('disabled', function ($expression) {
+            return "<?php echo ($expression) ? 'disabled' : ''; ?>";
         });
     }
 }

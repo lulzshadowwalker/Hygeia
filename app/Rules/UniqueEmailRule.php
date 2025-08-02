@@ -21,7 +21,7 @@ class UniqueEmailRule implements ValidationRule
                         detail: 'An account with this email address already exists',
                         code: Response::HTTP_CONFLICT,
                         indicator: 'EMAIL_ALREADY_EXISTS'
-                    )->build()
+                    )->build(Response::HTTP_CONFLICT)
             );
         }
     }

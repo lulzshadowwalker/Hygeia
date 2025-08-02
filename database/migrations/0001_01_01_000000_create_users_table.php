@@ -15,6 +15,8 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            //  TODO: Add phone cast
+            $table->string('phone')->unique()->nullable();
             $table->string('username')->unique();
             $table->enum('status', UserStatus::values())->default(UserStatus::Active->value);
             $table->string('email')->unique();

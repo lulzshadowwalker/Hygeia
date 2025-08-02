@@ -47,6 +47,17 @@ class AdminPanelProvider extends PanelProvider
                 Widgets\FilamentInfoWidget::class,
             ])
             ->navigationItems([
+                NavigationItem::make('support-chat')
+                    ->label('Support Chat')
+                    ->badge(fn(): ?string => \App\Models\ChatRoom::support()->whereHas('messages', function ($query) {
+                        $query->where('created_at', '>=', now()->subHour());
+                    })->count() ?: null)
+                    ->badgeTooltip('Manage customer support conversations in real-time.')
+                    ->url(fn(): string => route('admin.support.chat.index'), shouldOpenInNewTab: false)
+                    ->icon('heroicon-o-chat-bubble-left-right')
+                    ->group('Support')
+                    ->visible(fn(): bool => Auth::user()->isAdmin),
+
                 NavigationItem::make('telescope')
                     ->label('Telescope')
                     ->badge(fn(): string => '●')

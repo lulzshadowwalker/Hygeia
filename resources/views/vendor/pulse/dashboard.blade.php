@@ -7,7 +7,11 @@
 
     <livewire:pulse.cache cols="4" />
 
-    <livewire:pulse.slow-queries cols="8" />
+    <livewire:reverb.connections cols="full" />
+
+    <livewire:reverb.messages cols="full" />
+
+    <livewire:pulse.slow-queries cols="full" />
 
     <livewire:pulse.exceptions cols="6" />
 
