@@ -24,7 +24,9 @@ class ReviewResource extends JsonResource
             ],
             'includes' => (object) [
                 'cleaner' => CleanerResource::make($this->reviewable),
-                'client' => ClientResource::make($this->user->client),
+                
+                //  TODO: I believe we should be passing the client model and not the user model 
+                'client' => ClientResource::make($this->user),
             ],
         ];
     }

@@ -16,7 +16,7 @@ class ProfileController extends Controller
 
         switch (true) {
             case $user->isClient:
-                return ClientResource::make($user->client);
+                return ClientResource::make($user);
             case $user->isCleaner:
                 return CleanerResource::make($user->cleaner);
             default:
