@@ -29,7 +29,6 @@ class LoginController extends Controller
             $user->deviceTokens()->firstOrCreate(['token' => $deviceToken]);
         }
 
-
         $accessToken = $user->createToken(config('app.name'))->plainTextToken;
 
         return AuthTokenResource::make(
