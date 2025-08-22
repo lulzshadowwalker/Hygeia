@@ -17,7 +17,7 @@ class PricingResource extends JsonResource
         return [
             'id' => (string) $this->id,
             'attributes' => [
-                'amount' => $this->base_amount,
+                'amount' => $this->amount,
                 'minArea' => $this->min_area,
                 'maxArea' => $this->max_area,
             ],

@@ -13,7 +13,7 @@ class Pricing extends Model
     protected $fillable = [
         'min_area',
         'max_area',
-        'base_amount',
+        'amount',
         'service_id',
     ];
 
@@ -24,7 +24,7 @@ class Pricing extends Model
             'max_area' => 'integer',
 
             // TODO: Use a money cast
-            'base_amount' => 'decimal:2',
+            'amount' => 'decimal:2',
         ];
     }
 

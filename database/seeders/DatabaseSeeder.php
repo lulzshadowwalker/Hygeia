@@ -9,6 +9,7 @@ use App\Models\City;
 use App\Models\Cleaner;
 use App\Models\Client;
 use App\Models\District;
+use App\Models\Extra;
 use App\Models\Faq;
 use App\Models\Pricing;
 use App\Models\Review;
@@ -88,5 +89,7 @@ class DatabaseSeeder extends Seeder
         Service::factory()
             ->has(Pricing::factory()->count(3))
             ->create();
+
+        Extra::factory()->count(5)->create();
     }
 }

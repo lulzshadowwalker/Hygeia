@@ -20,7 +20,7 @@ class PricingFactory extends Factory
         return [
             'min_area' => $this->faker->numberBetween(0, 90),
             'max_area' => $this->faker->numberBetween(100, 200),
-            'base_amount' => $this->faker->randomFloat(2, 50, 9980),
+            'amount' => $this->faker->randomFloat(2, 50, 9980),
             'service_id' => Service::factory(),
         ];
     }
