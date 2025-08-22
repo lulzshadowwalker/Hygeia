@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\V1\DistrictController;
 use App\Http\Controllers\Api\V1\UserPreferenceController;
 use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\Api\V1\RegisterClientController;
+use App\Http\Controllers\Api\V1\ServiceController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/auth/login', [LoginController::class, 'store'])
@@ -72,6 +73,12 @@ Route::post('/cleaners/{cleaner}/favorites', [FavoriteCleanerController::class, 
 Route::delete('/cleaners/{cleaner}/favorites', [FavoriteCleanerController::class, 'destroy'])
     ->middleware('auth:sanctum')
     ->name('api.v1.cleaners.favorites.destroy');
+
+Route::get('/services', [ServiceController::class, 'index'])
+    ->name('api.v1.services.index');
+
+Route::get('/services/{service}', [ServiceController::class, 'show'])
+    ->name('api.v1.services.show');
 
 Route::get('/notifications', [NotificationController::class, 'index'])
     ->middleware('auth:sanctum')
