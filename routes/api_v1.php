@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\V1\SupportTicketController;
 use App\Http\Controllers\Api\V1\PageController;
 use App\Http\Controllers\Api\V1\CleanerReviewController;
 use App\Http\Controllers\Api\V1\DistrictController;
+use App\Http\Controllers\Api\V1\ExtraController;
 use App\Http\Controllers\Api\V1\UserPreferenceController;
 use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\Api\V1\RegisterClientController;
@@ -76,9 +77,13 @@ Route::delete('/cleaners/{cleaner}/favorites', [FavoriteCleanerController::class
 
 Route::get('/services', [ServiceController::class, 'index'])
     ->name('api.v1.services.index');
-
 Route::get('/services/{service}', [ServiceController::class, 'show'])
     ->name('api.v1.services.show');
+
+Route::get('/extras', [ExtraController::class, 'index'])
+    ->name('api.v1.extras.index');
+Route::get('/extras/{extra}', [ExtraController::class, 'show'])
+    ->name('api.v1.extras.show');
 
 Route::get('/notifications', [NotificationController::class, 'index'])
     ->middleware('auth:sanctum')
