@@ -3,13 +3,16 @@
 namespace Database\Seeders;
 
 use App\Enums\Role;
+use App\Enums\ServiceType;
 use App\Enums\UserStatus;
 use App\Models\City;
 use App\Models\Cleaner;
 use App\Models\Client;
 use App\Models\District;
 use App\Models\Faq;
+use App\Models\Pricing;
 use App\Models\Review;
+use App\Models\Service;
 use App\Models\SupportTicket;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -81,5 +84,9 @@ class DatabaseSeeder extends Seeder
 
         Review::factory()->count(10)->create();
         SupportTicket::factory()->count(10)->create();
+
+        Service::factory()
+            ->has(Pricing::factory()->count(3))
+            ->create();
     }
 }
