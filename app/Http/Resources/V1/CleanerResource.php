@@ -35,6 +35,9 @@ class CleanerResource extends JsonResource
                 'serviceRadius' => 10.5,
                 'preferredJobTypes' => [],
                 'agreedToTerms' => true,
+
+                //  TODO: Implement isFavorite attribute based on the current authenticated user
+                'isFavorite' => false,
             ],
         ];
     }
