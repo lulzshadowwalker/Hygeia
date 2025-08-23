@@ -364,7 +364,7 @@ class ChatRoomControllerTest extends TestCase
             ]);
             $supportChatRoom->addParticipant($client->user);
 
-            return $supportChatRoom; 
+            return $supportChatRoom;
         });
 
         $this->actingAs($client->user);

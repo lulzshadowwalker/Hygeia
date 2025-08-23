@@ -14,8 +14,7 @@ class Client extends Model
      * The attributes that are mass assignable.
      *
      * @var array
-     */
-    protected $fillable = [
+     */ protected $fillable = [
         'user_id',
     ];
 
@@ -42,5 +41,10 @@ class Client extends Model
     {
         return $this->belongsToMany(Cleaner::class, 'client_favorite_cleaners')
             ->withTimestamps();
+    }
+
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class);
     }
 }

@@ -6,10 +6,11 @@ use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasIcon;
 use Filament\Support\Contracts\HasLabel;
 
-enum ServiceType: string implements HasColor, HasIcon, HasLabel
+enum BookingUrgency: string implements HasColor, HasIcon, HasLabel
 {
-    case Residential = 'residential';
-    case Commercial = 'commercial';
+    case Flexible = 'flexible';
+    case Scheduled = 'scheduled';
+    case Urgent = 'urgent'; // same-day
 
     public static function values(): array
     {
@@ -19,8 +20,9 @@ enum ServiceType: string implements HasColor, HasIcon, HasLabel
     public function label(): string
     {
         return match ($this) {
-            self::Residential => 'Residential',
-            self::Commercial => 'Commercial',
+            self::Flexible => 'Flexible',
+            self::Scheduled => 'Scheduled',
+            self::Urgent => 'Urgent',
         };
     }
 
@@ -32,16 +34,18 @@ enum ServiceType: string implements HasColor, HasIcon, HasLabel
     public function getIcon(): ?string
     {
         return match ($this) {
-            self::Residential => 'heroicon-o-home',
-            self::Commercial => 'heroicon-o-office-building',
+            self::Flexible => 'heroicon-o-clock',
+            self::Scheduled => 'heroicon-o-calendar',
+            self::Urgent => 'heroicon-o-exclamation-circle',
         };
     }
 
     public function getColor(): string | array | null
     {
         return match ($this) {
-            self::Residential => 'primary',
-            self::Commercial => 'info',
+            self::Flexible => 'primary',
+            self::Scheduled => 'info',
+            self::Urgent => 'danger',
         };
     }
 }

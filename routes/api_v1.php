@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\V1\UserPreferenceController;
 use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\Api\V1\RegisterClientController;
 use App\Http\Controllers\Api\V1\ServiceController;
+use App\Http\Controllers\Api\V1\BookingController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/auth/login', [LoginController::class, 'store'])
@@ -84,6 +85,16 @@ Route::get('/extras', [ExtraController::class, 'index'])
     ->name('api.v1.extras.index');
 Route::get('/extras/{extra}', [ExtraController::class, 'show'])
     ->name('api.v1.extras.show');
+
+Route::post('/bookings', [BookingController::class, 'store'])
+    ->middleware('auth:sanctum')
+    ->name('api.v1.bookings.store');
+Route::get('/bookings', [BookingController::class, 'index'])
+    ->middleware('auth:sanctum')
+    ->name('api.v1.bookings.index');
+Route::get('/bookings/{booking}', [BookingController::class, 'show'])
+    ->middleware('auth:sanctum')
+    ->name('api.v1.bookings.show');
 
 Route::get('/notifications', [NotificationController::class, 'index'])
     ->middleware('auth:sanctum')

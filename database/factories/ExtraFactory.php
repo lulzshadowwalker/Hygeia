@@ -2,9 +2,6 @@
 
 namespace Database\Factories;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Extra>
- */
 class ExtraFactory extends BaseFactory
 {
     /**

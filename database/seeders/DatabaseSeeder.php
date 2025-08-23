@@ -86,9 +86,15 @@ class DatabaseSeeder extends Seeder
         Review::factory()->count(10)->create();
         SupportTicket::factory()->count(10)->create();
 
-        Service::factory()
-            ->has(Pricing::factory()->count(3))
-            ->create();
+        foreach (ServiceType::cases() as $type) {
+            Service::factory()
+                ->count(3)
+                ->state(['type' => $type->value])
+                ->create()
+                ->each(function ($service) {
+                    Pricing::factory()->count(3)->create(['service_id' => $service->id]);
+                });
+        }
 
         Extra::factory()->count(5)->create();
     }
