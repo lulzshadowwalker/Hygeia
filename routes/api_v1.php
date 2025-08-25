@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\Api\V1\RegisterClientController;
 use App\Http\Controllers\Api\V1\ServiceController;
 use App\Http\Controllers\Api\V1\BookingController;
+use App\Http\Controllers\Api\V1\CallbackRequestController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/auth/login', [LoginController::class, 'store'])
@@ -58,6 +59,10 @@ Route::get('/support-tickets/{supportTicket}', [SupportTicketController::class, 
     ->name('api.v1.support-tickets.show');
 Route::post('/support-tickets', [SupportTicketController::class, 'store'])
     ->name('api.v1.support-tickets.store');
+
+Route::post('/callback-requests', [CallbackRequestController::class, 'store'])
+    ->middleware('auth:sanctum')
+    ->name('api.v1.callback-requests.store');
 
 Route::get('/cleaners/{cleaner}/reviews', [CleanerReviewController::class, 'index'])
     ->middleware('auth:sanctum')
