@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Enums\Role;
 use App\Enums\ServiceType;
 use App\Enums\UserStatus;
+use App\Models\CallbackRequest;
 use App\Models\City;
 use App\Models\Cleaner;
 use App\Models\Client;
@@ -97,5 +98,7 @@ class DatabaseSeeder extends Seeder
         }
 
         Extra::factory()->count(5)->create();
+
+        CallbackRequest::factory()->count(10)->create();
     }
 }

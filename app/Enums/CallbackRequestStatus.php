@@ -44,7 +44,7 @@ enum CallbackRequestStatus: string implements HasColor, HasIcon, HasLabel
     public function getColor(): string | array | null
     {
         return match ($this) {
-            self::Pending => 'primary',
+            self::Pending => 'warning',
             self::Completed => 'success',
             self::Failed => 'danger',
         };
