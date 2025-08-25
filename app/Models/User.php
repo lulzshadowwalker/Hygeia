@@ -195,4 +195,9 @@ class User extends Authenticatable implements HasMedia, FilamentUser
     {
         return $this->hasMany(Message::class);
     }
+
+    public function callbackRequests(): HasMany
+    {
+        return $this->hasMany(CallbackRequest::class);
+    }
 }
