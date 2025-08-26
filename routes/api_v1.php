@@ -20,6 +20,8 @@ use App\Http\Controllers\Api\V1\RegisterClientController;
 use App\Http\Controllers\Api\V1\ServiceController;
 use App\Http\Controllers\Api\V1\BookingController;
 use App\Http\Controllers\Api\V1\CallbackRequestController;
+use App\Http\Controllers\Api\V1\OfferController;
+use App\Http\Middleware\CleanerMiddleware;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/auth/login', [LoginController::class, 'store'])
@@ -100,6 +102,15 @@ Route::get('/bookings', [BookingController::class, 'index'])
 Route::get('/bookings/{booking}', [BookingController::class, 'show'])
     ->middleware('auth:sanctum')
     ->name('api.v1.bookings.show');
+
+Route::get('/offers', [OfferController::class, 'index'])
+    ->middleware('auth:sanctum')
+    ->middleware(CleanerMiddleware::class)
+    ->name('api.v1.offers.index');
+Route::get('/offers/{offer}', [OfferController::class, 'show'])
+    ->middleware('auth:sanctum')
+    ->middleware(CleanerMiddleware::class)
+    ->name('api.v1.offers.show');
 
 Route::get('/notifications', [NotificationController::class, 'index'])
     ->middleware('auth:sanctum')

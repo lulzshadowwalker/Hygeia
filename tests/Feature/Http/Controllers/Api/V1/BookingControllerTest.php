@@ -129,6 +129,7 @@ class BookingControllerTest extends TestCase
             ])
             ->assertForbidden();
     }
+
     public function test_client_can_view_own_bookings_index(): void
     {
         $service = Service::factory()->has(Pricing::factory())->create();
