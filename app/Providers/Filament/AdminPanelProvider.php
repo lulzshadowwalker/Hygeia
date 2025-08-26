@@ -32,6 +32,7 @@ class AdminPanelProvider extends PanelProvider
             ->defaultThemeMode(ThemeMode::Light)
             ->brandLogo(asset('images/logo.png'))
             ->brandLogoHeight('50px')
+            ->favicon(asset('favicon.ico'))
             ->colors(colors())
             ->id('admin')
             ->path('admin')
