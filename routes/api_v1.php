@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\ChatRoomController;
 use App\Http\Controllers\Api\V1\CleanerController;
 use App\Http\Controllers\Api\V1\FaqController;
 use App\Http\Controllers\Api\V1\FavoriteCleanerController;
+use App\Http\Controllers\Api\V1\InvoiceController;
 use App\Http\Controllers\Api\V1\LoginController;
 use App\Http\Controllers\Api\V1\LogoutController;
 use App\Http\Controllers\Api\V1\NotificationController;
@@ -111,6 +112,13 @@ Route::get('/offers/{offer}', [OfferController::class, 'show'])
     ->middleware('auth:sanctum')
     ->middleware(CleanerMiddleware::class)
     ->name('api.v1.offers.show');
+
+Route::get('/invoices', [InvoiceController::class, 'index'] )
+    ->middleware('auth:sanctum')
+    ->name('api.v1.invoices.index');
+Route::get('/invoices/{invoice}', [InvoiceController::class, 'show'] )
+    ->middleware('auth:sanctum')
+    ->name('api.v1.invoices.show');
 
 Route::get('/notifications', [NotificationController::class, 'index'])
     ->middleware('auth:sanctum')

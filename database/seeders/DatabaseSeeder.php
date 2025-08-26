@@ -12,6 +12,7 @@ use App\Models\Client;
 use App\Models\District;
 use App\Models\Extra;
 use App\Models\Faq;
+use App\Models\Invoice;
 use App\Models\Pricing;
 use App\Models\Review;
 use App\Models\Service;
@@ -100,5 +101,7 @@ class DatabaseSeeder extends Seeder
         Extra::factory()->count(5)->create();
 
         CallbackRequest::factory()->count(10)->create();
+
+        Invoice::factory()->count(10)->create();
     }
 }
