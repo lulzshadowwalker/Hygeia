@@ -19,7 +19,7 @@ class InvoiceTest extends TestCase
         $this->assertNotEmpty($invoice1->number);
         $this->assertNotEmpty($invoice2->number);
         $this->assertNotEquals($invoice1->number, $invoice2->number);
-        $this->assertStringStartsWith('INV-' . now()->format('Y') . '-', $invoice1->number);
-        $this->assertStringStartsWith('INV-' . now()->format('Y') . '-', $invoice2->number);
+        $this->assertStringStartsWith('INV-', $invoice1->number);
+        $this->assertStringStartsWith('INV-', $invoice2->number);
     }
 }

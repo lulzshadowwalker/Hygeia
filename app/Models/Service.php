@@ -35,4 +35,25 @@ class Service extends Model
     {
         return $this->hasMany(Booking::class);
     }
+
+    // cleaners who have previously used this service
+    public function previousCleaners()
+    {
+        return $this->belongsToMany(
+            Cleaner::class,
+            'previous_service_cleaner',
+            'service_id',
+            'cleaner_id'
+        )->withTimestamps();
+    }
+
+    public function preferredByCleaners()
+    {
+        return $this->belongsToMany(
+            Cleaner::class,
+            'preferred_service_cleaner',
+            'service_id',
+            'cleaner_id'
+        )->withTimestamps();
+    }
 }

@@ -5,7 +5,6 @@ namespace App\Http\Requests\V1;
 use App\Http\Requests\BaseFormRequest;
 use App\Rules\UniqueEmailRule;
 use App\Rules\UniqueUsernameRule;
-use Illuminate\Foundation\Http\FormRequest;
 
 class StoreRegisterClientRequest extends BaseFormRequest
 {

@@ -30,10 +30,9 @@ class Cleaner extends Model implements HasMedia
         'years_of_experience',
         'has_cleaning_supplies',
         'comfortable_with_pets',
-        'previous_job_types',
         'service_radius',
-        'preferred_job_types',
         'agreed_to_terms',
+        'accepts_urgent_offers',
         'user_id',
     ];
 
@@ -50,6 +49,7 @@ class Cleaner extends Model implements HasMedia
             'time_slots' => 'array',
             'has_cleaning_supplies' => 'boolean',
             'comfortable_with_pets' => 'boolean',
+            'accepts_urgent_offers' => 'boolean',
             'previous_job_types' => 'array',
             'preferred_job_types' => 'array',
             'agreed_to_terms' => 'boolean',
@@ -64,13 +64,24 @@ class Cleaner extends Model implements HasMedia
 
     const MEDIA_COLLECTION_ID_CARD = 'id-card';
 
-    public function registerMediaConversions(?Media $media = null): void
+    public function registerMediaCollection(): void
     {
         $name = Str::replace(" ", "+", $this->fullName);
 
-        $this->registerMediaCollection(self::MEDIA_COLLECTION_ID_CARD)
+        $this->addMediaCollection(self::MEDIA_COLLECTION_ID_CARD)
             ->singleFile()
-            ->useFallbackUrl("https://ui-avatars.com/api/?name={$name}");
+            ->useFallbackUrl("https://ui-avatars.com/api/?name={$name}")
+
+            //  TODO: Media conversions need to be tested
+            ->registerMediaConversions(function (Media $media = null) {
+                $this->addMediaConversion('thumb')
+                    ->width(100)
+                    ->sharpen(10);
+
+                $this->addMediaConversion('preview')
+                    ->width(300)
+                    ->sharpen(10);
+            });
         // ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp']);
     }
 
@@ -113,5 +124,31 @@ class Cleaner extends Model implements HasMedia
     public function reviews(): morphMany
     {
         return $this->morphMany(Review::class, 'reviewable');
+    }
+
+    public function serviceArea(): BelongsTo
+    {
+        return $this->belongsTo(District::class, 'service_area');
+    }
+
+    // services the cleaner has previously used (filled only on registeration)
+    public function previousServices()
+    {
+        return $this->belongsToMany(
+            Service::class,
+            'previous_service_cleaner',
+            'cleaner_id',
+            'service_id'
+        )->withTimestamps();
+    }
+
+    public function preferredServices()
+    {
+        return $this->belongsToMany(
+            Service::class,
+            'preferred_service_cleaner',
+            'cleaner_id',
+            'service_id'
+        )->withTimestamps();
     }
 }

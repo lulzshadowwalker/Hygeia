@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\V1\ExtraController;
 use App\Http\Controllers\Api\V1\UserPreferenceController;
 use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\Api\V1\RegisterClientController;
+use App\Http\Controllers\Api\V1\RegisterCleanerController;
 use App\Http\Controllers\Api\V1\ServiceController;
 use App\Http\Controllers\Api\V1\BookingController;
 use App\Http\Controllers\Api\V1\CallbackRequestController;
@@ -34,6 +35,8 @@ Route::post('/auth/logout', [LogoutController::class, 'store'])
 
 Route::post('/auth/register/client', [RegisterClientController::class, 'store'])
     ->name('api.v1.auth.register.client');
+Route::post('/auth/register/cleaner', [RegisterCleanerController::class, 'store'])
+    ->name('api.v1.auth.register.cleaner');
 
 Route::get('/me/preferences', [UserPreferenceController::class, 'index'])->middleware('auth:sanctum')->name('api.v1.profile.preferences.index');
 Route::patch('/me/preferences', [UserPreferenceController::class, 'update'])->middleware('auth:sanctum')->name('api.v1.profile.preferences.update');
