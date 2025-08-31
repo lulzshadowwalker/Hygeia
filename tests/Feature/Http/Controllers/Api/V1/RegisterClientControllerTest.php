@@ -54,7 +54,7 @@ class RegisterClientControllerTest extends TestCase
                 'relationships' => [
                     'deviceTokens' => [
                         'data' => [
-                            'type' => 'device_tokens',
+                            'type' => 'device-tokens',
                             'attributes' => [
                                 'token' => $deviceToken,
                             ],
