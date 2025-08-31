@@ -24,20 +24,22 @@ class CleanerResource extends JsonResource
                 'email' => 'email@example.com',
                 'avatar' => "https://ui-avatars.com/api/?name=John+Doe",
                 'status' => 'active',
-                'serviceArea' => [],
-                'availableDays' => [],
+                'availableDays' => ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'],
                 'maxHoursPerWeek' => 40,
-                'timeSlots' => [],
+                'timeSlots' => ['morning', 'afternoon', 'evening'],
                 'yearsOfExperience' => 5,
                 'hasCleaningSupplies' => true,
                 'comfortableWithPets' => true,
-                'previousJobTypes' => [],
-                'serviceRadius' => 10.5,
-                'preferredJobTypes' => [],
+                'serviceRadius' => 10,
                 'agreedToTerms' => true,
 
                 //  TODO: Implement isFavorite attribute based on the current authenticated user
                 'isFavorite' => false,
+            ],
+            'includes' => [
+                'previousServices' => ServiceResource::collection($this->previousServices),
+                'preferredServices' => ServiceResource::collection($this->preferredServices),
+                'serviceArea' => DistrictResource::collection($this->serviceArea),
             ],
         ];
     }
