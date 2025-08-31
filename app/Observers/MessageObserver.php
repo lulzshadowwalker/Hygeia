@@ -6,7 +6,7 @@ use App\Enums\Role;
 use App\Events\MessageSent;
 use App\Models\Message;
 use App\Notifications\SupportChatMessageNotification;
-use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Builder;
 
 class MessageObserver
 {
