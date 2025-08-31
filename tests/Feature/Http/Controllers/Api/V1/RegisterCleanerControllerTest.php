@@ -124,7 +124,7 @@ class RegisterCleanerControllerTest extends TestCase
                     ],
                     'deviceTokens' => [
                         'data' => [
-                            'type' => 'device-tokens',
+                            'type' => 'device-token',
                             'attributes' => [
                                 'token' => $deviceToken,
                             ],
@@ -172,7 +172,7 @@ class RegisterCleanerControllerTest extends TestCase
                     ],
                     'deviceTokens' => [
                         'data' => [
-                            'type' => 'device-tokens',
+                            'type' => 'device-token',
                             'attributes' => [
                                 'token' => 12345, // should be string
                             ],
