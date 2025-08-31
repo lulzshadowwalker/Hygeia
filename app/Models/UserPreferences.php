@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\Language;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -42,5 +43,13 @@ class UserPreferences extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function notificationChannels(): Attribute
+    {
+        return Attribute::get(fn(): array => array_filter([
+            'mail' => $this->email_notifications,
+            'push' => $this->push_notifications,
+        ]));
     }
 }

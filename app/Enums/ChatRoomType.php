@@ -2,9 +2,9 @@
 
 namespace App\Enums;
 
-enum ChatRoomType: string 
+enum ChatRoomType: string
 {
-    case Support = 'support'; 
+    case Support = 'support';
     case Standard = 'standard';
 
     public static function values(): array

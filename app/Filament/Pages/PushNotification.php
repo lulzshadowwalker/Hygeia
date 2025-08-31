@@ -103,6 +103,12 @@ class PushNotification extends Page
             // TODO: use PushNotificationService instead
             (new AudienceNotificationStrategy)->send($notification, $this->data['audience']);
 
+            Log::info('Push notification sent', [
+                'audience' => $this->data['audience'],
+                'title' => $this->data['title'],
+                'body' => $this->data['body'],
+            ]);
+
             $this->form->fill();
 
             Notification::make()
