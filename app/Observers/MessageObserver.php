@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Enums\Role;
 use App\Events\MessageSent;
 use App\Models\Message;
 use App\Notifications\SupportChatMessageNotification;
@@ -12,7 +13,9 @@ class MessageObserver
     {
         MessageSent::dispatch($message);
         if ($message->user->isAdmin) {
-            $message->chatRoom->participants()->where('is_admin', false)
+            $message->chatRoom->participants()->whereHas('roles', function (Builder $query) {
+                $query->where('name', '!=', Role::Admin->value);
+            })
                 ->get()
                 ->each(function ($user) use ($message) {
                     //  TODO: Write a feature test for notifications
