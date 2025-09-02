@@ -23,6 +23,7 @@ use App\Http\Controllers\Api\V1\ServiceController;
 use App\Http\Controllers\Api\V1\BookingController;
 use App\Http\Controllers\Api\V1\CallbackRequestController;
 use App\Http\Controllers\Api\V1\OfferController;
+use App\Http\Controllers\Api\V1\UsernameController;
 use App\Http\Middleware\CleanerMiddleware;
 use Illuminate\Support\Facades\Route;
 
@@ -37,6 +38,11 @@ Route::post('/auth/register/client', [RegisterClientController::class, 'store'])
     ->name('api.v1.auth.register.client');
 Route::post('/auth/register/cleaner', [RegisterCleanerController::class, 'store'])
     ->name('api.v1.auth.register.cleaner');
+
+Route::get('/auth/usernames/{username}', [UsernameController::class, 'show'])
+    ->name('api.v1.auth.usernames.show');
+
+
 
 Route::get('/me/preferences', [UserPreferenceController::class, 'index'])->middleware('auth:sanctum')->name('api.v1.profile.preferences.index');
 Route::patch('/me/preferences', [UserPreferenceController::class, 'update'])->middleware('auth:sanctum')->name('api.v1.profile.preferences.update');
