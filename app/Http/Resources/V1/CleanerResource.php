@@ -37,8 +37,8 @@ class CleanerResource extends JsonResource
                 'isFavorite' => false,
             ],
             'includes' => [
-                'previousServices' => ServiceResource::collection($this->previousServices),
-                'preferredServices' => ServiceResource::collection($this->preferredServices),
+                'previousServices' => ServiceResource::collection($this->previousServices ?? []),
+                'preferredServices' => ServiceResource::collection($this->preferredServices ?? []),
                 'serviceArea' => DistrictResource::collection($this->serviceArea),
             ],
         ];
