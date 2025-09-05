@@ -39,7 +39,7 @@ class CleanerResource extends JsonResource
             'includes' => [
                 'previousServices' => ServiceResource::collection($this->previousServices ?? []),
                 'preferredServices' => ServiceResource::collection($this->preferredServices ?? []),
-                'serviceArea' => DistrictResource::collection($this->serviceArea),
+                'serviceArea' => $this->serviceArea ? DistrictResource::make($this->serviceArea) : null,
             ],
         ];
     }
