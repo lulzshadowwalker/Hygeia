@@ -22,6 +22,7 @@
         "laravel/sanctum": "^4.0",
         "laravel/telescope": "^5.10",
         "laravel/tinker": "^2.10.1",
+        "matanyadaev/laravel-eloquent-spatial": "^4.5",
         "outerweb/filament-translatable-fields": "^2.1",
         "owenvoke/blade-fontawesome": "^2.9",
         "predis/predis": "^3.1",
