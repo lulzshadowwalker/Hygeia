@@ -16,8 +16,8 @@ class LoginController extends Controller
         $password = $request->password();
 
         if (
-            !auth()->attempt(['email' => $identifier, 'password' => $password]) &&
-            !auth()->attempt(['username' => $identifier, 'password' => $password])
+            !auth('web')->attempt(['email' => $identifier, 'password' => $password]) &&
+            !auth('web')->attempt(['username' => $identifier, 'password' => $password])
         ) {
             //  TODO: We can handle the repsonse better
             throw new \Illuminate\Auth\AuthenticationException('Invalid credentials');

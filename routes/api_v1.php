@@ -9,6 +9,9 @@ use App\Http\Controllers\Api\V1\FavoriteCleanerController;
 use App\Http\Controllers\Api\V1\InvoiceController;
 use App\Http\Controllers\Api\V1\LoginController;
 use App\Http\Controllers\Api\V1\LogoutController;
+use App\Http\Controllers\Api\V1\ResetPasswordController;
+use App\Http\Controllers\Api\V1\ChangePasswordController;
+use App\Http\Controllers\Api\V1\ForgotPasswordController;
 use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\SupportTicketController;
 use App\Http\Controllers\Api\V1\PageController;
@@ -33,6 +36,10 @@ Route::post('/auth/login', [LoginController::class, 'store'])
 Route::post('/auth/logout', [LogoutController::class, 'store'])
     ->middleware('auth:sanctum')
     ->name('api.v1.auth.logout');
+
+Route::post('/auth/forgot-password', [ForgotPasswordController::class, 'store'])->name('api.v1.auth.forgot-password');
+Route::post('/auth/reset-password', [ResetPasswordController::class, 'store'])->name('api.v1.auth.reset-password');
+Route::post('/auth/change-password', [ChangePasswordController::class, 'store'])->middleware('auth:sanctum')->name('api.v1.auth.change-password');
 
 Route::post('/auth/register/client', [RegisterClientController::class, 'store'])
     ->name('api.v1.auth.register.client');

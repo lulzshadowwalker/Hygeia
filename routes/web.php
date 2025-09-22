@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\SupportChatController;
 use App\Http\Controllers\Web\ChatPlaygroundController;
+use App\Http\Controllers\Web\PasswordResetController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -15,6 +16,10 @@ Route::middleware(['auth', 'web'])->prefix('admin/support')->name('admin.support
     Route::post('/chat/{chatRoom}/messages', [SupportChatController::class, 'sendMessage'])->name('chat.send');
     Route::get('/chat-config/reverb', [SupportChatController::class, 'getReverbConfig'])->name('chat.reverbconfig');
 });
+
+// Password reset routes for email links
+Route::get('/password/reset/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
+Route::post('/password/reset', [PasswordResetController::class, 'reset'])->name('password.update');
 
 // Chat Playground Routes
 if (app()->environment('local')) {
