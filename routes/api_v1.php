@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\V1\AcceptBookingController;
 use App\Http\Controllers\Api\V1\ChatController;
 use App\Http\Controllers\Api\V1\ChatMessageController;
 use App\Http\Controllers\Api\V1\ChatRoomController;
@@ -48,8 +49,6 @@ Route::post('/auth/register/cleaner', [RegisterCleanerController::class, 'store'
 
 Route::get('/auth/usernames/{username}', [UsernameController::class, 'show'])
     ->name('api.v1.auth.usernames.show');
-
-
 
 Route::get('/me/preferences', [UserPreferenceController::class, 'index'])->middleware('auth:sanctum')->name('api.v1.profile.preferences.index');
 Route::patch('/me/preferences', [UserPreferenceController::class, 'update'])->middleware('auth:sanctum')->name('api.v1.profile.preferences.update');
@@ -119,6 +118,11 @@ Route::get('/bookings', [BookingController::class, 'index'])
 Route::get('/bookings/{booking}', [BookingController::class, 'show'])
     ->middleware('auth:sanctum')
     ->name('api.v1.bookings.show');
+
+Route::post('/bookings/{booking}/accept', [AcceptBookingController::class, 'store'])
+    ->middleware('auth:sanctum')
+    ->middleware(CleanerMiddleware::class)
+    ->name('api.v1.bookings.accept');
 
 Route::get('/offers', [OfferController::class, 'index'])
     ->middleware('auth:sanctum')

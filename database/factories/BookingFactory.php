@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Enums\BookingStatus;
 use App\Enums\BookingUrgency;
+use App\Models\Cleaner;
 use App\Models\Client;
 use App\Models\Pricing;
 use App\Models\Service;
@@ -30,7 +31,8 @@ class BookingFactory extends Factory
             'scheduled_at' => $this->faker->dateTimeBetween('+1 days', '+1 month'),
             'has_cleaning_material' => $this->faker->boolean(),
             'amount' => $this->faker->randomFloat(2, 10, 100),
-            'status' => $this->faker->randomElement(BookingStatus::values())
+            'status' => $this->faker->randomElement(BookingStatus::values()),
+            'cleaner_id' => $this->faker->boolean() ? null : Cleaner::factory(),
         ];
     }
 }

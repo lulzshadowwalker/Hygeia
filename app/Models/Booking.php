@@ -55,4 +55,9 @@ class Booking extends Model
     {
         return $this->belongsToMany(Extra::class);
     }
+
+    public function cleaner(): BelongsTo
+    {
+        return $this->belongsTo(Cleaner::class);
+    }
 }

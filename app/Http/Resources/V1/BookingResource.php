@@ -29,6 +29,7 @@ class BookingResource extends JsonResource
             ],
             'includes' => [
                 'client' => new ClientResource($this->client->user),
+                'cleaner' => new CleanerResource($this->cleaner),
                 'service' => new ServiceResource($this->service),
                 'pricing' => new PricingResource($this->pricing),
                 'extras' => ExtraResource::collection($this->extras),

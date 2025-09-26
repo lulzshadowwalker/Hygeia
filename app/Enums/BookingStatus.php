@@ -13,6 +13,26 @@ enum BookingStatus: string implements HasColor, HasIcon, HasLabel
     case Cancelled = 'cancelled';
     case Completed = 'completed';
 
+    public function isConfirmed(): bool
+    {
+        return $this === self::Confirmed;
+    }
+
+    public function isPending(): bool
+    {
+        return $this === self::Pending;
+    }
+
+    public function isCancelled(): bool
+    {
+        return $this === self::Cancelled;
+    }
+
+    public function isCompleted(): bool
+    {
+        return $this === self::Completed;
+    }
+
     public static function values(): array
     {
         return array_column(self::cases(), 'value');

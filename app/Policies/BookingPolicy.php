@@ -21,4 +21,18 @@ class BookingPolicy
     {
         return $user->isClient;
     }
+
+    public function accept(User $user, Booking $booking): bool
+    {
+        if (! $user->isCleaner) {
+            return false;
+        }
+
+        $status = $booking->status;
+        if ($status->isCancelled() || $status->isCompleted() || $status->isConfirmed()) {
+            return false;
+        }
+
+        return true;
+    }
 }
