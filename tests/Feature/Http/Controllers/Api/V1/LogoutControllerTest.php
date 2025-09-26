@@ -2,13 +2,10 @@
 
 namespace Tests\Feature\Http\Controllers\Api\V1;
 
-use App\Enums\Language;
 use App\Models\DeviceToken;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Http\Testing\File;
 use Tests\TestCase;
-use Tests\Traits\WithRoles;
 
 class LogoutControllerTest extends TestCase
 {
@@ -32,7 +29,7 @@ class LogoutControllerTest extends TestCase
                         ],
                     ],
                 ],
-            ]
+            ],
             // 'deviceToken' => $user->deviceTokens->first()->token,
         ])->assertOk();
 

@@ -31,9 +31,9 @@ class ChatControllerTest extends TestCase
                         'key',
                         'host',
                         'port',
-                        'scheme'
+                        'scheme',
                     ],
-                ]
+                ],
             ]);
     }
 

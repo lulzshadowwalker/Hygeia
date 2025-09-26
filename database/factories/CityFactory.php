@@ -15,7 +15,7 @@ class CityFactory extends BaseFactory
     public function definition(): array
     {
         return [
-            'name' => $this->localized(fn(): string => $this->faker->city()),
+            'name' => $this->localized(fn (): string => $this->faker->city()),
         ];
     }
 }

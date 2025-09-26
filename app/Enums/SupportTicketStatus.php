@@ -6,7 +6,7 @@ use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasIcon;
 use Filament\Support\Contracts\HasLabel;
 
-enum SupportTicketStatus: string implements HasLabel, HasColor, HasIcon
+enum SupportTicketStatus: string implements HasColor, HasIcon, HasLabel
 {
     case Open = 'open';
     case InProgress = 'in-progress';
@@ -31,7 +31,7 @@ enum SupportTicketStatus: string implements HasLabel, HasColor, HasIcon
         return $this->label();
     }
 
-    public function getColor(): string | array | null
+    public function getColor(): string|array|null
     {
         return match ($this) {
             self::Open => 'info',

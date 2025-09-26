@@ -3,14 +3,14 @@
 namespace App\Models;
 
 use App\Enums\ChatRoomType;
+use App\Observers\ChatRoomObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use App\Observers\ChatRoomObserver;
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 
 #[ObservedBy(ChatRoomObserver::class)]
 class ChatRoom extends Model
@@ -86,6 +86,6 @@ class ChatRoom extends Model
      */
     public function user(): Attribute
     {
-        return Attribute::get(fn() => $this->participants->firstWhere(fn ($user) => ! $user->isAdmin));
+        return Attribute::get(fn () => $this->participants->firstWhere(fn ($user) => ! $user->isAdmin));
     }
 }

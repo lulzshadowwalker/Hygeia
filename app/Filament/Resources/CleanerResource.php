@@ -1,16 +1,16 @@
 <?php
 
 // CleanerResource.php
+
 namespace App\Filament\Resources;
 
+use App\Enums\UserStatus;
 use App\Filament\Resources\CleanerResource\Pages;
-use App\Filament\Resources\CleanerResource\RelationManagers;
 use App\Models\Cleaner;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use App\Enums\UserStatus;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -148,6 +148,7 @@ class CleanerResource extends Resource
                     ->limit(30)
                     ->tooltip(function (Tables\Columns\TextColumn $column): ?string {
                         $state = $column->getState();
+
                         return strlen($state) > 30 ? $state : null;
                     }),
 
@@ -221,7 +222,7 @@ class CleanerResource extends Resource
 
     public static function getGlobalSearchResultTitle(Model $record): string
     {
-        return $record->user->name . ' (' . $record->user->status->getLabel() . ')';
+        return $record->user->name.' ('.$record->user->status->getLabel().')';
     }
 
     public static function getGlobalSearchEloquentQuery(): Builder
@@ -239,7 +240,7 @@ class CleanerResource extends Resource
         return [
             'Status' => $record->user->status->getLabel(),
             'Service Area' => $record->service_area,
-            'Experience' => $record->years_of_experience . ' years',
+            'Experience' => $record->years_of_experience.' years',
             'Created' => $record->created_at->diffForHumans(),
         ];
     }

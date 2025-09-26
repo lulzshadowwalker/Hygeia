@@ -57,8 +57,8 @@ class LoginControllerTest extends TestCase
                             'attributes' => [
                                 'token' => 'example-device-token',
                             ],
-                        ]
-                    ]
+                        ],
+                    ],
                 ],
             ],
         ]);

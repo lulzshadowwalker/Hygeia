@@ -2,9 +2,9 @@
 
 namespace Tests\Feature\Http\Controllers\Api\V1;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Http\Resources\V1\ExtraResource;
 use App\Models\Extra;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class ExtraControllerTest extends TestCase

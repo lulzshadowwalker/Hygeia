@@ -13,7 +13,9 @@ trait WithChat
     use WithRoles;
 
     protected User $client;
+
     protected User $admin;
+
     protected ChatRoom $chatRoom;
 
     public function setUpWithChat(): void

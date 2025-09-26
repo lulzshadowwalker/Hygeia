@@ -24,7 +24,7 @@ class UpdateUserPreferenceRequest extends BaseFormRequest
     public function messages(): array
     {
         return [
-            'data.attributes.language' => 'The language field must be one of ' . implode(', ', Language::values()),
+            'data.attributes.language' => 'The language field must be one of '.implode(', ', Language::values()),
         ];
     }
 

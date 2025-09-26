@@ -11,6 +11,7 @@ class ExtraController extends Controller
     public function index()
     {
         $extras = Extra::all();
+
         return ExtraResource::collection($extras);
     }
 

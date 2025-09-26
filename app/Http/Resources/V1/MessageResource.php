@@ -2,10 +2,8 @@
 
 namespace App\Http\Resources\V1;
 
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use InvalidArgumentException;
 
 class MessageResource extends JsonResource
 {
@@ -25,8 +23,8 @@ class MessageResource extends JsonResource
                 'updatedAt' => $this->updated_at,
             ],
             'relationships' => [
-                'sender' =>  ParticipantResource::make($this->user),
-            ]
+                'sender' => ParticipantResource::make($this->user),
+            ],
         ];
     }
 }

@@ -26,7 +26,9 @@ class NotificationStrategyCollection extends Collection
     public function match($notifiable): ?NotificationStrategy
     {
         foreach ($this as $strategy) {
-            if ($strategy->isSatisfiedBy($notifiable)) return $strategy;
+            if ($strategy->isSatisfiedBy($notifiable)) {
+                return $strategy;
+            }
         }
 
         return null;

@@ -6,7 +6,7 @@ use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasIcon;
 use Filament\Support\Contracts\HasLabel;
 
-enum Role: string implements HasLabel, HasColor, HasIcon
+enum Role: string implements HasColor, HasIcon, HasLabel
 {
     case Client = 'client';
     case Cleaner = 'cleaner';
@@ -35,7 +35,7 @@ enum Role: string implements HasLabel, HasColor, HasIcon
         };
     }
 
-    public function getColor(): string | array | null
+    public function getColor(): string|array|null
     {
         return match ($this) {
             self::Client => 'primary',

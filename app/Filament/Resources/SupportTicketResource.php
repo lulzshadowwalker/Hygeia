@@ -3,16 +3,12 @@
 namespace App\Filament\Resources;
 
 use App\Enums\SupportTicketStatus;
-use App\Filament\Exports\SupportTicketExporter;
 use App\Filament\Resources\SupportTicketResource\Pages;
 use App\Filament\Resources\SupportTicketResource\Widgets\SupportTicketsStatsWidget;
 use App\Models\SupportTicket;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Tables\Actions\ExportAction;
-use Filament\Tables\Actions\ExportBulkAction;
 use Filament\Resources\Resource;
-use Filament\Support\Colors\Color;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -54,7 +50,7 @@ class SupportTicketResource extends Resource
     public static function getGlobalSearchResultDetails(Model $record): array
     {
         return [
-            'Attached Information' => $record->name . ' ' . $record->phone,
+            'Attached Information' => $record->name.' '.$record->phone,
         ];
     }
 
@@ -76,6 +72,7 @@ class SupportTicketResource extends Resource
         } elseif ($count === 1) {
             return 'One open ticket';
         }
+
         return "{$count} open tickets";
     }
 
@@ -91,7 +88,7 @@ class SupportTicketResource extends Resource
                             ->required()
                             ->maxLength(255)
                             ->disabled()
-                            ->formatStateUsing(fn($state) => Str::replace('TICKET-', '', $state)),
+                            ->formatStateUsing(fn ($state) => Str::replace('TICKET-', '', $state)),
 
                         Forms\Components\TextInput::make('user.name')
                             ->label('Name')
@@ -111,9 +108,9 @@ class SupportTicketResource extends Resource
                         Forms\Components\Select::make('status')
                             ->label('Status')
                             ->required()
-                            ->options(Arr::collapse(Arr::map(SupportTicketStatus::cases(), fn($status) => [$status->value => $status->label()])))
+                            ->options(Arr::collapse(Arr::map(SupportTicketStatus::cases(), fn ($status) => [$status->value => $status->label()])))
                             ->searchable(),
-                    ])
+                    ]),
             ]);
     }
 
@@ -123,7 +120,7 @@ class SupportTicketResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('user.name')
                     ->label('Author')
-                    ->description(fn($record) => $record->user->email)
+                    ->description(fn ($record) => $record->user->email)
                     ->sortable()
                     ->searchable(
                         query: function (Builder $query, $search) {
@@ -135,19 +132,19 @@ class SupportTicketResource extends Resource
                 Tables\Columns\TextColumn::make('subject')
                     ->label('Subject')
                     ->limit(50)
-                    ->tooltip(fn($record) => $record->subject),
+                    ->tooltip(fn ($record) => $record->subject),
 
                 Tables\Columns\TextColumn::make('user_type')
                     ->label('Author Type')
-                    ->getStateUsing(fn($record) => $record->user->isCleaner ? 'Cleaner' : 'Client')
-                    ->color(fn($record) => $record->user->isCleaner ? 'primary' : 'secondary')
+                    ->getStateUsing(fn ($record) => $record->user->isCleaner ? 'Cleaner' : 'Client')
+                    ->color(fn ($record) => $record->user->isCleaner ? 'primary' : 'secondary')
                     ->badge()
                     ->badge()
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('sent_at')
                     ->label('Sent At')
-                    ->getStateUsing(fn($record) => $record->created_at->diffForHumans())
+                    ->getStateUsing(fn ($record) => $record->created_at->diffForHumans())
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -155,14 +152,14 @@ class SupportTicketResource extends Resource
                 Tables\Columns\TextColumn::make('status')
                     ->label('Status')
                     ->badge()
-                    ->formatStateUsing(fn($state) => $state->label())
+                    ->formatStateUsing(fn ($state) => $state->label())
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('number')
                     ->label('Number')
                     ->badge()
                     ->alignCenter()
-                    ->formatStateUsing(fn($state) => Str::replace('TICKET-', '', $state))
+                    ->formatStateUsing(fn ($state) => Str::replace('TICKET-', '', $state))
                     ->searchable(),
 
             ])
@@ -180,22 +177,22 @@ class SupportTicketResource extends Resource
                         ->label('Open')
                         ->color(SupportTicketStatus::Open->getColor())
                         ->icon(SupportTicketStatus::Open->getIcon())
-                        ->visible(fn($record) => !$record->isOpen)
-                        ->action(fn($record) => $record->markAsOpen()),
+                        ->visible(fn ($record) => ! $record->isOpen)
+                        ->action(fn ($record) => $record->markAsOpen()),
 
                     Tables\Actions\Action::make('in-progress')
                         ->label('In Progress')
-                        ->visible(fn($record) => !$record->isInProgress)
-                        ->action(fn($record) => $record->markAsInProgress()),
+                        ->visible(fn ($record) => ! $record->isInProgress)
+                        ->action(fn ($record) => $record->markAsInProgress()),
 
                     Tables\Actions\Action::make('resolve')
                         ->label('Resolve')
                         ->color(SupportTicketStatus::Resolved->getColor())
                         ->icon(SupportTicketStatus::Resolved->getIcon())
-                        ->visible(fn($record) => !$record->isResolved)
-                        ->action(fn($record) => $record->markAsResolved()),
+                        ->visible(fn ($record) => ! $record->isResolved)
+                        ->action(fn ($record) => $record->markAsResolved()),
 
-                ])
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

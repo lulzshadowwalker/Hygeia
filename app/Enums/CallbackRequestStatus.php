@@ -6,7 +6,6 @@ use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasIcon;
 use Filament\Support\Contracts\HasLabel;
 
-
 enum CallbackRequestStatus: string implements HasColor, HasIcon, HasLabel
 {
     case Pending = 'pending';
@@ -41,7 +40,7 @@ enum CallbackRequestStatus: string implements HasColor, HasIcon, HasLabel
         };
     }
 
-    public function getColor(): string | array | null
+    public function getColor(): string|array|null
     {
         return match ($this) {
             self::Pending => 'warning',

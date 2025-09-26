@@ -55,7 +55,7 @@ class PushNotification extends Page
                         Forms\Components\Select::make('audience')
                             ->label('Audience')
                             ->placeholder('Target Audience')
-                            ->options(Arr::collapse(Arr::map(Audience::cases(), fn($status) => [$status->value => $status->label()])))
+                            ->options(Arr::collapse(Arr::map(Audience::cases(), fn ($status) => [$status->value => $status->label()])))
                             ->searchable()
                             ->preload()
                             ->required(),
@@ -88,7 +88,7 @@ class PushNotification extends Page
     {
         return [
             Action::make('Publish')
-                ->action(fn() => $this->publish()),
+                ->action(fn () => $this->publish()),
         ];
     }
 

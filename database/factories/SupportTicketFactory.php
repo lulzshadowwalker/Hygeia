@@ -3,9 +3,9 @@
 namespace Database\Factories;
 
 use App\Enums\SupportTicketStatus;
-use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\SupportTicket;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class SupportTicketFactory extends Factory
 {

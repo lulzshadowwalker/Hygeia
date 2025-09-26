@@ -25,6 +25,6 @@ class Invoice extends Model
 
     public function strippedNumber(): Attribute
     {
-        return Attribute::get(fn(): string => str_replace('INV-', '', $this->number));
+        return Attribute::get(fn (): string => str_replace('INV-', '', $this->number));
     }
 }

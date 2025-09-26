@@ -6,7 +6,7 @@ use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasIcon;
 use Filament\Support\Contracts\HasLabel;
 
-enum UserStatus: string implements HasLabel, HasColor, HasIcon
+enum UserStatus: string implements HasColor, HasIcon, HasLabel
 {
     case Active = 'active';
     case Banned = 'banned';
@@ -24,12 +24,12 @@ enum UserStatus: string implements HasLabel, HasColor, HasIcon
         };
     }
 
-    public function getLabel(): string|null
+    public function getLabel(): ?string
     {
         return $this->label();
     }
 
-    public function getColor(): string | array | null
+    public function getColor(): string|array|null
     {
         return match ($this) {
             self::Active => 'success',

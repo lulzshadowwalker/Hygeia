@@ -8,7 +8,9 @@ use Illuminate\Http\Request;
 abstract class QueryFilter
 {
     protected $sortable = [];
+
     protected Request $request;
+
     protected Builder $builder;
 
     public function __construct(Request $request)
@@ -39,7 +41,7 @@ abstract class QueryFilter
                 $attr = substr($attr, 1);
             }
 
-            if (!in_array($attr, $this->sortable) && !array_key_exists($attr, $this->sortable)) {
+            if (! in_array($attr, $this->sortable) && ! array_key_exists($attr, $this->sortable)) {
                 continue;
             }
 

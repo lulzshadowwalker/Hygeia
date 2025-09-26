@@ -2,9 +2,9 @@
 
 namespace App\Policies;
 
+use App\Enums\ChatRoomType;
 use App\Models\ChatRoom;
 use App\Models\User;
-use App\Enums\ChatRoomType;
 use Illuminate\Auth\Access\Response;
 
 class ChatRoomPolicy
@@ -96,11 +96,11 @@ class ChatRoomPolicy
     public function moderate(User $user, ChatRoom $chatRoom): bool
     {
         // Only admins or users with admin role in the chat room
-        return $user->isAdmin || 
+        return $user->isAdmin ||
                $chatRoom->participants()
-                        ->where('user_id', $user->id)
-                        ->where('role', 'admin')
-                        ->exists();
+                   ->where('user_id', $user->id)
+                   ->where('role', 'admin')
+                   ->exists();
     }
 
     /**

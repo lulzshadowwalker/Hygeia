@@ -5,7 +5,6 @@ namespace Tests\Feature\Http\Controllers\Api\V1;
 use App\Enums\Role;
 use App\Http\Resources\V1\SupportTicketResource;
 use App\Models\Client;
-use App\Models\Faq;
 use App\Models\SupportTicket;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -27,7 +26,7 @@ class SupportTicketControllerTest extends TestCase
 
         $response = $this->getJson(route('api.v1.support-tickets.index'));
         $response->assertOk()
-            ->assertExactJson($resource->response()->getData(true));;
+            ->assertExactJson($resource->response()->getData(true));
     }
 
     public function test_it_shows_a_single_support_ticket_for_the_current_user(): void

@@ -50,17 +50,17 @@ class SupportTicket extends Model
 
     public function isOpen(): Attribute
     {
-        return Attribute::get(fn(): bool => $this->status === SupportTicketStatus::Open);
+        return Attribute::get(fn (): bool => $this->status === SupportTicketStatus::Open);
     }
 
     public function isInProgress(): Attribute
     {
-        return Attribute::get(fn(): bool => $this->status === SupportTicketStatus::InProgress);
+        return Attribute::get(fn (): bool => $this->status === SupportTicketStatus::InProgress);
     }
 
     public function isResolved(): Attribute
     {
-        return Attribute::get(fn(): bool => $this->status === SupportTicketStatus::Resolved);
+        return Attribute::get(fn (): bool => $this->status === SupportTicketStatus::Resolved);
     }
 
     public function scopeOpen(Builder $query): Builder

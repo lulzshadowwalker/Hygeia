@@ -35,6 +35,7 @@ class RegisterClientController extends Controller
             $user->client()->create();
 
             $accessToken = $user->createToken(config('app.name'))->plainTextToken;
+
             return AuthTokenResource::make(
                 new AccessToken(accessToken: $accessToken, role: Role::Client),
             )->response()->setStatusCode(201);

@@ -17,7 +17,7 @@ class ServiceFactory extends BaseFactory
     public function definition(): array
     {
         return [
-            'name' => $this->localized(fn(): string => $this->faker->word()),
+            'name' => $this->localized(fn (): string => $this->faker->word()),
             'type' => $this->faker->randomElement(ServiceType::values()),
         ];
     }

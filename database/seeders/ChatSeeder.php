@@ -16,12 +16,13 @@ class ChatSeeder extends Seeder
     public function run(): void
     {
         // Get some existing users
-        $admin = User::whereHas('roles', fn($q) => $q->where('name', Role::Admin->value))->first();
-        $client = User::whereHas('roles', fn($q) => $q->where('name', Role::Client->value))->first();
-        $cleaner = User::whereHas('roles', fn($q) => $q->where('name', Role::Cleaner->value))->first();
+        $admin = User::whereHas('roles', fn ($q) => $q->where('name', Role::Admin->value))->first();
+        $client = User::whereHas('roles', fn ($q) => $q->where('name', Role::Client->value))->first();
+        $cleaner = User::whereHas('roles', fn ($q) => $q->where('name', Role::Cleaner->value))->first();
 
-        if (!$admin || !$client || !$cleaner) {
+        if (! $admin || ! $client || ! $cleaner) {
             $this->command->warn('Make sure to run DatabaseSeeder first to create users with roles');
+
             return;
         }
 

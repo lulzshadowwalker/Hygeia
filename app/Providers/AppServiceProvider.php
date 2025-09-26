@@ -7,10 +7,10 @@ use App\Contracts\ResponseBuilder;
 use App\Http\Response\JsonResponseBuilder;
 use App\Models\User;
 use App\Services\FirebasePushNotification\FirebasePushNotificationService;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Blade;
 
 class AppServiceProvider extends ServiceProvider
 {

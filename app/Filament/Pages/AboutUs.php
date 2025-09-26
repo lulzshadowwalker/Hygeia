@@ -5,8 +5,8 @@ namespace App\Filament\Pages;
 use App\Models\Page as ModelsPage;
 use Exception;
 use Filament\Actions\Action;
-use Filament\Forms\Form;
 use Filament\Forms;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Contracts\Support\Htmlable;
@@ -66,14 +66,16 @@ class AboutUs extends Page
     {
         return [
             Action::make('Publish')
-                ->action(fn() => $this->publish()),
+                ->action(fn () => $this->publish()),
         ];
     }
 
     public function publish()
     {
         $content = $this->data['content'];
-        if (! $content) return;
+        if (! $content) {
+            return;
+        }
 
         try {
             $page = ModelsPage::where('slug', ModelsPage::ABOUT_US)->first();

@@ -2,13 +2,13 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\UserStatus;
 use App\Filament\Resources\ClientResource\Pages;
 use App\Models\Client;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use App\Enums\UserStatus;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -141,7 +141,7 @@ class ClientResource extends Resource
 
     public static function getGlobalSearchResultTitle(Model $record): string
     {
-        return $record->user->name . ' (' . $record->user->status->getLabel() . ')';
+        return $record->user->name.' ('.$record->user->status->getLabel().')';
     }
 
     public static function getGlobalSearchEloquentQuery(): Builder

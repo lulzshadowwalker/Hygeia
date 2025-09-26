@@ -11,6 +11,7 @@ class DistrictController extends Controller
     public function index()
     {
         $districts = District::all();
+
         return DistrictResource::collection($districts);
     }
 

@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Events\SupportChatRoomUpdated;
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\V1\StoreChatMessageRequest;
-use App\Models\ChatRoom;
-use App\Events\MessageSent;
-use App\Events\SupportChatRoomUpdated;
-use App\Models\Message;
 use App\Http\Resources\V1\MessageResource;
+use App\Models\ChatRoom;
+use App\Models\Message;
 
 class ChatMessageController extends ApiController
 {
@@ -34,7 +33,7 @@ class ChatMessageController extends ApiController
                 'last' => $messages->url($messages->lastPage()),
                 'prev' => $messages->previousPageUrl(),
                 'next' => $messages->nextPageUrl(),
-            ]
+            ],
         ]);
     }
 

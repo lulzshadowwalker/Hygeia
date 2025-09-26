@@ -55,9 +55,9 @@ class RegisterCleanerControllerTest extends TestCase
                         'data' => [
                             'type' => 'service',
                             'id' => 1,
-                        ]
-                    ]
-                ]
+                        ],
+                    ],
+                ],
             ],
         ]);
 
@@ -130,7 +130,7 @@ class RegisterCleanerControllerTest extends TestCase
                             ],
                         ],
                     ],
-                ]
+                ],
             ],
         ]);
 
@@ -178,7 +178,7 @@ class RegisterCleanerControllerTest extends TestCase
                             ],
                         ],
                     ],
-                ]
+                ],
             ],
         ]);
 
@@ -244,9 +244,9 @@ class RegisterCleanerControllerTest extends TestCase
                         'data' => [
                             'type' => 'service',
                             'id' => 1,
-                        ]
-                    ]
-                ]
+                        ],
+                    ],
+                ],
             ],
         ]);
 
@@ -302,9 +302,9 @@ class RegisterCleanerControllerTest extends TestCase
                         'data' => [
                             'type' => 'service',
                             'id' => 1,
-                        ]
-                    ]
-                ]
+                        ],
+                    ],
+                ],
             ],
         ]);
 

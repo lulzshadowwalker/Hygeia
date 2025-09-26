@@ -4,7 +4,6 @@ namespace App\Filament\Resources;
 
 use App\Enums\CallbackRequestStatus;
 use App\Filament\Resources\CallbackRequestResource\Pages;
-use App\Filament\Resources\CallbackRequestResource\RelationManagers;
 use App\Models\CallbackRequest;
 use Filament\Forms;
 use Filament\Forms\Components\Section;
@@ -12,9 +11,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class CallbackRequestResource extends Resource
 {
@@ -71,7 +68,7 @@ class CallbackRequestResource extends Resource
             return null;
         }
 
-        return "{$count} pending callback request" . ($count > 1 ? 's' : '');
+        return "{$count} pending callback request".($count > 1 ? 's' : '');
     }
 
     public static function form(Form $form): Form

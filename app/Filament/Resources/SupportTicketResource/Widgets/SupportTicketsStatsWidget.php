@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\SupportTicketResource\Widgets;
 
 use App\Models\SupportTicket;
-use Filament\Notifications\Notification;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Carbon;
@@ -58,6 +57,7 @@ class SupportTicketsStatsWidget extends BaseWidget
         } elseif ($trend < 0) {
             return 'danger'; // Negative trend
         }
+
         return 'primary'; // No change
     }
 
@@ -69,6 +69,7 @@ class SupportTicketsStatsWidget extends BaseWidget
         } elseif ($trend < 0) {
             return 'heroicon-m-arrow-trending-down';
         }
+
         return 'heroicon-m-minus'; // No change
     }
 
@@ -76,10 +77,11 @@ class SupportTicketsStatsWidget extends BaseWidget
     protected function getTrendDescription($trend)
     {
         if ($trend > 0) {
-            return number_format($trend, 2) . '% ' . __('filament/resources/support-ticket-resource.increase');
+            return number_format($trend, 2).'% '.__('filament/resources/support-ticket-resource.increase');
         } elseif ($trend < 0) {
-            return number_format(abs($trend), 2) . '% ' . __('filament/resources/support-ticket-resource.decrease');
+            return number_format(abs($trend), 2).'% '.__('filament/resources/support-ticket-resource.decrease');
         }
+
         return 'No change';
     }
 

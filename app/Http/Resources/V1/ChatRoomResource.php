@@ -23,14 +23,13 @@ class ChatRoomResource extends JsonResource
             'relationships' => (object) [
                 'participants' => $this->whenLoaded(
                     'participants',
-                    fn() =>
-                    ParticipantResource::collection($this->participants)
+                    fn () => ParticipantResource::collection($this->participants)
                 ),
                 'latestMessage' => $this->whenLoaded(
                     'messages',
-                    fn() => $this->messages->isNotEmpty() ? MessageResource::make($this->messages->first()) : null
-                )
-            ]
+                    fn () => $this->messages->isNotEmpty() ? MessageResource::make($this->messages->first()) : null
+                ),
+            ],
         ];
     }
 }

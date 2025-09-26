@@ -41,10 +41,10 @@ class BookingControllerTest extends TestCase
                             'data' => ['id' => $pricing->id],
                         ],
                         'extras' => [
-                            'data' => $extras->map(fn($extra) => ['id' => $extra->id])->toArray(),
+                            'data' => $extras->map(fn ($extra) => ['id' => $extra->id])->toArray(),
                         ],
                     ],
-                ]
+                ],
             ])
             ->assertCreated();
     }
@@ -76,7 +76,7 @@ class BookingControllerTest extends TestCase
                             'data' => [],
                         ],
                     ],
-                ]
+                ],
             ])
             ->assertCreated();
 
@@ -85,7 +85,7 @@ class BookingControllerTest extends TestCase
             'urgency' => 'flexible',
 
             'pricing_id' => $pricing->id,
-            'selected_amount'  => $pricing->amount,
+            'selected_amount' => $pricing->amount,
 
             'scheduled_at' => null,
 
@@ -122,13 +122,14 @@ class BookingControllerTest extends TestCase
                             'data' => ['id' => $pricing->id],
                         ],
                         'extras' => [
-                            'data' => $extras->map(fn($extra) => ['id' => $extra->id])->toArray(),
+                            'data' => $extras->map(fn ($extra) => ['id' => $extra->id])->toArray(),
                         ],
                     ],
-                ]
+                ],
             ])
             ->assertForbidden();
     }
+
     public function test_client_can_view_own_bookings_index(): void
     {
         $service = Service::factory()->has(Pricing::factory())->create();
@@ -149,7 +150,7 @@ class BookingControllerTest extends TestCase
         $this->actingAs($client->user)
             ->getJson(route('api.v1.bookings.index'))
             ->assertOk()
-            ->assertJsonFragment(['id' => (string)$booking->id]);
+            ->assertJsonFragment(['id' => (string) $booking->id]);
     }
 
     public function test_client_can_view_own_booking_show(): void
@@ -172,7 +173,7 @@ class BookingControllerTest extends TestCase
         $this->actingAs($client->user)
             ->getJson(route('api.v1.bookings.show', $booking))
             ->assertOk()
-            ->assertJsonFragment(['id' => (string)$booking->id]);
+            ->assertJsonFragment(['id' => (string) $booking->id]);
     }
 
     public function test_client_cannot_view_other_clients_booking(): void

@@ -20,7 +20,7 @@ return new class extends Migration
             $table->foreignIdFor(ChatRoom::class)->constrained()->onDelete('cascade');
             $table->text('content');
             $table->enum('type', MessageType::values())->default(MessageType::Text);
-            $table->index(['chat_room_id', 'created_at']); 
+            $table->index(['chat_room_id', 'created_at']);
             $table->timestamps();
         });
     }

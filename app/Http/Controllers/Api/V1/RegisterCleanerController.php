@@ -59,6 +59,7 @@ class RegisterCleanerController extends Controller
             $user->assignRole(Role::Cleaner->value);
 
             $accessToken = $user->createToken(config('app.name'))->plainTextToken;
+
             return AuthTokenResource::make(
                 new AccessToken(accessToken: $accessToken, role: Role::Cleaner),
             )->response()->setStatusCode(201);

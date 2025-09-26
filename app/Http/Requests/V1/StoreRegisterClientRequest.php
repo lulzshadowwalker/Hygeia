@@ -8,7 +8,6 @@ use App\Rules\UniqueUsernameRule;
 
 class StoreRegisterClientRequest extends BaseFormRequest
 {
-
     /**
      * Get the validation rules that apply to the request.
      *
@@ -18,8 +17,8 @@ class StoreRegisterClientRequest extends BaseFormRequest
     {
         return [
             'data.attributes.name' => 'required|string|max:255',
-            'data.attributes.username' => ['required', 'string', 'max:255', 'unique:users,username', new UniqueUsernameRule()],
-            'data.attributes.email' => ['required', 'email', 'max:255', new UniqueEmailRule()],
+            'data.attributes.username' => ['required', 'string', 'max:255', 'unique:users,username', new UniqueUsernameRule],
+            'data.attributes.email' => ['required', 'email', 'max:255', new UniqueEmailRule],
             'data.attributes.password' => 'required|string|min:8',
             'data.attributes.avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:4048',
             'data.relationships.deviceTokens.data.attributes.token' => 'nullable|string',

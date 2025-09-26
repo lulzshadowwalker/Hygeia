@@ -18,7 +18,7 @@ class ChatRoomFactory extends Factory
     public function definition(): array
     {
         return [
-            "type" => $this->faker->randomElement(ChatRoomType::values()),
+            'type' => $this->faker->randomElement(ChatRoomType::values()),
         ];
     }
 }

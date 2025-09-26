@@ -18,7 +18,7 @@ class ChatRoomController extends ApiController
         }])->orderBy('updated_at', 'desc')->get();
 
         return response()->json([
-            'data' => ChatRoomResource::collection($chatRooms)
+            'data' => ChatRoomResource::collection($chatRooms),
         ]);
     }
 
@@ -40,7 +40,7 @@ class ChatRoomController extends ApiController
         $participants = $request->participants();
 
         // Add the creator participant to the participants
-        if (!in_array($user->id, $request->participants())) {
+        if (! in_array($user->id, $request->participants())) {
             $participants[] = $user->id;
         }
 
@@ -59,10 +59,11 @@ class ChatRoomController extends ApiController
     {
         $chatRoom = auth()->user()->chatRooms()
             ->where('type', ChatRoomType::Support)
-            ->with(['participants', 'messages' => fn($query) => $query->latest()->limit(1)])
+            ->with(['participants', 'messages' => fn ($query) => $query->latest()->limit(1)])
             ->firstOr(function () {
                 $chatRoom = ChatRoom::create(['type' => ChatRoomType::Support]);
                 $chatRoom->addParticipant(auth()->user());
+
                 return $chatRoom;
             });
 
@@ -91,7 +92,7 @@ class ChatRoomController extends ApiController
     {
         $this->authorize('leave', $chatRoom);
 
-        if (!$chatRoom->participants->contains(auth()->user())) {
+        if (! $chatRoom->participants->contains(auth()->user())) {
             return response()->json(['message' => 'Successfully left chat room'], 200);
         }
 

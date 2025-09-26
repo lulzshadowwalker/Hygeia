@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ReviewResource\Pages;
-use App\Filament\Resources\ReviewResource\RelationManagers;
 use App\Models\Review;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -12,7 +11,6 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ReviewResource extends Resource
 {
@@ -63,7 +61,7 @@ class ReviewResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('comment')
                     ->limit(50)
-                    ->tooltip(fn(string $state): string => $state)
+                    ->tooltip(fn (string $state): string => $state)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -104,7 +102,7 @@ class ReviewResource extends Resource
 
     public static function getGlobalSearchResultTitle(Model $record): string
     {
-        return $record->user->name . ' - ' . $record->rating;
+        return $record->user->name.' - '.$record->rating;
     }
 
     public static function getGlobalSearchEloquentQuery(): Builder

@@ -18,7 +18,9 @@ class Page extends Model
     public $translatable = ['title', 'content'];
 
     const TERMS_AND_CONDITIONS = 'terms-and-conditions';
+
     const PRIVACY_POLICY = 'privacy-policy';
+
     const ABOUT_US = 'about-us';
 
     public function getRouteKeyName()

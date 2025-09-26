@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\ReviewResource\Pages;
 
 use App\Filament\Resources\ReviewResource;
-use App\Filament\Resources\ReviewResource\Pages\ListReviews;
 use App\Models\Review;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;

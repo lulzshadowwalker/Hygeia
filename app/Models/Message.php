@@ -45,6 +45,6 @@ class Message extends Model
 
     public function mine(): Attribute
     {
-        return Attribute::get(fn(): bool => $this->user_id === Auth::id());
+        return Attribute::get(fn (): bool => $this->user_id === Auth::id());
     }
 }

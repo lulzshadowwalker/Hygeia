@@ -11,9 +11,13 @@ use InvalidArgumentException;
 class FirebasePushNotificationService implements PushNotificationService
 {
     protected ?string $title;
+
     protected ?string $body;
+
     protected ?NotificationStrategy $strategy;
+
     protected NotificationStrategyCollection $strategies;
+
     protected mixed $notifiable;
 
     public function __construct()
@@ -32,26 +36,29 @@ class FirebasePushNotificationService implements PushNotificationService
     public function title(string $title): self
     {
         $this->title = $title;
+
         return $this;
     }
 
     public function body(string $body): self
     {
         $this->body = $body;
+
         return $this;
     }
 
     /**
-     * @param Object|array<Object>|Audience $notifiable
-     *
-     * @return self
+     * @param  object|array<object>|Audience  $notifiable
      */
     public function to($notifiable): self
     {
         $this->strategy = $this->strategies->match($notifiable);
-        if (! $this->strategy) throw new InvalidArgumentException('Unrecognized notifiable');
+        if (! $this->strategy) {
+            throw new InvalidArgumentException('Unrecognized notifiable');
+        }
 
         $this->notifiable = $notifiable;
+
         return $this;
     }
 

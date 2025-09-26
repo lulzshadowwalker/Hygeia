@@ -83,12 +83,12 @@ class FaqResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->limit(50)
-                    ->tooltip(fn(Model $record) => $record->question),
+                    ->tooltip(fn (Model $record) => $record->question),
                 Tables\Columns\TextColumn::make('answer')
                     ->searchable()
                     ->sortable()
                     ->limit(50)
-                    ->tooltip(fn(Model $record) => $record->answer),
+                    ->tooltip(fn (Model $record) => $record->answer),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

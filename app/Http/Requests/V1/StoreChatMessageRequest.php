@@ -4,7 +4,6 @@ namespace App\Http\Requests\V1;
 
 use App\Enums\MessageType;
 use App\Http\Requests\BaseFormRequest;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 class StoreChatMessageRequest extends BaseFormRequest

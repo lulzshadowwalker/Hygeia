@@ -46,7 +46,7 @@ class NotificationController extends ApiController
     public function destroyAll()
     {
         //  NOTE: not entirely sure if this is required but doesn't hurt to have it
-        return  DB::transaction(function () {
+        return DB::transaction(function () {
             Auth::user()->notifications()->delete();
 
             return $this->response

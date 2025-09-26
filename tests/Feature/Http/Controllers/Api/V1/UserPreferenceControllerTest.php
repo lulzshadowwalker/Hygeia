@@ -5,7 +5,6 @@ namespace Tests\Feature\Http\Controllers\Api\V1;
 use App\Enums\Language;
 use App\Http\Resources\V1\UserPreferenceResource;
 use App\Models\User;
-use App\Models\UserPreference;
 use App\Models\UserPreferences;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
@@ -50,8 +49,8 @@ class UserPreferenceControllerTest extends TestCase
                     'language' => 'hu',
                     'emailNotifications' => false,
                     'pushNotifications' => false,
-                ]
-            ]
+                ],
+            ],
         ])->assertOk();
 
         $user->refresh();

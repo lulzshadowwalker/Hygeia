@@ -47,7 +47,7 @@ class MessagePolicy
     public function delete(User $user, Message $message): bool
     {
         // Message author, room creator, or admin can delete
-        return $message->user_id === $user->id || 
+        return $message->user_id === $user->id ||
                $message->chatRoom->created_by === $user->id ||
                $user->isAdmin;
     }

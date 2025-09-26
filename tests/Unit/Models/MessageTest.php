@@ -3,12 +3,10 @@
 namespace Tests\Unit\Models;
 
 use App\Enums\Role;
-use App\Events\SupportChatRoomUpdated;
 use App\Models\ChatRoom;
 use App\Models\Message;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use Tests\Traits\WithRoles;
 

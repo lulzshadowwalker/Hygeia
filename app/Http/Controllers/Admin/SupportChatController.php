@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Enums\ChatRoomType;
 use App\Enums\MessageType;
-use App\Events\MessageSent;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\ChatRoomResource;
 use App\Http\Resources\V1\MessageResource;
@@ -17,6 +16,7 @@ use Illuminate\Support\Facades\Auth;
 class SupportChatController extends Controller
 {
     use AuthorizesRequests;
+
     public function index()
     {
         // Use policy for authorization
@@ -43,7 +43,7 @@ class SupportChatController extends Controller
         }
 
         // Add admin to room if not already a participant
-        if (!$chatRoom->isParticipant(Auth::user())) {
+        if (! $chatRoom->isParticipant(Auth::user())) {
             $chatRoom->addParticipant(Auth::user());
         }
 
@@ -106,7 +106,7 @@ class SupportChatController extends Controller
         $this->authorize('viewAny', ChatRoom::class);
 
         // Additional admin check for config access
-        if (!Auth::user()->isAdmin) {
+        if (! Auth::user()->isAdmin) {
             return response()->json(['error' => 'Access denied'], 403);
         }
 

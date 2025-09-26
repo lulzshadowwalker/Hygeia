@@ -3,10 +3,9 @@
 namespace Database\Factories;
 
 use App\Enums\Language;
-use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
 use App\Models\User;
 use App\Models\UserPreferences;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class UserPreferencesFactory extends Factory
 {

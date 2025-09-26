@@ -12,7 +12,6 @@ use Filament\Navigation\NavigationItem;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
-use Filament\Support\Colors\Color;
 use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -50,41 +49,41 @@ class AdminPanelProvider extends PanelProvider
             ->navigationItems([
                 NavigationItem::make('support-chat')
                     ->label('Support Chat')
-                    ->badge(fn(): ?string => \App\Models\ChatRoom::support()->whereHas('messages', function ($query) {
+                    ->badge(fn (): ?string => \App\Models\ChatRoom::support()->whereHas('messages', function ($query) {
                         $query->where('created_at', '>=', now()->subHour());
                     })->count() ?: null)
                     ->badgeTooltip('Manage customer support conversations in real-time.')
-                    ->url(fn(): string => route('admin.support.chat.index'), shouldOpenInNewTab: false)
+                    ->url(fn (): string => route('admin.support.chat.index'), shouldOpenInNewTab: false)
                     ->icon('heroicon-o-chat-bubble-left-right')
                     ->group('Support')
-                    ->visible(fn(): bool => Auth::user()->isAdmin),
+                    ->visible(fn (): bool => Auth::user()->isAdmin),
 
                 NavigationItem::make('telescope')
                     ->label('Telescope')
-                    ->badge(fn(): string => '●')
+                    ->badge(fn (): string => '●')
                     ->badgeTooltip('Telescope helps track what happens behind the scenes in your app.')
-                    ->url(fn(): string => app()->environment('local') ? route('telescope') : '#', shouldOpenInNewTab: true)
+                    ->url(fn (): string => app()->environment('local') ? route('telescope') : '#', shouldOpenInNewTab: true)
                     ->icon('heroicon-o-chart-bar-square')
                     ->group('Monitor')
-                    ->visible(fn(): bool => !app()->environment('testing') && app()->environment(['local', 'staging']) && Auth::user()->isAdmin),
+                    ->visible(fn (): bool => ! app()->environment('testing') && app()->environment(['local', 'staging']) && Auth::user()->isAdmin),
 
                 NavigationItem::make('pulse')
                     ->label('Pulse')
-                    ->badge(fn(): string => '●')
+                    ->badge(fn (): string => '●')
                     ->badgeTooltip('Pulse provides real-time insights into your application\'s performance and health.')
-                    ->url(fn(): string => route('pulse'), shouldOpenInNewTab: true)
+                    ->url(fn (): string => route('pulse'), shouldOpenInNewTab: true)
                     ->icon('heroicon-o-heart')
                     ->group('Monitor')
-                    ->visible(fn(): bool => !app()->environment('testing') && Auth::user()->isAdmin),
+                    ->visible(fn (): bool => ! app()->environment('testing') && Auth::user()->isAdmin),
 
                 NavigationItem::make('horizon')
                     ->label('Horizon')
-                    ->badge(fn(): string => '●')
+                    ->badge(fn (): string => '●')
                     ->badgeTooltip('Horizon gives you a simple way to manage and monitor background tasks.')
-                    ->url(fn(): string => route('horizon.index'), shouldOpenInNewTab: true)
+                    ->url(fn (): string => route('horizon.index'), shouldOpenInNewTab: true)
                     ->icon('heroicon-o-lifebuoy')
                     ->group('Monitor')
-                    ->visible(fn(): bool => !app()->environment('testing') && Auth::user()->isAdmin),
+                    ->visible(fn (): bool => ! app()->environment('testing') && Auth::user()->isAdmin),
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -104,10 +103,9 @@ class AdminPanelProvider extends PanelProvider
                 FilamentTranslatableFieldsPlugin::make()
                     ->supportedLocales(config('app.supported_locales')),
                 GlobalSearchModalPlugin::make(),
-            ]);;
+            ]);
     }
 }
-
 
 function colors()
 {

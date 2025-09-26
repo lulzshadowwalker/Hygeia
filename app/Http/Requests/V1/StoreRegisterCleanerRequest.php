@@ -8,7 +8,6 @@ use App\Rules\UniqueUsernameRule;
 
 class StoreRegisterCleanerRequest extends BaseFormRequest
 {
-
     /**
      * Get the validation rules that apply to the request.
      *
@@ -19,8 +18,8 @@ class StoreRegisterCleanerRequest extends BaseFormRequest
         return [
             'data.attributes.name' => 'required|string|max:255',
             'data.attributes.phone' => 'phone',
-            'data.attributes.username' => ['required', 'string', 'max:255', 'unique:users,username', new UniqueUsernameRule()],
-            'data.attributes.email' => ['required', 'email', 'max:255', new UniqueEmailRule()],
+            'data.attributes.username' => ['required', 'string', 'max:255', 'unique:users,username', new UniqueUsernameRule],
+            'data.attributes.email' => ['required', 'email', 'max:255', new UniqueEmailRule],
             'data.attributes.password' => 'required|string|min:8',
             'data.attributes.availableDays' => 'required|array|min:1',
             'data.attributes.availableDays.*' => 'in:sunday,monday,tuesday,wednesday,thursday,friday,saturday',

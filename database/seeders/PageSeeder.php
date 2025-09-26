@@ -12,6 +12,7 @@ class PageSeeder extends Seeder
         $failed = Artisan::call('upsert:pages');
         if ($failed) {
             $this->command->error('Failed to seed pages data');
+
             return;
         }
     }

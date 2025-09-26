@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\CleanerResource;
 use App\Http\Resources\V1\ClientResource;
 use Exception;
-use Illuminate\Http\Request;
 
 class ProfileController extends Controller
 {

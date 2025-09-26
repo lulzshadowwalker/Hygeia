@@ -12,7 +12,7 @@ class ExtraFactory extends BaseFactory
     public function definition(): array
     {
         return [
-            'name' => $this->localized(fn(): string => $this->faker->word()),
+            'name' => $this->localized(fn (): string => $this->faker->word()),
             'amount' => $this->faker->randomFloat(2, 50, 99),
         ];
     }

@@ -16,18 +16,18 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Notifications\Notification;
+use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
-use Illuminate\Support\Str;
 use Spatie\Permission\Traits\HasRoles;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Notifications\Notification;
 
-class User extends Authenticatable implements HasMedia, FilamentUser
+class User extends Authenticatable implements FilamentUser, HasMedia
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasApiTokens, InteractsWithMedia, HasRoles;
+    use HasApiTokens, HasFactory, HasRoles, InteractsWithMedia, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -69,17 +69,17 @@ class User extends Authenticatable implements HasMedia, FilamentUser
 
     public function isClient(): Attribute
     {
-        return Attribute::get(fn(): bool => $this->hasRole(Role::Client->value));
+        return Attribute::get(fn (): bool => $this->hasRole(Role::Client->value));
     }
 
     public function isCleaner(): Attribute
     {
-        return Attribute::get(fn(): bool => $this->hasRole(Role::Cleaner->value));
+        return Attribute::get(fn (): bool => $this->hasRole(Role::Cleaner->value));
     }
 
     public function isAdmin(): Attribute
     {
-        return Attribute::get(fn(): bool => $this->hasRole(Role::Admin->value));
+        return Attribute::get(fn (): bool => $this->hasRole(Role::Admin->value));
     }
 
     public function scopeClients(Builder $query): Builder
@@ -137,7 +137,7 @@ class User extends Authenticatable implements HasMedia, FilamentUser
 
     public function registerMediaCollections(): void
     {
-        $name = Str::replace(" ", "+", $this->name);
+        $name = Str::replace(' ', '+', $this->name);
 
         $this->addMediaCollection(self::MEDIA_COLLECTION_AVATAR)
             ->singleFile()
@@ -150,7 +150,7 @@ class User extends Authenticatable implements HasMedia, FilamentUser
     public function avatar(): Attribute
     {
         return Attribute::get(
-            fn() => $this->getFirstMediaUrl(self::MEDIA_COLLECTION_AVATAR) ?:
+            fn () => $this->getFirstMediaUrl(self::MEDIA_COLLECTION_AVATAR) ?:
                 null
         );
     }
@@ -161,7 +161,7 @@ class User extends Authenticatable implements HasMedia, FilamentUser
     public function avatarFile(): Attribute
     {
         return Attribute::get(
-            fn() => $this->getFirstMedia(self::MEDIA_COLLECTION_AVATAR) ?: null
+            fn () => $this->getFirstMedia(self::MEDIA_COLLECTION_AVATAR) ?: null
         );
     }
 
@@ -172,7 +172,7 @@ class User extends Authenticatable implements HasMedia, FilamentUser
 
     public function routeNotificationForPush(Notification $notification): array
     {
-        return $this->deviceTokens->pluck("token")->toArray();
+        return $this->deviceTokens->pluck('token')->toArray();
     }
 
     public function canAccessPanel(Panel $panel): bool

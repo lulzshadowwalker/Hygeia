@@ -42,12 +42,12 @@ class ChatMessageControllerTest extends TestCase
                         'attributes' => [
                             'content',
                             'type',
-                            'createdAt'
-                        ]
-                    ]
+                            'createdAt',
+                        ],
+                    ],
                 ],
                 'links',
-                'meta'
+                'meta',
             ])
             ->assertJsonCount(3, 'data');
     }
@@ -74,9 +74,9 @@ class ChatMessageControllerTest extends TestCase
             'data' => [
                 'attributes' => [
                     'content' => $messageContent,
-                    'type' => 'text'
-                ]
-            ]
+                    'type' => 'text',
+                ],
+            ],
         ]);
 
         $response->assertStatus(Response::HTTP_CREATED)
@@ -87,18 +87,18 @@ class ChatMessageControllerTest extends TestCase
                     'attributes' => [
                         'content',
                         'type',
-                        'createdAt'
-                    ]
-                ]
+                        'createdAt',
+                    ],
+                ],
             ])
             ->assertJson([
                 'data' => [
                     'type' => 'message',
                     'attributes' => [
                         'content' => $messageContent,
-                        'type' => 'text'
-                    ]
-                ]
+                        'type' => 'text',
+                    ],
+                ],
             ]);
 
         // Assert message was created in database
@@ -106,7 +106,7 @@ class ChatMessageControllerTest extends TestCase
             'content' => $messageContent,
             'type' => 'text',
             'user_id' => $this->client->id,
-            'chat_room_id' => $this->chatRoom->id
+            'chat_room_id' => $this->chatRoom->id,
         ]);
 
         // Assert event was dispatched
@@ -121,9 +121,9 @@ class ChatMessageControllerTest extends TestCase
             'data' => [
                 'attributes' => [
                     'content' => '', // Empty content
-                    'type' => 'text'
-                ]
-            ]
+                    'type' => 'text',
+                ],
+            ],
         ]);
 
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
@@ -138,9 +138,9 @@ class ChatMessageControllerTest extends TestCase
             'data' => [
                 'attributes' => [
                     'content' => 'Test message',
-                    'type' => 'invalid_type' // Invalid type
-                ]
-            ]
+                    'type' => 'invalid_type', // Invalid type
+                ],
+            ],
         ]);
 
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
@@ -157,9 +157,9 @@ class ChatMessageControllerTest extends TestCase
             'data' => [
                 'attributes' => [
                     'content' => 'This should not be allowed',
-                    'type' => 'text'
-                ]
-            ]
+                    'type' => 'text',
+                ],
+            ],
         ]);
 
         $response->assertStatus(Response::HTTP_FORBIDDEN);

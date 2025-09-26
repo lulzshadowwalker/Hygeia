@@ -22,7 +22,7 @@ class CleanerResource extends JsonResource
                 'name' => 'John Doe',
                 'phone' => '+962791234567',
                 'email' => 'email@example.com',
-                'avatar' => "https://ui-avatars.com/api/?name=John+Doe",
+                'avatar' => 'https://ui-avatars.com/api/?name=John+Doe',
                 'status' => 'active',
                 'availableDays' => ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'],
                 'maxHoursPerWeek' => 40,

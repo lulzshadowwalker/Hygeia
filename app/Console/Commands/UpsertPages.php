@@ -16,21 +16,22 @@ class UpsertPages extends Command
         $pages = [
             [
                 'title' => ['en' => 'About Us', 'ar' => 'من نحن'],
-                'content' => ['en' => 'About us content', 'ar' => 'محتوى من نحن']
+                'content' => ['en' => 'About us content', 'ar' => 'محتوى من نحن'],
             ],
             [
                 'title' => ['en' => 'Terms and conditions', 'ar' => 'الشروط والأحكام'],
-                'content' => ['en' => 'Terms and conditions content', 'ar' => 'محتوى الشروط والأحكام']
+                'content' => ['en' => 'Terms and conditions content', 'ar' => 'محتوى الشروط والأحكام'],
             ],
             [
                 'title' => ['en' => 'Privacy policy', 'ar' => 'سياسة الخصوصية'],
-                'content' => ['en' => 'Privacy policy content', 'ar' => 'محتوى سياسة الخصوصية']
-            ]
+                'content' => ['en' => 'Privacy policy content', 'ar' => 'محتوى سياسة الخصوصية'],
+            ],
         ];
 
         foreach ($pages as $page) {
-            if (Page::where('title', 'like', '%' . $page['title']['en'] . '%')->exists()) {
-                $this->info('Page with title "' . $page['title']['en'] . '" already exists, skipping');
+            if (Page::where('title', 'like', '%'.$page['title']['en'].'%')->exists()) {
+                $this->info('Page with title "'.$page['title']['en'].'" already exists, skipping');
+
                 continue;
             }
 

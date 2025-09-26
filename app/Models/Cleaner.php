@@ -9,10 +9,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Support\Str;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
-use Illuminate\Support\Str;
 
 class Cleaner extends Model implements HasMedia
 {
@@ -67,14 +67,14 @@ class Cleaner extends Model implements HasMedia
 
     public function registerMediaCollection(): void
     {
-        $name = Str::replace(" ", "+", $this->fullName);
+        $name = Str::replace(' ', '+', $this->fullName);
 
         $this->addMediaCollection(self::MEDIA_COLLECTION_ID_CARD)
             ->singleFile()
             ->useFallbackUrl("https://ui-avatars.com/api/?name={$name}")
 
             //  TODO: Media conversions need to be tested
-            ->registerMediaConversions(function (Media $media = null) {
+            ->registerMediaConversions(function (?Media $media = null) {
                 $this->addMediaConversion('thumb')
                     ->width(100)
                     ->sharpen(10);
@@ -92,7 +92,7 @@ class Cleaner extends Model implements HasMedia
     public function idCard(): Attribute
     {
         return Attribute::get(
-            fn() => $this->getFirstMediaUrl(self::MEDIA_COLLECTION_ID_CARD) ?:
+            fn () => $this->getFirstMediaUrl(self::MEDIA_COLLECTION_ID_CARD) ?:
                 null
         );
     }
@@ -103,7 +103,7 @@ class Cleaner extends Model implements HasMedia
     public function idCardFile(): Attribute
     {
         return Attribute::get(
-            fn() => $this->getFirstMedia(self::MEDIA_COLLECTION_ID_CARD) ?: null
+            fn () => $this->getFirstMedia(self::MEDIA_COLLECTION_ID_CARD) ?: null
         );
     }
 
@@ -153,7 +153,7 @@ class Cleaner extends Model implements HasMedia
         )->withTimestamps();
     }
 
-    public function bookings(): HasMany 
+    public function bookings(): HasMany
     {
         return $this->hasMany(Booking::class);
     }
