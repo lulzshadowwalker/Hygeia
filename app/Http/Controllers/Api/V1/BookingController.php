@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Enums\BookingStatus;
+use App\Filters\BookingFilter;
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\V1\StoreBookingRequest;
 use App\Http\Resources\V1\BookingResource;
@@ -14,12 +15,13 @@ use Illuminate\Support\Facades\DB;
 
 class BookingController extends ApiController
 {
-    public function index()
+    public function index(BookingFilter $filters)
     {
         $this->authorize('viewAny', Booking::class);
 
         $bookings = Booking::with(['client', 'service', 'pricing', 'extras'])
             ->where('client_id', Auth::user()->client->id)
+            ->filter($filters)
             ->get();
 
         return BookingResource::collection($bookings);
@@ -28,6 +30,7 @@ class BookingController extends ApiController
     public function show(Booking $booking)
     {
         $this->authorize('view', $booking);
+
         return BookingResource::make($booking);
     }
 
