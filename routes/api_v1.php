@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\ChatController;
 use App\Http\Controllers\Api\V1\ChatMessageController;
 use App\Http\Controllers\Api\V1\ChatRoomController;
 use App\Http\Controllers\Api\V1\CleanerController;
+use App\Http\Controllers\Api\V1\CleanerDashboardController;
 use App\Http\Controllers\Api\V1\CleanerReviewController;
 use App\Http\Controllers\Api\V1\CompleteBookingController;
 use App\Http\Controllers\Api\V1\DistrictController;
@@ -70,6 +71,10 @@ Route::get('/me/reviews', [ProfileReviewController::class, 'index'])
     ->middleware('auth:sanctum')
     ->middleware(CleanerMiddleware::class)
     ->name('api.v1.profile.reviews.index');
+Route::get('/me/dashboard', [CleanerDashboardController::class, 'index'])
+    ->middleware('auth:sanctum')
+    ->middleware(CleanerMiddleware::class)
+    ->name('api.v1.profile.dashboard');
 
 Route::get('/cleaners', [CleanerController::class, 'index'])
     ->name('api.v1.cleaner.index');

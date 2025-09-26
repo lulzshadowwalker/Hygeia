@@ -67,4 +67,20 @@ class Booking extends Model
     {
         return $filters->apply($builder);
     }
+
+    public function scopePending(Builder $builder): Builder
+    {
+        return $builder->where('status', BookingStatus::Pending);
+    }
+
+    public function scopeUpcoming(Builder $builder): Builder
+    {
+        return $builder->whereIn('status', [BookingStatus::Pending, BookingStatus::Confirmed])
+            ->where('scheduled_at', '>=', now());
+    }
+
+    public function scopeCompleted(Builder $builder): Builder
+    {
+        return $builder->where('status', BookingStatus::Completed);
+    }
 }
