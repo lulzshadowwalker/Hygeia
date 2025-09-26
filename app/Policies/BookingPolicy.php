@@ -19,7 +19,7 @@ class BookingPolicy
 
     public function viewAny(User $user): bool
     {
-        return $user->isClient;
+        return $user->isClient || $user->isCleaner;
     }
 
     // Accept offer

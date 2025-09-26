@@ -19,10 +19,16 @@ class BookingController extends ApiController
     {
         $this->authorize('viewAny', Booking::class);
 
-        $bookings = Booking::with(['client', 'service', 'pricing', 'extras'])
-            ->where('client_id', Auth::user()->client->id)
-            ->filter($filters)
-            ->get();
+        $query = Booking::with(['client', 'service', 'pricing', 'extras'])
+            ->filter($filters);
+
+        if (auth()->user()->isClient) {
+            $query->where('client_id', auth()->user()->client->id);
+        } elseif (auth()->user()->isCleaner) {
+            $query->where('cleaner_id', auth()->user()->cleaner->id);
+        }
+
+        $bookings = $query->get();
 
         return BookingResource::collection($bookings);
     }
