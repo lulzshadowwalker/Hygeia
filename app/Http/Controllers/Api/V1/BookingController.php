@@ -9,6 +9,7 @@ use App\Http\Resources\V1\BookingResource;
 use App\Models\Booking;
 use App\Models\Extra;
 use App\Models\Pricing;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class BookingController extends ApiController
@@ -18,7 +19,7 @@ class BookingController extends ApiController
         $this->authorize('viewAny', Booking::class);
 
         $bookings = Booking::with(['client', 'service', 'pricing', 'extras'])
-            ->where('client_id', auth()->user()->client->id)
+            ->where('client_id', Auth::user()->client->id)
             ->get();
 
         return BookingResource::collection($bookings);
@@ -38,7 +39,7 @@ class BookingController extends ApiController
             $pricing = Pricing::findOrFail($request->pricingId());
 
             $booking = Booking::create([
-                'client_id' => $request->user()->client->id,
+                'client_id' => Auth::user()->client->id,
                 'service_id' => $request->serviceId(),
                 'pricing_id' => $request->pricingId(),
                 'selected_amount' => $pricing->amount,
