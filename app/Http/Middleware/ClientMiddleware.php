@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Restricts access to routes for users with the 'cleaner' role.
  */
-class CleanerMiddleware
+class ClientMiddleware
 {
     /**
      * Handle an incoming request.
@@ -26,9 +26,9 @@ class CleanerMiddleware
             throw new AuthenticationException('Unauthenticated.');
         }
 
-        if (! $user->isCleaner) {
+        if (! $user->isClient) {
             throw new AuthorizationException(
-                'Only cleaners can access this resource.',
+                'Only clients can access this resource.',
                 Response::HTTP_FORBIDDEN
             );
         }

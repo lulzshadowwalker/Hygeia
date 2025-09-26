@@ -36,4 +36,17 @@ class BookingPolicy
 
         return true;
     }
+
+    public function complete(User $user, Booking $booking): bool
+    {
+        if (! $user->isClient) {
+            return false;
+        }
+
+        if ($user->client->id !== $booking->client_id) {
+            return false;
+        }
+
+        return true;
+    }
 }

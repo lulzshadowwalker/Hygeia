@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\V1\ChatMessageController;
 use App\Http\Controllers\Api\V1\ChatRoomController;
 use App\Http\Controllers\Api\V1\CleanerController;
 use App\Http\Controllers\Api\V1\CleanerReviewController;
+use App\Http\Controllers\Api\V1\CompleteBookingController;
 use App\Http\Controllers\Api\V1\DistrictController;
 use App\Http\Controllers\Api\V1\ExtraController;
 use App\Http\Controllers\Api\V1\FaqController;
@@ -30,6 +31,7 @@ use App\Http\Controllers\Api\V1\SupportTicketController;
 use App\Http\Controllers\Api\V1\UsernameController;
 use App\Http\Controllers\Api\V1\UserPreferenceController;
 use App\Http\Middleware\CleanerMiddleware;
+use App\Http\Middleware\ClientMiddleware;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/auth/login', [LoginController::class, 'store'])
@@ -133,6 +135,10 @@ Route::get('/bookings', [BookingController::class, 'index'])
 Route::get('/bookings/{booking}', [BookingController::class, 'show'])
     ->middleware('auth:sanctum')
     ->name('api.v1.bookings.show');
+Route::post('/bookings/{booking}/complete', [CompleteBookingController::class, 'store'])
+    ->middleware('auth:sanctum')
+    ->middleware(ClientMiddleware::class)
+    ->name('api.v1.bookings.complete');
 
 Route::post('/offers/{offer}/accept', [AcceptOfferController::class, 'store'])
     ->middleware('auth:sanctum')
