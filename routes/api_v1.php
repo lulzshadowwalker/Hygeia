@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Api\V1\AcceptBookingController;
+use App\Http\Controllers\Api\V1\AcceptOfferController;
 use App\Http\Controllers\Api\V1\ChatController;
 use App\Http\Controllers\Api\V1\ChatMessageController;
 use App\Http\Controllers\Api\V1\ChatRoomController;
@@ -119,10 +119,10 @@ Route::get('/bookings/{booking}', [BookingController::class, 'show'])
     ->middleware('auth:sanctum')
     ->name('api.v1.bookings.show');
 
-Route::post('/bookings/{booking}/accept', [AcceptBookingController::class, 'store'])
+Route::post('/offers/{offer}/accept', [AcceptOfferController::class, 'store'])
     ->middleware('auth:sanctum')
     ->middleware(CleanerMiddleware::class)
-    ->name('api.v1.bookings.accept');
+    ->name('api.v1.offers.accept');
 
 Route::get('/offers', [OfferController::class, 'index'])
     ->middleware('auth:sanctum')

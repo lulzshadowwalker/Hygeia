@@ -10,7 +10,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tests\Traits\WithRoles;
 
-class AcceptBookingControllerTest extends TestCase
+class AcceptOfferControllerTest extends TestCase
 {
     use RefreshDatabase, WithRoles;
 
@@ -21,7 +21,7 @@ class AcceptBookingControllerTest extends TestCase
         $cleaner->user->assignRole(Role::Cleaner);
         $this->actingAs($cleaner->user);
 
-        $this->postJson(route('api.v1.bookings.accept', $booking))
+        $this->postJson(route('api.v1.offers.accept', $booking))
             ->assertOk()
             ->assertJsonPath('data.attributes.status', BookingStatus::Confirmed->value);
 

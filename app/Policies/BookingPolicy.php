@@ -22,6 +22,7 @@ class BookingPolicy
         return $user->isClient;
     }
 
+    // Accept offer
     public function accept(User $user, Booking $booking): bool
     {
         if (! $user->isCleaner) {
