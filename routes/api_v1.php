@@ -1,33 +1,34 @@
 <?php
 
 use App\Http\Controllers\Api\V1\AcceptOfferController;
+use App\Http\Controllers\Api\V1\BookingController;
+use App\Http\Controllers\Api\V1\CallbackRequestController;
+use App\Http\Controllers\Api\V1\ChangePasswordController;
 use App\Http\Controllers\Api\V1\ChatController;
 use App\Http\Controllers\Api\V1\ChatMessageController;
 use App\Http\Controllers\Api\V1\ChatRoomController;
 use App\Http\Controllers\Api\V1\CleanerController;
-use App\Http\Controllers\Api\V1\FaqController;
-use App\Http\Controllers\Api\V1\FavoriteCleanerController;
-use App\Http\Controllers\Api\V1\InvoiceController;
-use App\Http\Controllers\Api\V1\LoginController;
-use App\Http\Controllers\Api\V1\LogoutController;
-use App\Http\Controllers\Api\V1\ResetPasswordController;
-use App\Http\Controllers\Api\V1\ChangePasswordController;
-use App\Http\Controllers\Api\V1\ForgotPasswordController;
-use App\Http\Controllers\Api\V1\NotificationController;
-use App\Http\Controllers\Api\V1\SupportTicketController;
-use App\Http\Controllers\Api\V1\PageController;
 use App\Http\Controllers\Api\V1\CleanerReviewController;
 use App\Http\Controllers\Api\V1\DistrictController;
 use App\Http\Controllers\Api\V1\ExtraController;
-use App\Http\Controllers\Api\V1\UserPreferenceController;
-use App\Http\Controllers\Api\V1\ProfileController;
-use App\Http\Controllers\Api\V1\RegisterClientController;
-use App\Http\Controllers\Api\V1\RegisterCleanerController;
-use App\Http\Controllers\Api\V1\ServiceController;
-use App\Http\Controllers\Api\V1\BookingController;
-use App\Http\Controllers\Api\V1\CallbackRequestController;
+use App\Http\Controllers\Api\V1\FaqController;
+use App\Http\Controllers\Api\V1\FavoriteCleanerController;
+use App\Http\Controllers\Api\V1\ForgotPasswordController;
+use App\Http\Controllers\Api\V1\InvoiceController;
+use App\Http\Controllers\Api\V1\LoginController;
+use App\Http\Controllers\Api\V1\LogoutController;
+use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\OfferController;
+use App\Http\Controllers\Api\V1\PageController;
+use App\Http\Controllers\Api\V1\ProfileController;
+use App\Http\Controllers\Api\V1\ProfileReviewController;
+use App\Http\Controllers\Api\V1\RegisterCleanerController;
+use App\Http\Controllers\Api\V1\RegisterClientController;
+use App\Http\Controllers\Api\V1\ResetPasswordController;
+use App\Http\Controllers\Api\V1\ServiceController;
+use App\Http\Controllers\Api\V1\SupportTicketController;
 use App\Http\Controllers\Api\V1\UsernameController;
+use App\Http\Controllers\Api\V1\UserPreferenceController;
 use App\Http\Middleware\CleanerMiddleware;
 use Illuminate\Support\Facades\Route;
 
@@ -38,9 +39,13 @@ Route::post('/auth/logout', [LogoutController::class, 'store'])
     ->middleware('auth:sanctum')
     ->name('api.v1.auth.logout');
 
-Route::post('/auth/forgot-password', [ForgotPasswordController::class, 'store'])->name('api.v1.auth.forgot-password');
-Route::post('/auth/reset-password', [ResetPasswordController::class, 'store'])->name('api.v1.auth.reset-password');
-Route::post('/auth/change-password', [ChangePasswordController::class, 'store'])->middleware('auth:sanctum')->name('api.v1.auth.change-password');
+Route::post('/auth/forgot-password', [ForgotPasswordController::class, 'store'])
+    ->name('api.v1.auth.forgot-password');
+Route::post('/auth/reset-password', [ResetPasswordController::class, 'store'])
+    ->name('api.v1.auth.reset-password');
+Route::post('/auth/change-password', [ChangePasswordController::class, 'store'])
+    ->middleware('auth:sanctum')
+    ->name('api.v1.auth.change-password');
 
 Route::post('/auth/register/client', [RegisterClientController::class, 'store'])
     ->name('api.v1.auth.register.client');
@@ -50,9 +55,19 @@ Route::post('/auth/register/cleaner', [RegisterCleanerController::class, 'store'
 Route::get('/auth/usernames/{username}', [UsernameController::class, 'show'])
     ->name('api.v1.auth.usernames.show');
 
-Route::get('/me/preferences', [UserPreferenceController::class, 'index'])->middleware('auth:sanctum')->name('api.v1.profile.preferences.index');
-Route::patch('/me/preferences', [UserPreferenceController::class, 'update'])->middleware('auth:sanctum')->name('api.v1.profile.preferences.update');
-Route::get('/me', [ProfileController::class, 'index'])->middleware('auth:sanctum')->name('api.v1.profile.index');
+Route::get('/me/preferences', [UserPreferenceController::class, 'index'])
+    ->middleware('auth:sanctum')
+    ->name('api.v1.profile.preferences.index');
+Route::patch('/me/preferences', [UserPreferenceController::class, 'update'])
+    ->middleware('auth:sanctum')
+    ->name('api.v1.profile.preferences.update');
+Route::get('/me', [ProfileController::class, 'index'])
+    ->middleware('auth:sanctum')
+    ->name('api.v1.profile.index');
+Route::get('/me/reviews', [ProfileReviewController::class, 'index'])
+    ->middleware('auth:sanctum')
+    ->middleware(CleanerMiddleware::class)
+    ->name('api.v1.profile.reviews.index');
 
 Route::get('/cleaners', [CleanerController::class, 'index'])
     ->name('api.v1.cleaner.index');
@@ -133,10 +148,10 @@ Route::get('/offers/{offer}', [OfferController::class, 'show'])
     ->middleware(CleanerMiddleware::class)
     ->name('api.v1.offers.show');
 
-Route::get('/invoices', [InvoiceController::class, 'index'] )
+Route::get('/invoices', [InvoiceController::class, 'index'])
     ->middleware('auth:sanctum')
     ->name('api.v1.invoices.index');
-Route::get('/invoices/{invoice}', [InvoiceController::class, 'show'] )
+Route::get('/invoices/{invoice}', [InvoiceController::class, 'show'])
     ->middleware('auth:sanctum')
     ->name('api.v1.invoices.show');
 
