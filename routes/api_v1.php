@@ -67,6 +67,9 @@ Route::patch('/me/preferences', [UserPreferenceController::class, 'update'])
 Route::get('/me', [ProfileController::class, 'index'])
     ->middleware('auth:sanctum')
     ->name('api.v1.profile.index');
+Route::patch('/me', [ProfileController::class, 'update'])
+    ->middleware('auth:sanctum')
+    ->name('api.v1.profile.update');
 Route::get('/me/reviews', [ProfileReviewController::class, 'index'])
     ->middleware('auth:sanctum')
     ->middleware(CleanerMiddleware::class)
