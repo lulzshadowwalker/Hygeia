@@ -61,8 +61,10 @@ class ServiceResource extends Resource
                 Tables\Columns\TextColumn::make('type')
                     ->label('Type')
                     ->badge()
-                    ->color(fn (string $state): string => ServiceType::from($state)->getColor())
-                    ->icon(fn (string $state): string => ServiceType::from($state)->getIcon()),
+                    ->getStateUsing(fn (Service $record) => $record->type)
+                    ->formatStateUsing(fn ($state): string => $state->getLabel())
+                    ->color(fn ($state): string => $state->getColor())
+                    ->icon(fn ($state): string => $state->getIcon()),
 
                 Tables\Columns\TextColumn::make('pricings_count')
                     ->label('Pricing Tiers')

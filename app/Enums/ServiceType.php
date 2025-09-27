@@ -33,7 +33,7 @@ enum ServiceType: string implements HasColor, HasIcon, HasLabel
     {
         return match ($this) {
             self::Residential => 'heroicon-o-home',
-            self::Commercial => 'heroicon-o-office-building',
+            self::Commercial => 'heroicon-o-building-office'
         };
     }
 
