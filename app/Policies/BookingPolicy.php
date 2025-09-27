@@ -9,22 +9,37 @@ class BookingPolicy
 {
     public function view(User $user, Booking $booking): bool
     {
+        if ($user->isAdmin) {
+            return true;
+        }
+
         return $user->isClient && $booking->client_id === $user->client->id;
     }
 
     public function create(User $user): bool
     {
+        if ($user->isAdmin) {
+            return true;
+        }
+
         return $user->isClient;
     }
 
     public function viewAny(User $user): bool
     {
+        if ($user->isAdmin) {
+            return true;
+        }
+
         return $user->isClient || $user->isCleaner;
     }
 
     // Accept offer
     public function accept(User $user, Booking $booking): bool
     {
+        if ($user->isAdmin) {
+            return true;
+        }
         if (! $user->isCleaner) {
             return false;
         }
@@ -39,6 +54,9 @@ class BookingPolicy
 
     public function complete(User $user, Booking $booking): bool
     {
+        if ($user->isAdmin) {
+            return true;
+        }
         if (! $user->isClient) {
             return false;
         }
