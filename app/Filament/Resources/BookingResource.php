@@ -33,6 +33,8 @@ class BookingResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Section::make('Client Information')
+                    ->description('Select the client who is requesting this booking')
+                    ->aside()
                     ->schema([
                         Forms\Components\Select::make('client_id')
                             ->label('Client')
@@ -43,6 +45,8 @@ class BookingResource extends Resource
                     ])->columns(1),
 
                 Forms\Components\Section::make('Service Details')
+                    ->description('Choose the service type and pricing tier for this booking')
+                    ->aside()
                     ->schema([
                         Forms\Components\Select::make('service_id')
                             ->label('Service')
@@ -64,7 +68,7 @@ class BookingResource extends Resource
                                 return Pricing::where('service_id', $serviceId)
                                     ->get()
                                     ->pluck('amount', 'id')
-                                    ->map(fn ($amount) => '$'.number_format($amount, 2));
+                                    ->map(fn ($amount) => 'Ft '.number_format($amount, 0));
                             })
                             ->required()
                             ->reactive()
@@ -81,12 +85,14 @@ class BookingResource extends Resource
                         Forms\Components\TextInput::make('selected_amount')
                             ->label('Selected Amount')
                             ->numeric()
-                            ->prefix('$')
+                            ->prefix('Ft')
                             ->disabled()
                             ->dehydrated(),
-                    ])->columns(2),
+                    ])->columns(1),
 
                 Forms\Components\Section::make('Booking Details')
+                    ->description('Set the urgency level, schedule, and calculate the total amount')
+                    ->aside()
                     ->schema([
                         Forms\Components\Select::make('urgency')
                             ->label('Urgency')
@@ -107,11 +113,13 @@ class BookingResource extends Resource
                         Forms\Components\TextInput::make('amount')
                             ->label('Total Amount')
                             ->numeric()
-                            ->prefix('$')
+                            ->prefix('Ft')
                             ->required(),
-                    ])->columns(2),
+                    ])->columns(1),
 
                 Forms\Components\Section::make('Status & Assignment')
+                    ->description('Manage the booking status and assign a cleaner')
+                    ->aside()
                     ->schema([
                         Forms\Components\Select::make('status')
                             ->label('Status')
@@ -126,7 +134,7 @@ class BookingResource extends Resource
                             ->searchable()
                             ->preload()
                             ->nullable(),
-                    ])->columns(2),
+                    ])->columns(1),
             ]);
     }
 
@@ -151,7 +159,7 @@ class BookingResource extends Resource
 
                 Tables\Columns\TextColumn::make('amount')
                     ->label('Amount')
-                    ->money('USD')
+                    ->money('HUF')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('urgency')
