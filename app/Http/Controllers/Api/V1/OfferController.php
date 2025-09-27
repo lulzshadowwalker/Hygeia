@@ -6,10 +6,17 @@ use App\Enums\BookingStatus;
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Resources\V1\OfferResource;
 use App\Models\Booking;
+use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
+#[Group('Offers')]
 class OfferController extends ApiController
 {
+    /**
+     * List offers
+     *
+     * Get a list of all available offers.
+     */
     public function index()
     {
         $offers = Booking::with(['service', 'pricing', 'extras'])
@@ -19,6 +26,11 @@ class OfferController extends ApiController
         return OfferResource::collection($offers);
     }
 
+    /**
+     * Get an offer
+     *
+     * Get the details of a specific offer.
+     */
     public function show(Booking $offer)
     {
         if ($offer->status !== BookingStatus::Pending) {

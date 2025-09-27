@@ -8,10 +8,17 @@ use App\Http\Requests\V1\StoreRegisterCleanerRequest;
 use App\Http\Resources\V1\AuthTokenResource;
 use App\Models\User;
 use App\Support\AccessToken;
+use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Support\Facades\DB;
 
+#[Group('Authentication')]
 class RegisterCleanerController extends Controller
 {
+    /**
+     * Register a new cleaner
+     *
+     * Handle new cleaner registration and issue an authentication token.
+     */
     public function store(StoreRegisterCleanerRequest $request)
     {
         return DB::transaction(function () use ($request) {

@@ -7,10 +7,17 @@ use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\V1\StoreChatRoomRequest;
 use App\Http\Resources\V1\ChatRoomResource;
 use App\Models\ChatRoom;
+use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\Request;
 
+#[Group('Chat')]
 class ChatRoomController extends ApiController
 {
+    /**
+     * List chat rooms
+     *
+     * Get a list of all chat rooms for the authenticated user.
+     */
     public function index()
     {
         $chatRooms = auth()->user()->chatRooms()->with(['participants', 'messages' => function ($query) {
@@ -22,6 +29,11 @@ class ChatRoomController extends ApiController
         ]);
     }
 
+    /**
+     * Get a chat room
+     *
+     * Get the details of a specific chat room.
+     */
     public function show(ChatRoom $chatRoom)
     {
         $this->authorize('view', $chatRoom);
@@ -33,6 +45,11 @@ class ChatRoomController extends ApiController
         return ChatRoomResource::make($chatRoom);
     }
 
+    /**
+     * Create a chat room
+     *
+     * Create a new chat room.
+     */
     public function store(StoreChatRoomRequest $request)
     {
         $user = $request->user();
@@ -55,6 +72,11 @@ class ChatRoomController extends ApiController
         return ChatRoomResource::make($chatRoom);
     }
 
+    /**
+     * Get or create a support chat room
+     *
+     * Get or create a support chat room for the authenticated user.
+     */
     public function support()
     {
         $chatRoom = auth()->user()->chatRooms()
@@ -72,6 +94,11 @@ class ChatRoomController extends ApiController
         return ChatRoomResource::make($chatRoom)->response()->setStatusCode(200);
     }
 
+    /**
+     * Join a chat room
+     *
+     * Join a specific chat room.
+     */
     public function join(Request $request, ChatRoom $chatRoom)
     {
         $this->authorize('join', $chatRoom);
@@ -88,6 +115,11 @@ class ChatRoomController extends ApiController
             ->setStatusCode(200);
     }
 
+    /**
+     * Leave a chat room
+     *
+     * Leave a specific chat room.
+     */
     public function leave(ChatRoom $chatRoom)
     {
         $this->authorize('leave', $chatRoom);

@@ -4,9 +4,16 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cleaner;
+use Dedoc\Scramble\Attributes\Group;
 
+#[Group('Cleaners')]
 class FavoriteCleanerController extends Controller
 {
+    /**
+     * Add a cleaner to favorites
+     *
+     * Add a specific cleaner to the authenticated user's favorites.
+     */
     public function store(Cleaner $cleaner)
     {
         //  TODO: It would be better if we simply used a client_favorites table with
@@ -17,6 +24,11 @@ class FavoriteCleanerController extends Controller
         return response()->noContent(204);
     }
 
+    /**
+     * Remove a cleaner from favorites
+     *
+     * Remove a specific cleaner from the authenticated user's favorites.
+     */
     public function destroy(Cleaner $cleaner)
     {
         auth()->user()->client->favoriteCleaners()

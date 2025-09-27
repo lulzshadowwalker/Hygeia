@@ -8,9 +8,16 @@ use App\Http\Requests\V1\StoreChatMessageRequest;
 use App\Http\Resources\V1\MessageResource;
 use App\Models\ChatRoom;
 use App\Models\Message;
+use Dedoc\Scramble\Attributes\Group;
 
+#[Group('Chat')]
 class ChatMessageController extends ApiController
 {
+    /**
+     * List messages in a chat room
+     *
+     * Get a paginated list of messages in a specific chat room.
+     */
     public function index(ChatRoom $chatRoom)
     {
         $this->authorize('viewMessages', [Message::class, $chatRoom]);
@@ -37,6 +44,11 @@ class ChatMessageController extends ApiController
         ]);
     }
 
+    /**
+     * Send a message
+     *
+     * Send a message in a specific chat room.
+     */
     public function store(StoreChatMessageRequest $request, ChatRoom $chatRoom)
     {
         $this->authorize('sendMessage', [Message::class, $chatRoom]);

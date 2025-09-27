@@ -10,11 +10,18 @@ use App\Http\Resources\V1\BookingResource;
 use App\Models\Booking;
 use App\Models\Extra;
 use App\Models\Pricing;
+use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
+#[Group('Bookings')]
 class BookingController extends ApiController
 {
+    /**
+     * List bookings
+     *
+     * Get a list of all bookings for the authenticated user.
+     */
     public function index(BookingFilter $filters)
     {
         $this->authorize('viewAny', Booking::class);
@@ -33,6 +40,11 @@ class BookingController extends ApiController
         return BookingResource::collection($bookings);
     }
 
+    /**
+     * Get a booking
+     *
+     * Get the details of a specific booking.
+     */
     public function show(Booking $booking)
     {
         $this->authorize('view', $booking);
@@ -40,6 +52,11 @@ class BookingController extends ApiController
         return BookingResource::make($booking);
     }
 
+    /**
+     * Create a booking
+     *
+     * Create a new booking.
+     */
     public function store(StoreBookingRequest $request)
     {
         $this->authorize('create', Booking::class);

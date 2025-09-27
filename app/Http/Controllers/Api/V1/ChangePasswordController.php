@@ -3,12 +3,18 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules\Password;
 
+#[Group('Authentication')]
 class ChangePasswordController extends Controller
 {
+    /**
+     * Change password
+     *
+     * Handle a user changing their own password.
+     */
     public function store(Request $request)
     {
         $request->validate([

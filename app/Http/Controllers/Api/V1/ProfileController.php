@@ -8,12 +8,19 @@ use App\Http\Requests\V1\UpdateClientProfileRequest;
 use App\Http\Resources\V1\CleanerResource;
 use App\Http\Resources\V1\ClientResource;
 use App\Models\User;
+use Dedoc\Scramble\Attributes\Group;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
+#[Group('User Profile')]
 class ProfileController extends Controller
 {
+    /**
+     * Get user profile
+     *
+     * Get the profile of the currently authenticated user.
+     */
     public function index()
     {
         $user = Auth::user();
@@ -28,6 +35,11 @@ class ProfileController extends Controller
         }
     }
 
+    /**
+     * Update user profile
+     *
+     * Update the profile of the currently authenticated user.
+     */
     public function update()
     {
         $user = Auth::user();
