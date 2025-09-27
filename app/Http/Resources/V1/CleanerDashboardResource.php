@@ -26,7 +26,7 @@ class CleanerDashboardResource extends JsonResource
                 'averageRating' => $averageRating ? round($averageRating, 2) : null,
                 'totalReviews' => $this->reviews()->count(),
                 'earnings' => '4.5',
-                'availableDays' => $this->available_days,
+                'availableDays' => (array) $this->available_days,
             ],
             'includes' => [
                 'upcomingBookings' => BookingResource::collection($this->bookings()->upcoming()->limit(2)->get()),
