@@ -31,7 +31,9 @@ class UpdateProfileControllerTest extends TestCase
                 ],
             ]);
 
-        $response->assertOk();
+        $response->assertOk()
+            ->assertJsonPath('data.attributes.name', 'Updated Name')
+            ->assertJsonPath('data.attributes.phone', '+962792002803');
 
         $client->user->refresh();
         $this->assertEquals('Updated Name', $client->user->name);
