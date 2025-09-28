@@ -164,22 +164,11 @@ class BookingResource extends Resource
 
                 Tables\Columns\TextColumn::make('urgency')
                     ->label('Urgency')
-                    ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        BookingUrgency::Flexible->value => 'success',
-                        BookingUrgency::Scheduled->value => 'warning',
-                        BookingUrgency::Urgent->value => 'danger',
-                    }),
+                    ->badge(),
 
                 Tables\Columns\TextColumn::make('status')
                     ->label('Status')
-                    ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        BookingStatus::Pending->value => 'gray',
-                        BookingStatus::Confirmed->value => 'warning',
-                        BookingStatus::Completed->value => 'success',
-                        BookingStatus::Cancelled->value => 'danger',
-                    }),
+                    ->badge(),
 
                 Tables\Columns\TextColumn::make('cleaner.user.name')
                     ->label('Assigned Cleaner')
