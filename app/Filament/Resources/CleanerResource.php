@@ -232,7 +232,7 @@ class CleanerResource extends Resource
 
     public static function getGloballySearchableAttributes(): array
     {
-        return ['user.name', 'service_area'];
+        return ['user.name'];
     }
 
     public static function getGlobalSearchResultDetails(Model $record): array
