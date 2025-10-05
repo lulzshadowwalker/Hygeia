@@ -57,11 +57,11 @@ class BookingPolicy
         if ($user->isAdmin) {
             return true;
         }
-        if (! $user->isClient) {
+        if (! $user->isCleaner) {
             return false;
         }
 
-        if ($user->client->id !== $booking->client_id) {
+        if ($user->cleaner->id !== $booking->cleaner_id) {
             return false;
         }
 
