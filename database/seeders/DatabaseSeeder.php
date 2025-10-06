@@ -52,6 +52,8 @@ class DatabaseSeeder extends Seeder
             ])
             ->assignRole(Role::Client->value);
 
+        // TODO: Add a middleware to prevent banned users from logging in
+
         User::factory()
             ->has(Client::factory())
             ->create([
