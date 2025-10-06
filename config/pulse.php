@@ -1,5 +1,6 @@
 <?php
 
+use Chrysanthos\PulseRequests\Recorders\RequestRecorder;
 use Laravel\Pulse\Http\Middleware\Authorize;
 use Laravel\Pulse\Pulse;
 use Laravel\Pulse\Recorders;
@@ -256,5 +257,7 @@ return [
                 '#^/pulse$#', // Pulse dashboard...
             ],
         ],
+
+        RequestRecorder::class => [],
     ],
 ];

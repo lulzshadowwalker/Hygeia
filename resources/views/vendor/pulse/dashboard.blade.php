@@ -24,4 +24,6 @@
     <livewire:pulse.about-application />
 
     <livewire:requests-graph cols="6" />
+
+    <livewire:requests cols="8" />
 </x-pulse>

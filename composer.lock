@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2f190b020156c200e3af9e2bf011b84c",
+    "content-hash": "9ef70e16fcfa6375109fcce8ed556e15",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -397,6 +397,66 @@
                 "source": "https://github.com/CharrafiMed/global-search-modal/tree/v3.7.1"
             },
             "time": "2025-06-02T12:26:13+00:00"
+        },
+        {
+            "name": "chrysanthos/pulse-requests",
+            "version": "1.0.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/chrysanthos/pulse-requests.git",
+                "reference": "e56c4859dc541b45dc6477ac073f43e72499b1a6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/chrysanthos/pulse-requests/zipball/e56c4859dc541b45dc6477ac073f43e72499b1a6",
+                "reference": "e56c4859dc541b45dc6477ac073f43e72499b1a6",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/pulse": "^1.0@beta",
+                "php": "^8.1"
+            },
+            "require-dev": {
+                "mockery/mockery": "^1.5.0",
+                "orchestra/testbench": "^8.17",
+                "phpunit/phpunit": "^10"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Chrysanthos\\PulseRequests\\PulseRequestsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Chrysanthos\\PulseRequests\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Chrysanthos Prodromou",
+                    "email": "me@chrysanthos.xyz",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A Laravel Pulse package for Requests",
+            "homepage": "https://github.com/chrysanthos/pulse-requests",
+            "keywords": [
+                "Chrysanthos",
+                "Laravel Pulse",
+                "Laravel Pulse Requests"
+            ],
+            "support": {
+                "issues": "https://github.com/chrysanthos/pulse-requests/issues",
+                "source": "https://github.com/chrysanthos/pulse-requests/tree/1.0.5"
+            },
+            "time": "2024-02-02T18:06:26+00:00"
         },
         {
             "name": "clue/redis-protocol",
