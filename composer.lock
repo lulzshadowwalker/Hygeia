@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e0df5e43a5e1695583af77f98b147998",
+    "content-hash": "9834b224c4b959570f85008a93794034",
     "packages": [
         {
             "name": "abbasudo/pulse-users",
@@ -10729,6 +10729,66 @@
                 "source": "https://github.com/tijsverkoyen/CssToInlineStyles/tree/v2.3.0"
             },
             "time": "2024-12-21T16:25:41+00:00"
+        },
+        {
+            "name": "timacdonald/pulse-validation-errors",
+            "version": "v1.5.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/timacdonald/pulse-validation-errors.git",
+                "reference": "c29f3006a89ef099b7d29f86638f643342afaa0a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/timacdonald/pulse-validation-errors/zipball/c29f3006a89ef099b7d29f86638f643342afaa0a",
+                "reference": "c29f3006a89ef099b7d29f86638f643342afaa0a",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/pulse": "^1.2",
+                "php": "^8.1"
+            },
+            "require-dev": {
+                "inertiajs/inertia-laravel": "^1.0",
+                "orchestra/testbench": "^9.0",
+                "phpunit/phpunit": "^10.0 || ^11.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "TiMacDonald\\Pulse\\ValidationErrorsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "TiMacDonald\\Pulse\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Tim MacDonald",
+                    "email": "hello@timacdonald.me",
+                    "homepage": "https://timacdonald.me"
+                }
+            ],
+            "description": "Validation errors card for Laravel Pulse",
+            "keywords": [
+                "errors",
+                "laravel",
+                "pulse",
+                "validation"
+            ],
+            "support": {
+                "issues": "https://github.com/timacdonald/pulse-validation-errors/issues",
+                "source": "https://github.com/timacdonald/pulse-validation-errors/tree/v1.5.1"
+            },
+            "time": "2024-06-26T02:54:17+00:00"
         },
         {
             "name": "vlucas/phpdotenv",

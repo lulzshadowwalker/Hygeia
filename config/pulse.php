@@ -7,6 +7,7 @@ use Laravel\Pulse\Recorders;
 use Laravel\Reverb\Pulse\Recorders\ReverbConnections;
 use Laravel\Reverb\Pulse\Recorders\ReverbMessages;
 use PauloHortelan\RequestsGraphPulse\Recorders\RequestsGraphRecorder;
+use TiMacDonald\Pulse\Recorders\ValidationErrors;
 
 return [
 
@@ -258,7 +259,23 @@ return [
             ],
         ],
 
-        RequestRecorder::class => [],
+        RequestRecorder::class => [
+            //
+        ],
+
+        ValidationErrors::class => [
+            'enabled' => env('PULSE_VALIDATION_ERRORS_ENABLED', true),
+            'sample_rate' => env('PULSE_VALIDATION_ERRORS_SAMPLE_RATE', 1),
+            'capture_messages' => true,
+            'ignore' => [
+                // '#^/login$#',
+                // '#^/register$#',
+                // '#^/forgot-password$#',
+            ],
+            'groups' => [
+                // '#^/products/.*$#' => '/products/{user}',
+            ],
+        ],
     ],
 
     // Configuration for the "abbasudo/pulse-users" package

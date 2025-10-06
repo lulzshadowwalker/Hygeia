@@ -28,4 +28,6 @@
     <livewire:requests cols="8" />
 
     <livewire:pulse.usage-hours cols='4' />
+
+    <livewire:pulse.validation-errors cols="8" rows="4" />
 </x-pulse>
