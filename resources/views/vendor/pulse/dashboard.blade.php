@@ -26,4 +26,6 @@
     <livewire:requests-graph cols="6" />
 
     <livewire:requests cols="8" />
+
+    <livewire:pulse.usage-hours cols='4' />
 </x-pulse>

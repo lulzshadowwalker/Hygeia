@@ -260,4 +260,13 @@ return [
 
         RequestRecorder::class => [],
     ],
+
+    // Configuration for the "abbasudo/pulse-users" package
+    'usage_hours' => [
+        'timezones' => [
+            'UTC',
+            'Europe/Budapest',
+            'Asia/Amman',
+        ],
+    ],
 ];
