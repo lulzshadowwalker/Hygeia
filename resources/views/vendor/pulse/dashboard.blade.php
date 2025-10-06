@@ -23,5 +23,5 @@
 
     <livewire:pulse.about-application />
 
-    <livewire:pulse_active_session cols='4' rows='2' />
+    <livewire:requests-graph cols="6" />
 </x-pulse>

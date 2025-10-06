@@ -26,6 +26,7 @@
         "matanyadaev/laravel-eloquent-spatial": "^4.5",
         "outerweb/filament-translatable-fields": "^2.1",
         "owenvoke/blade-fontawesome": "^2.9",
+        "paulo-hortelan/requests-graph-pulse": "^1.2",
         "predis/predis": "^3.1",
         "propaganistas/laravel-phone": "^6.0",
         "spatie/browsershot": "^5.0",
