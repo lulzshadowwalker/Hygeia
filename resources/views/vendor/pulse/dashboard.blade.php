@@ -30,4 +30,6 @@
     <livewire:pulse.usage-hours cols='4' />
 
     <livewire:pulse.validation-errors cols="8" rows="4" />
+
+    <livewire:pulse.log-files cols="4" />
 </x-pulse>

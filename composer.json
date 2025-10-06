@@ -15,6 +15,7 @@
         "chrysanthos/pulse-requests": "^1.0",
         "dedoc/scramble": "^0.12.23",
         "denniseilander/pulse-about-application": "^0.3.0",
+        "denniseilander/pulse-log-files": "^0.3.0",
         "filament/filament": "^3.3",
         "filament/spatie-laravel-media-library-plugin": "^3.2",
         "google/apiclient": "^2.18",

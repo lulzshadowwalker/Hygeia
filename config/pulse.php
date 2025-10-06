@@ -1,6 +1,7 @@
 <?php
 
 use Chrysanthos\PulseRequests\Recorders\RequestRecorder;
+use Denniseilander\LogFiles\Recorders\LogFiles;
 use Laravel\Pulse\Http\Middleware\Authorize;
 use Laravel\Pulse\Pulse;
 use Laravel\Pulse\Recorders;
@@ -275,6 +276,10 @@ return [
             'groups' => [
                 // '#^/products/.*$#' => '/products/{user}',
             ],
+        ],
+
+        LogFiles::class => [
+            //
         ],
     ],
 

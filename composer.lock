@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9834b224c4b959570f85008a93794034",
+    "content-hash": "edb2262263f3ba6a1f98da9d8f6b043c",
     "packages": [
         {
             "name": "abbasudo/pulse-users",
@@ -996,6 +996,73 @@
                 "source": "https://github.com/denniseilander/pulse-about-application/tree/0.3.0"
             },
             "time": "2025-03-05T19:52:01+00:00"
+        },
+        {
+            "name": "denniseilander/pulse-log-files",
+            "version": "0.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/denniseilander/pulse-log-files.git",
+                "reference": "ef0619c90d7764a4df713fc397d103624a9a9d6a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/denniseilander/pulse-log-files/zipball/ef0619c90d7764a4df713fc397d103624a9a9d6a",
+                "reference": "ef0619c90d7764a4df713fc397d103624a9a9d6a",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/contracts": "^10.0|^11.0|^12.0",
+                "laravel/pulse": "^1.0",
+                "php": "^8.1",
+                "spatie/laravel-package-tools": "^1.16.0"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.0",
+                "nesbot/carbon": "^2.63|^3.8.4",
+                "nunomaduro/collision": "^7.8|^8.1",
+                "nunomaduro/larastan": "^2.0.1",
+                "orchestra/testbench": "^8.23.1|^9.0|^10.0",
+                "pestphp/pest": "^2.31|^3.7",
+                "pestphp/pest-plugin-arch": "^2.0|^3.0",
+                "pestphp/pest-plugin-laravel": "^2.0|^3.1"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Denniseilander\\LogFiles\\LogFilesServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Denniseilander\\LogFiles\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Dennis Eilander",
+                    "email": "eilander.dennis@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A lightweight Laravel Pulse package for effortlessly viewing available log files in your current project.",
+            "homepage": "https://github.com/denniseilander/pulse-log-files",
+            "keywords": [
+                "Dennis Eilander",
+                "laravel",
+                "pulse-log-files"
+            ],
+            "support": {
+                "issues": "https://github.com/denniseilander/pulse-log-files/issues",
+                "source": "https://github.com/denniseilander/pulse-log-files/tree/0.3.0"
+            },
+            "time": "2025-03-05T20:56:15+00:00"
         },
         {
             "name": "dflydev/dot-access-data",
