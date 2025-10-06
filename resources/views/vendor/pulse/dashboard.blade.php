@@ -20,4 +20,8 @@
     <livewire:pulse.slow-jobs cols="6" />
 
     <livewire:pulse.slow-outgoing-requests cols="6" />
+
+    <livewire:pulse.about-application />
+
+    <livewire:pulse_active_session cols='4' rows='2' />
 </x-pulse>

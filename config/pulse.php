@@ -5,6 +5,7 @@ use Laravel\Pulse\Pulse;
 use Laravel\Pulse\Recorders;
 use Laravel\Reverb\Pulse\Recorders\ReverbConnections;
 use Laravel\Reverb\Pulse\Recorders\ReverbMessages;
+use Vcian\Pulse\PulseActiveSessions\Recorders\PulseActiveSessionRecorder;
 
 return [
 
@@ -241,6 +242,10 @@ return [
 
         ReverbMessages::class => [
             'sample_rate' => 1,
+        ],
+
+        PulseActiveSessionRecorder::class => [
+            //
         ],
     ],
 ];
