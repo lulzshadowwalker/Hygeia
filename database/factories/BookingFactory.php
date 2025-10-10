@@ -33,6 +33,7 @@ class BookingFactory extends Factory
             'amount' => $this->faker->randomFloat(2, 10, 100),
             'status' => $this->faker->randomElement(BookingStatus::values()),
             'cleaner_id' => $this->faker->boolean() ? null : Cleaner::factory(),
+            'location' => $this->faker->address,
         ];
     }
 }

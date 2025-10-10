@@ -18,6 +18,7 @@ class StoreBookingRequest extends BaseFormRequest
         return [
             'data.attributes.hasCleaningMaterials' => 'required|boolean',
             'data.attributes.urgency' => ['required', new Enum(BookingUrgency::class)],
+            'data.attributes.location' => 'required|string|max:255',
             'data.attributes.scheduledAt' => [
                 'nullable',
                 function ($attribute, $value, $fail) {
@@ -64,5 +65,10 @@ class StoreBookingRequest extends BaseFormRequest
     public function scheduledAt(): ?string
     {
         return $this->input('data.attributes.scheduledAt', null);
+    }
+
+    public function location(): string
+    {
+        return $this->input('data.attributes.location');
     }
 }

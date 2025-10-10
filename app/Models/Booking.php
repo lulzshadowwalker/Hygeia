@@ -26,6 +26,7 @@ class Booking extends Model
         'has_cleaning_material',
         'amount',
         'status',
+        'location',
     ];
 
     protected function casts(): array

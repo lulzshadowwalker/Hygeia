@@ -72,6 +72,7 @@ class BookingController extends ApiController
                 'urgency' => $request->urgency()->value,
                 'scheduled_at' => $request->scheduledAt(),
                 'has_cleaning_material' => $request->hasCleaningMaterials(),
+                'location' => $request->location(),
 
                 //  TODO: Calculate booking price action class
                 'amount' => $pricing->amount,

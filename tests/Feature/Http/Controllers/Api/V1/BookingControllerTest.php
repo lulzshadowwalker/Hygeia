@@ -32,6 +32,7 @@ class BookingControllerTest extends TestCase
                     'attributes' => [
                         'hasCleaningMaterials' => true,
                         'urgency' => 'flexible',
+                        'location' => '123 Main St, Springfield',
                     ],
                     'relationships' => [
                         'service' => [
@@ -47,6 +48,15 @@ class BookingControllerTest extends TestCase
                 ],
             ])
             ->assertCreated();
+
+        $this->assertDatabaseHas('bookings', [
+            'has_cleaning_material' => true,
+            'urgency' => 'flexible',
+            'pricing_id' => $pricing->id,
+            'selected_amount' => $pricing->amount,
+            'location' => '123 Main St, Springfield',
+            'scheduled_at' => null,
+        ]);
     }
 
     public function test_client_can_create_booking_with_no_extras(): void
@@ -64,6 +74,7 @@ class BookingControllerTest extends TestCase
                     'attributes' => [
                         'hasCleaningMaterials' => true,
                         'urgency' => 'flexible',
+                        'location' => '123 Main St, Springfield',
                     ],
                     'relationships' => [
                         'service' => [
@@ -94,6 +105,7 @@ class BookingControllerTest extends TestCase
             'status' => 'pending',
             'client_id' => $client->id,
             'service_id' => $service->id,
+            'location' => '123 Main St, Springfield',
         ]);
     }
 
@@ -113,6 +125,7 @@ class BookingControllerTest extends TestCase
                     'attributes' => [
                         'hasCleaningMaterials' => true,
                         'urgency' => 'flexible',
+                        'location' => '123 Main St, Springfield',
                     ],
                     'relationships' => [
                         'service' => [
@@ -145,6 +158,7 @@ class BookingControllerTest extends TestCase
             'has_cleaning_material' => true,
             'amount' => $pricing->amount,
             'status' => 'pending',
+            'location' => '123 Main St, Springfield',
         ]);
 
         $this->actingAs($client->user)
@@ -168,6 +182,7 @@ class BookingControllerTest extends TestCase
             'has_cleaning_material' => true,
             'amount' => $pricing->amount,
             'status' => 'pending',
+            'location' => '123 Main St, Springfield',
         ]);
 
         $this->actingAs($client->user)
@@ -193,6 +208,7 @@ class BookingControllerTest extends TestCase
             'has_cleaning_material' => true,
             'amount' => $pricing->amount,
             'status' => 'pending',
+            'location' => '123 Main St, Springfield',
         ]);
 
         $this->actingAs($client2->user)
