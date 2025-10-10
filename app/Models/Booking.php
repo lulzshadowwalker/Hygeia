@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Booking extends Model
 {
@@ -74,14 +75,29 @@ class Booking extends Model
         return $builder->where('status', BookingStatus::Pending);
     }
 
+    public function scopeCompleted(Builder $builder): Builder
+    {
+        return $builder->where('status', BookingStatus::Completed);
+    }
+
+    public function scopeCancelled(Builder $builder): Builder
+    {
+        return $builder->where('status', BookingStatus::Cancelled);
+    }
+
+    public function scopeConfirmed(Builder $builder): Builder
+    {
+        return $builder->where('status', BookingStatus::Confirmed);
+    }
+
     public function scopeUpcoming(Builder $builder): Builder
     {
         return $builder->whereIn('status', [BookingStatus::Pending, BookingStatus::Confirmed])
             ->where('scheduled_at', '>=', now());
     }
 
-    public function scopeCompleted(Builder $builder): Builder
+    public function chatRooms(): HasMany
     {
-        return $builder->where('status', BookingStatus::Completed);
+        return $this->hasMany(ChatRoom::class);
     }
 }

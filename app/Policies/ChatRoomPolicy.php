@@ -3,6 +3,7 @@
 namespace App\Policies;
 
 use App\Enums\ChatRoomType;
+use App\Models\Booking;
 use App\Models\ChatRoom;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
@@ -32,11 +33,24 @@ class ChatRoomPolicy
     }
 
     /**
-     * Determine whether the user can create chat rooms.
+     * Determine whether the user can create a chat room for a booking.
      */
-    public function create(User $user): bool
+    public function create(User $user, Booking $booking): bool
     {
-        return true; // All authenticated users can create chat rooms
+        if ($user->isAdmin) return true;
+
+        if (
+            $user->id !== $booking->client->user_id &&
+            $user->id !== $booking->cleaner->user_id
+        ) {
+            return false;
+        }
+
+        if (! $booking->status->isConfirmed()) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -99,10 +113,10 @@ class ChatRoomPolicy
     {
         // Only admins or users with admin role in the chat room
         return $user->isAdmin ||
-               $chatRoom->participants()
-                   ->where('user_id', $user->id)
-                   ->where('role', 'admin')
-                   ->exists();
+            $chatRoom->participants()
+            ->where('user_id', $user->id)
+            ->where('role', 'admin')
+            ->exists();
     }
 
     /**

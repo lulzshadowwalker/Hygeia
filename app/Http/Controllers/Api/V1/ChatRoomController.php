@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Enums\ChatRoomType;
 use App\Http\Controllers\Api\ApiController;
-use App\Http\Requests\V1\StoreChatRoomRequest;
 use App\Http\Resources\V1\ChatRoomResource;
 use App\Models\ChatRoom;
 use Dedoc\Scramble\Attributes\Group;
@@ -41,33 +40,6 @@ class ChatRoomController extends ApiController
         $chatRoom->load(['participants', 'messages' => function ($query) {
             $query->latest()->limit(1);
         }]);
-
-        return ChatRoomResource::make($chatRoom);
-    }
-
-    /**
-     * Create a chat room
-     *
-     * Create a new chat room.
-     */
-    public function store(StoreChatRoomRequest $request)
-    {
-        $user = $request->user();
-
-        $participants = $request->participants();
-
-        // Add the creator participant to the participants
-        if (! in_array($user->id, $request->participants())) {
-            $participants[] = $user->id;
-        }
-
-        $chatRoom = ChatRoom::create([
-            'type' => ChatRoomType::Standard,
-        ]);
-
-        //  TODO: This should be moved into an action class with unit testing
-        $chatRoom->participants()->attach($participants);
-        $chatRoom->load('participants');
 
         return ChatRoomResource::make($chatRoom);
     }

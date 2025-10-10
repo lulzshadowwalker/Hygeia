@@ -19,6 +19,7 @@ class ChatRoomFactory extends Factory
     {
         return [
             'type' => $this->faker->randomElement(ChatRoomType::values()),
+            'booking_id' => null,
         ];
     }
 }

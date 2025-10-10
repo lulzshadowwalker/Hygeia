@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -18,7 +19,7 @@ class ChatRoom extends Model
     /** @use HasFactory<\Database\Factories\ChatRoomFactory> */
     use HasFactory;
 
-    protected $fillable = ['type'];
+    protected $fillable = ['type', 'booking_id'];
 
     protected function casts(): array
     {
@@ -75,7 +76,7 @@ class ChatRoom extends Model
     protected function messagesCount(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->messages()->count(),
+            get: fn() => $this->messages()->count(),
         );
     }
 
@@ -86,6 +87,11 @@ class ChatRoom extends Model
      */
     public function user(): Attribute
     {
-        return Attribute::get(fn () => $this->participants->firstWhere(fn ($user) => ! $user->isAdmin));
+        return Attribute::get(fn() => $this->participants->firstWhere(fn($user) => ! $user->isAdmin));
+    }
+
+    public function booking(): BelongsTo
+    {
+        return $this->belongsTo(Booking::class);
     }
 }

@@ -36,4 +36,32 @@ class BookingFactory extends Factory
             'location' => $this->faker->address,
         ];
     }
+
+    public function pending(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => BookingStatus::Pending,
+        ]);
+    }
+
+    public function confirmed(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => BookingStatus::Confirmed,
+        ]);
+    }
+
+    public function completed(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => BookingStatus::Completed,
+        ]);
+    }
+
+    public function cancelled(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => BookingStatus::Cancelled,
+        ]);
+    }
 }

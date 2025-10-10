@@ -122,60 +122,6 @@ class ChatRoomControllerTest extends TestCase
             ]);
     }
 
-    public function test_it_creates_a_new_chat_room(): void
-    {
-        $this->actingAs($this->client);
-
-        $otherUser = User::factory()->has(Client::factory())->create();
-        $otherUser->assignRole(Role::Client->value);
-
-        $chatRoomData = [
-            'data' => [
-                'relationships' => [
-                    'participants' => [
-                        [
-                            'id' => $otherUser->id,
-                        ],
-                        [
-                            'id' => $this->client->id,
-                        ],
-                    ],
-                ],
-            ],
-        ];
-
-        $response = $this->postJson(route('api.v1.chat.rooms.store'), $chatRoomData);
-
-        $response->assertStatus(Response::HTTP_CREATED)
-            ->assertJsonStructure([
-                'data' => [
-                    'type',
-                    'id',
-                    'attributes' => [
-                        'type',
-                        'createdAt',
-                        'updatedAt',
-                    ],
-                    'relationships' => [
-                        'participants',
-                    ],
-                ],
-            ]);
-
-        // Assert the chat room was created in database
-        $chatRoomId = $response->json('data.id');
-        $this->assertDatabaseHas('chat_rooms', [
-            'type' => ChatRoomType::Standard->value,
-            'id' => $chatRoomId,
-        ]);
-
-        // Assert the user is a participant
-        $this->assertDatabaseHas('chat_room_participants', [
-            'chat_room_id' => $chatRoomId,
-            'user_id' => $this->client->id,
-        ]);
-    }
-
     public function test_it_allows_user_to_join_chat_room(): void
     {
         $this->markTestSkipped('Joining chat rooms is currently disabled in policy until we figure out the correct business logic. Besides, it is not currently being used.');

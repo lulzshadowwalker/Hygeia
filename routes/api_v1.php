@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\AcceptOfferController;
+use App\Http\Controllers\Api\V1\BookingChatRoomController;
 use App\Http\Controllers\Api\V1\BookingController;
 use App\Http\Controllers\Api\V1\CallbackRequestController;
 use App\Http\Controllers\Api\V1\ChangePasswordController;
@@ -219,3 +220,7 @@ Route::post('/chat/rooms/{chatRoom}/messages', [ChatMessageController::class, 's
 Route::get('/chat/reverb-config', [ChatController::class, 'getReverbConfig'])
     ->middleware('auth:sanctum')
     ->name('api.v1.chat.reverb-config');
+
+Route::post('/bookings/{booking}/chat/rooms', [BookingChatRoomController::class, 'store'])
+    ->middleware('auth:sanctum')
+    ->name('api.v1.bookings.chat.rooms.store');
