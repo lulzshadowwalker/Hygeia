@@ -178,6 +178,8 @@ class ChatRoomControllerTest extends TestCase
 
     public function test_it_allows_user_to_join_chat_room(): void
     {
+        $this->markTestSkipped('Joining chat rooms is currently disabled in policy until we figure out the correct business logic. Besides, it is not currently being used.');
+
         $newUser = User::factory()->has(Client::factory())->create();
         $newUser->assignRole(Role::Client->value);
         $this->actingAs($newUser);
@@ -207,6 +209,8 @@ class ChatRoomControllerTest extends TestCase
 
     public function test_it_handles_joining_chat_room_when_already_participant(): void
     {
+        $this->markTestSkipped('Joining chat rooms is currently disabled in policy until we figure out the correct business logic. Besides, it is not currently being used.');
+
         $this->actingAs($this->client);
 
         $response = $this->postJson(route('api.v1.chat.rooms.join', ['chatRoom' => $this->chatRoom]));

@@ -32,7 +32,6 @@ use App\Http\Controllers\Api\V1\SupportTicketController;
 use App\Http\Controllers\Api\V1\UsernameController;
 use App\Http\Controllers\Api\V1\UserPreferenceController;
 use App\Http\Middleware\CleanerMiddleware;
-use App\Http\Middleware\ClientMiddleware;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/auth/login', [LoginController::class, 'store'])
@@ -145,7 +144,7 @@ Route::get('/bookings/{booking}', [BookingController::class, 'show'])
     ->name('api.v1.bookings.show');
 Route::post('/bookings/{booking}/complete', [CompleteBookingController::class, 'store'])
     ->middleware('auth:sanctum')
-    ->middleware(ClientMiddleware::class)
+    ->middleware(CleanerMiddleware::class)
     ->name('api.v1.bookings.complete');
 
 Route::post('/offers/{offer}/accept', [AcceptOfferController::class, 'store'])

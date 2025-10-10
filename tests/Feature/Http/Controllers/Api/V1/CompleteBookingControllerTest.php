@@ -15,34 +15,13 @@ class CompleteBookingControllerTest extends TestCase
 {
     use RefreshDatabase, WithRoles;
 
-    public function test_client_can_complete_a_confirmed_booking(): void
+    public function test_cleaner_can_complete_a_confirmed_booking(): void
     {
-        // $booking = Booking::factory()->create(['status' => BookingStatus::Pending]);
-        // $cleaner = Cleaner::factory()->create();
-        // $cleaner->user->assignRole(Role::Cleaner);
-        // $this->actingAs($cleaner->user);
+        $cleaner = Cleaner::factory()->create();
+        $cleaner->user->assignRole(Role::Cleaner);
+        $this->actingAs($cleaner->user);
 
-        // $this->postJson(route('api.v1.offers.accept', $booking))
-        //     ->assertOk()
-        //     ->assertJsonPath('data.attributes.status', BookingStatus::Confirmed->value);
-
-        // $this->assertDatabaseHas('bookings', [
-        //     'id' => $booking->id,
-        //     'status' => BookingStatus::Confirmed,
-        //     'cleaner_id' => $cleaner->id,
-        // ]);
-
-        // $booking->refresh();
-        // $this->assertTrue($booking->status->isConfirmed());
-        // $this->assertEquals($cleaner->id, $booking->cleaner_id);
-        // $this->assertCount(1, $cleaner->bookings);
-        // $this->assertNotNull($booking->cleaner);
-
-        $client = Client::factory()->create();
-        $client->user->assignRole(Role::Client);
-        $this->actingAs($client->user);
-
-        $booking = Booking::factory()->for($client)->create([
+        $booking = Booking::factory()->for($cleaner)->create([
             'status' => BookingStatus::Confirmed,
         ]);
 
@@ -59,12 +38,12 @@ class CompleteBookingControllerTest extends TestCase
         $this->assertTrue($booking->status->isCompleted());
     }
 
-    public function test_cleaner_cannot_complete_a_booking(): void
+    public function test_client_cannot_complete_a_booking(): void
     {
         $booking = Booking::factory()->create(['status' => BookingStatus::Confirmed]);
-        $cleaner = Cleaner::factory()->create();
-        $cleaner->user->assignRole(Role::Cleaner);
-        $this->actingAs($cleaner->user);
+        $client = Client::factory()->create();
+        $client->user->assignRole(Role::Client);
+        $this->actingAs($client->user);
 
         $this->postJson(route('api.v1.bookings.complete', $booking))
             ->assertForbidden();
@@ -80,11 +59,11 @@ class CompleteBookingControllerTest extends TestCase
 
     public function test_cannot_complete_an_already_completed_booking(): void
     {
-        $client = Client::factory()->create();
-        $client->user->assignRole(Role::Client);
-        $this->actingAs($client->user);
+        $cleaner = Cleaner::factory()->create();
+        $cleaner->user->assignRole(Role::Cleaner);
+        $this->actingAs($cleaner->user);
 
-        $booking = Booking::factory()->for($client)->create([
+        $booking = Booking::factory()->for($cleaner)->create([
             'status' => BookingStatus::Completed,
         ]);
 
@@ -103,11 +82,11 @@ class CompleteBookingControllerTest extends TestCase
 
     public function test_cannot_complete_a_non_confirmed_booking(): void
     {
-        $client = Client::factory()->create();
-        $client->user->assignRole(Role::Client);
-        $this->actingAs($client->user);
+        $cleaner = Cleaner::factory()->create();
+        $cleaner->user->assignRole(Role::Cleaner);
+        $this->actingAs($cleaner->user);
 
-        $booking = Booking::factory()->for($client)->create([
+        $booking = Booking::factory()->for($cleaner)->create([
             'status' => BookingStatus::Pending,
         ]);
 

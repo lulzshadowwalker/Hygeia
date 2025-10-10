@@ -65,7 +65,7 @@ class ChatRoomController extends ApiController
             'type' => ChatRoomType::Standard,
         ]);
 
-        // TODO: This should be moved into an action class with unit testing
+        //  TODO: This should be moved into an action class with unit testing
         $chatRoom->participants()->attach($participants);
         $chatRoom->load('participants');
 

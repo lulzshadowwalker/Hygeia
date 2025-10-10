@@ -62,6 +62,8 @@ class ChatRoomPolicy
      */
     public function join(User $user, ChatRoom $chatRoom): bool
     {
+        return false;
+
         // Support rooms: anyone can join (even if already a participant - handled in controller)
         if ($chatRoom->type === ChatRoomType::Support) {
             return true;
