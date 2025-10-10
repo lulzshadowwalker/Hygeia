@@ -30,6 +30,9 @@ class ChatRoomResource extends JsonResource
                     fn () => $this->messages->isNotEmpty() ? MessageResource::make($this->messages->first()) : null
                 ),
             ],
+            'includes' => [
+                'booking' => $this->when($this->booking, fn () => new BookingResource($this->booking)),
+            ],
         ];
     }
 }
