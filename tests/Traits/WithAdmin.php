@@ -9,6 +9,8 @@ trait WithAdmin
 {
     use WithRoles;
 
+    protected User $admin;
+
     public function setUpWithAdmin(): void
     {
         $this->setUpWithRoles();
@@ -16,5 +18,6 @@ trait WithAdmin
         $user = User::factory()->create();
         $user->assignRole(Role::Admin->value);
         $this->actingAs($user);
+        $this->admin = $user;
     }
 }
