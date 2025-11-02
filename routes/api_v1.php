@@ -21,6 +21,7 @@ use App\Http\Controllers\Api\V1\InvoiceController;
 use App\Http\Controllers\Api\V1\LoginController;
 use App\Http\Controllers\Api\V1\LogoutController;
 use App\Http\Controllers\Api\V1\NotificationController;
+use App\Http\Controllers\Api\V1\OAuthLoginController;
 use App\Http\Controllers\Api\V1\OfferController;
 use App\Http\Controllers\Api\V1\PageController;
 use App\Http\Controllers\Api\V1\ProfileController;
@@ -37,6 +38,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/auth/login', [LoginController::class, 'store'])
     ->name('api.v1.auth.login');
+
+Route::post('/auth/oauth/login', [OAuthLoginController::class, 'store'])
+    ->name('api.v1.auth.oauth.login');
 
 Route::post('/auth/logout', [LogoutController::class, 'store'])
     ->middleware('auth:sanctum')

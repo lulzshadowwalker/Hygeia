@@ -41,6 +41,7 @@ class User extends Authenticatable implements FilamentUser, HasMedia
         'email',
         'password',
         'status',
+        'email_verified_at',
     ];
 
     /**
@@ -168,6 +169,11 @@ class User extends Authenticatable implements FilamentUser, HasMedia
     public function deviceTokens(): HasMany
     {
         return $this->hasMany(DeviceToken::class);
+    }
+
+    public function oauthProviders(): HasMany
+    {
+        return $this->hasMany(OAuthProvider::class);
     }
 
     public function routeNotificationForPush(Notification $notification): array

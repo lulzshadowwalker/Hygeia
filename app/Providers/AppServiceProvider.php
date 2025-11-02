@@ -9,8 +9,10 @@ use App\Models\User;
 use App\Services\FirebasePushNotification\FirebasePushNotificationService;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Broadcast;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use SocialiteProviders\Manager\SocialiteWasCalled;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -38,6 +40,13 @@ class AppServiceProvider extends ServiceProvider
 
         Blade::directive('disabled', function ($expression) {
             return "<?php echo ($expression) ? 'disabled' : ''; ?>";
+        });
+
+        // Register Socialite providers for OAuth authentication
+        Event::listen(function (SocialiteWasCalled $event) {
+            $event->extendSocialite('google', \SocialiteProviders\Google\Provider::class);
+            $event->extendSocialite('facebook', \SocialiteProviders\Facebook\Provider::class);
+            $event->extendSocialite('apple', \SocialiteProviders\Apple\Provider::class);
         });
     }
 }
