@@ -37,7 +37,9 @@ class ChatRoomPolicy
      */
     public function create(User $user, Booking $booking): bool
     {
-        if ($user->isAdmin) return true;
+        if ($user->isAdmin) {
+            return true;
+        }
 
         if (
             $user->id !== $booking->client->user_id &&
@@ -114,9 +116,9 @@ class ChatRoomPolicy
         // Only admins or users with admin role in the chat room
         return $user->isAdmin ||
             $chatRoom->participants()
-            ->where('user_id', $user->id)
-            ->where('role', 'admin')
-            ->exists();
+                ->where('user_id', $user->id)
+                ->where('role', 'admin')
+                ->exists();
     }
 
     /**

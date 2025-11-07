@@ -76,7 +76,7 @@ class ChatRoom extends Model
     protected function messagesCount(): Attribute
     {
         return Attribute::make(
-            get: fn() => $this->messages()->count(),
+            get: fn () => $this->messages()->count(),
         );
     }
 
@@ -87,7 +87,7 @@ class ChatRoom extends Model
      */
     public function user(): Attribute
     {
-        return Attribute::get(fn() => $this->participants->firstWhere(fn($user) => ! $user->isAdmin));
+        return Attribute::get(fn () => $this->participants->firstWhere(fn ($user) => ! $user->isAdmin));
     }
 
     public function booking(): BelongsTo

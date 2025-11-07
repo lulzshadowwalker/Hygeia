@@ -8,7 +8,6 @@ use App\Http\Resources\V1\ChatRoomResource;
 use App\Models\Booking;
 use App\Models\ChatRoom;
 use Dedoc\Scramble\Attributes\Group;
-use Illuminate\Http\Request;
 
 #[Group('Chat')]
 class BookingChatRoomController extends ApiController
