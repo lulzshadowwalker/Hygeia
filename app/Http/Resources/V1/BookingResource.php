@@ -20,10 +20,15 @@ class BookingResource extends JsonResource
             'attributes' => [
                 'hasCleaningMaterials' => $this->has_cleaning_material,
                 'urgency' => $this->urgency?->value,
-                'scheduledAt' => optional($this->scheduled_at)->toIso8601String(),
+                'scheduledAt' => optional(
+                    $this->scheduled_at,
+                )->toIso8601String(),
                 'selectedAmount' => $this->selected_amount,
                 'amount' => $this->amount,
                 'status' => $this->status?->value,
+                'location' => $this->location,
+                'lat' => $this->lat,
+                'lng' => $this->lng,
                 'createdAt' => optional($this->created_at)->toIso8601String(),
                 'updatedAt' => optional($this->updated_at)->toIso8601String(),
             ],
