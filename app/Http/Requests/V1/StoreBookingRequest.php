@@ -17,13 +17,24 @@ class StoreBookingRequest extends BaseFormRequest
     {
         return [
             'data.attributes.hasCleaningMaterials' => 'required|boolean',
-            'data.attributes.urgency' => ['required', new Enum(BookingUrgency::class)],
-            'data.attributes.location' => 'required|string|max:255',
+            'data.attributes.urgency' => [
+                'required',
+                new Enum(BookingUrgency::class),
+            ],
+            'data.attributes.location.description' => 'sometimes|nullable|string|max:255',
+            'data.attributes.location.lat' => 'sometimes|nullable|numeric|between:-90,90',
+            'data.attributes.location.lng' => 'sometimes|nullable|numeric|between:-180,180',
             'data.attributes.scheduledAt' => [
                 'nullable',
                 function ($attribute, $value, $fail) {
-                    if ($this->input('data.attributes.urgency') === BookingUrgency::Scheduled->value && empty($value)) {
-                        $fail('The scheduledAt field is required when urgency is scheduled.');
+                    if (
+                        $this->input('data.attributes.urgency') ===
+                            BookingUrgency::Scheduled->value &&
+                        empty($value)
+                    ) {
+                        $fail(
+                            'The scheduledAt field is required when urgency is scheduled.',
+                        );
                     }
                 },
             ],
@@ -67,8 +78,18 @@ class StoreBookingRequest extends BaseFormRequest
         return $this->input('data.attributes.scheduledAt', null);
     }
 
-    public function location(): string
+    public function location(): ?string
     {
-        return $this->input('data.attributes.location');
+        return $this->input('data.attributes.location.description');
+    }
+
+    public function lat(): ?float
+    {
+        return $this->input('data.attributes.location.lat');
+    }
+
+    public function lng(): ?float
+    {
+        return $this->input('data.attributes.location.lng');
     }
 }

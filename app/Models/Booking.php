@@ -28,6 +28,8 @@ class Booking extends Model
         'amount',
         'status',
         'location',
+        'lat',
+        'lng',
     ];
 
     protected function casts(): array
@@ -37,6 +39,9 @@ class Booking extends Model
             'urgency' => BookingUrgency::class,
             'scheduled_at' => 'datetime',
             'has_cleaning_material' => 'boolean',
+            'location' => 'string',
+            'lat' => 'decimal:7',
+            'lng' => 'decimal:7',
         ];
     }
 
@@ -92,7 +97,11 @@ class Booking extends Model
 
     public function scopeUpcoming(Builder $builder): Builder
     {
-        return $builder->whereIn('status', [BookingStatus::Pending, BookingStatus::Confirmed])
+        return $builder
+            ->whereIn('status', [
+                BookingStatus::Pending,
+                BookingStatus::Confirmed,
+            ])
             ->where('scheduled_at', '>=', now());
     }
 

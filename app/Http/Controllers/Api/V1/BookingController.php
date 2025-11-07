@@ -26,8 +26,12 @@ class BookingController extends ApiController
     {
         $this->authorize('viewAny', Booking::class);
 
-        $query = Booking::with(['client', 'service', 'pricing', 'extras'])
-            ->filter($filters);
+        $query = Booking::with([
+            'client',
+            'service',
+            'pricing',
+            'extras',
+        ])->filter($filters);
 
         if (auth()->user()->isClient) {
             $query->where('client_id', auth()->user()->client->id);
@@ -73,6 +77,8 @@ class BookingController extends ApiController
                 'scheduled_at' => $request->scheduledAt(),
                 'has_cleaning_material' => $request->hasCleaningMaterials(),
                 'location' => $request->location(),
+                'lat' => $request->lat(),
+                'lng' => $request->lng(),
 
                 //  TODO: Calculate booking price action class
                 'amount' => $pricing->amount,
@@ -81,7 +87,9 @@ class BookingController extends ApiController
 
             foreach ($request->extraIds() as $extraId) {
                 $extra = Extra::findOrFail($extraId);
-                $booking->extras()->attach($extraId, ['amount' => $extra->amount]);
+                $booking
+                    ->extras()
+                    ->attach($extraId, ['amount' => $extra->amount]);
             }
 
             return BookingResource::make($booking);

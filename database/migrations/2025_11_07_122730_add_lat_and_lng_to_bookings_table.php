@@ -12,10 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('bookings', function (Blueprint $table) {
-            $table
-                ->string('location')
-                ->nullable()
-                ->after('has_cleaning_material');
+            $table->decimal('lat', 10, 7);
+            $table->decimal('lng', 10, 7);
         });
     }
 
@@ -25,7 +23,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('bookings', function (Blueprint $table) {
-            $table->dropColumn('location');
+            $table->dropColumn(['lat', 'lng']);
         });
     }
 };

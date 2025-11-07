@@ -32,7 +32,11 @@ class BookingControllerTest extends TestCase
                     'attributes' => [
                         'hasCleaningMaterials' => true,
                         'urgency' => 'flexible',
-                        'location' => '123 Main St, Springfield',
+                        'location' => [
+                            'description' => '123 Main St, Springfield',
+                            'lat' => 40.712776,
+                            'lng' => -74.005974,
+                        ],
                     ],
                     'relationships' => [
                         'service' => [
@@ -42,7 +46,9 @@ class BookingControllerTest extends TestCase
                             'data' => ['id' => $pricing->id],
                         ],
                         'extras' => [
-                            'data' => $extras->map(fn ($extra) => ['id' => $extra->id])->toArray(),
+                            'data' => $extras
+                                ->map(fn ($extra) => ['id' => $extra->id])
+                                ->toArray(),
                         ],
                     ],
                 ],
@@ -55,6 +61,8 @@ class BookingControllerTest extends TestCase
             'pricing_id' => $pricing->id,
             'selected_amount' => $pricing->amount,
             'location' => '123 Main St, Springfield',
+            'lat' => 40.712776,
+            'lng' => -74.005974,
             'scheduled_at' => null,
         ]);
     }
@@ -74,7 +82,12 @@ class BookingControllerTest extends TestCase
                     'attributes' => [
                         'hasCleaningMaterials' => true,
                         'urgency' => 'flexible',
-                        'location' => '123 Main St, Springfield',
+                        // "location" => "123 Main St, Springfield",
+                        'location' => [
+                            'description' => '123 Main St, Springfield',
+                            'lat' => 40.712776,
+                            'lng' => -74.005974,
+                        ],
                     ],
                     'relationships' => [
                         'service' => [
@@ -106,6 +119,8 @@ class BookingControllerTest extends TestCase
             'client_id' => $client->id,
             'service_id' => $service->id,
             'location' => '123 Main St, Springfield',
+            'lat' => 40.712776,
+            'lng' => -74.005974,
         ]);
     }
 
@@ -125,7 +140,11 @@ class BookingControllerTest extends TestCase
                     'attributes' => [
                         'hasCleaningMaterials' => true,
                         'urgency' => 'flexible',
-                        'location' => '123 Main St, Springfield',
+                        'location' => [
+                            'description' => '123 Main St, Springfield',
+                            'lat' => 40.712776,
+                            'lng' => -74.005974,
+                        ],
                     ],
                     'relationships' => [
                         'service' => [
@@ -135,7 +154,9 @@ class BookingControllerTest extends TestCase
                             'data' => ['id' => $pricing->id],
                         ],
                         'extras' => [
-                            'data' => $extras->map(fn ($extra) => ['id' => $extra->id])->toArray(),
+                            'data' => $extras
+                                ->map(fn ($extra) => ['id' => $extra->id])
+                                ->toArray(),
                         ],
                     ],
                 ],
@@ -159,6 +180,8 @@ class BookingControllerTest extends TestCase
             'amount' => $pricing->amount,
             'status' => 'pending',
             'location' => '123 Main St, Springfield',
+            'lat' => 40.712776,
+            'lng' => -74.005974,
         ]);
 
         $this->actingAs($client->user)
@@ -183,6 +206,8 @@ class BookingControllerTest extends TestCase
             'amount' => $pricing->amount,
             'status' => 'pending',
             'location' => '123 Main St, Springfield',
+            'lat' => 40.712776,
+            'lng' => -74.005974,
         ]);
 
         $this->actingAs($client->user)
@@ -209,6 +234,8 @@ class BookingControllerTest extends TestCase
             'amount' => $pricing->amount,
             'status' => 'pending',
             'location' => '123 Main St, Springfield',
+            'lat' => 40.712776,
+            'lng' => -74.005974,
         ]);
 
         $this->actingAs($client2->user)
