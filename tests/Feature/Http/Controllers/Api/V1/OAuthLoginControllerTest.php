@@ -28,10 +28,16 @@ class OAuthLoginControllerTest extends TestCase
     {
         $user = Mockery::mock(SocialiteUser::class);
         $user->shouldReceive('getId')->andReturn($data['id'] ?? '123456789');
-        $user->shouldReceive('getEmail')->andReturn($data['email'] ?? 'test@example.com');
+        $user
+            ->shouldReceive('getEmail')
+            ->andReturn($data['email'] ?? 'test@example.com');
         $user->shouldReceive('getName')->andReturn($data['name'] ?? 'John Doe');
-        $user->shouldReceive('getNickname')->andReturn($data['nickname'] ?? 'johndoe');
-        $user->shouldReceive('getAvatar')->andReturn($data['avatar'] ?? 'https://example.com/avatar.jpg');
+        $user
+            ->shouldReceive('getNickname')
+            ->andReturn($data['nickname'] ?? 'johndoe');
+        $user
+            ->shouldReceive('getAvatar')
+            ->andReturn($data['avatar'] ?? 'https://example.com/avatar.jpg');
         $user->token = $data['token'] ?? 'mock-oauth-token';
         $user->refreshToken = $data['refreshToken'] ?? null;
         $user->expiresIn = $data['expiresIn'] ?? 3600;
@@ -61,16 +67,9 @@ class OAuthLoginControllerTest extends TestCase
             ],
         ]);
 
-        $response->assertStatus(200)
-            ->assertJsonStructure([
-                'data' => [
-                    'type',
-                    'id',
-                    'attributes' => [
-                        'token',
-                    ],
-                ],
-            ]);
+        $response->assertStatus(200)->assertJsonStructure([
+            'data' => ['type', 'id', 'attributes' => ['token']],
+        ]);
 
         $user = User::where('email', 'client@example.com')->first();
         $this->assertNotNull($user);
@@ -135,16 +134,9 @@ class OAuthLoginControllerTest extends TestCase
             ],
         ]);
 
-        $response->assertStatus(200)
-            ->assertJsonStructure([
-                'data' => [
-                    'type',
-                    'id',
-                    'attributes' => [
-                        'token',
-                    ],
-                ],
-            ]);
+        $response->assertStatus(200)->assertJsonStructure([
+            'data' => ['type', 'id', 'attributes' => ['token']],
+        ]);
 
         $user = User::where('email', 'cleaner@example.com')->first();
         $this->assertNotNull($user);
@@ -201,7 +193,10 @@ class OAuthLoginControllerTest extends TestCase
         $response->assertStatus(200);
 
         $user->refresh();
-        $oauthProvider = $user->oauthProviders()->where('provider', 'apple')->first();
+        $oauthProvider = $user
+            ->oauthProviders()
+            ->where('provider', 'apple')
+            ->first();
         $this->assertEquals('new-apple-token', $oauthProvider->access_token);
     }
 
@@ -236,7 +231,10 @@ class OAuthLoginControllerTest extends TestCase
 
         $response->assertStatus(200);
 
-        $this->assertEquals(1, User::where('email', 'linkemail@example.com')->count());
+        $this->assertEquals(
+            1,
+            User::where('email', 'linkemail@example.com')->count(),
+        );
 
         $oauthProvider = OAuthProvider::where('user_id', $existingUser->id)
             ->where('provider', 'google')
@@ -280,7 +278,9 @@ class OAuthLoginControllerTest extends TestCase
         $response->assertStatus(200);
 
         $user = User::where('email', 'device@example.com')->first();
-        $this->assertNotNull($user->deviceTokens()->where('token', $deviceToken)->first());
+        $this->assertNotNull(
+            $user->deviceTokens()->where('token', $deviceToken)->first(),
+        );
     }
 
     public function test_oauth_login_validates_required_fields()
@@ -291,7 +291,8 @@ class OAuthLoginControllerTest extends TestCase
             ],
         ]);
 
-        $response->assertStatus(422)
+        $response
+            ->assertStatus(422)
             ->assertJsonValidationErrors([
                 'data.attributes.provider',
                 'data.attributes.oauthToken',
@@ -311,7 +312,8 @@ class OAuthLoginControllerTest extends TestCase
             ],
         ]);
 
-        $response->assertStatus(422)
+        $response
+            ->assertStatus(422)
             ->assertJsonValidationErrors(['data.attributes.provider']);
     }
 
@@ -327,7 +329,8 @@ class OAuthLoginControllerTest extends TestCase
             ],
         ]);
 
-        $response->assertStatus(422)
+        $response
+            ->assertStatus(422)
             ->assertJsonValidationErrors(['data.attributes.role']);
     }
 
@@ -427,8 +430,12 @@ class OAuthLoginControllerTest extends TestCase
 
         $user->refresh();
         $this->assertCount(2, $user->oauthProviders);
-        $this->assertNotNull($user->oauthProviders()->where('provider', 'google')->first());
-        $this->assertNotNull($user->oauthProviders()->where('provider', 'facebook')->first());
+        $this->assertNotNull(
+            $user->oauthProviders()->where('provider', 'google')->first(),
+        );
+        $this->assertNotNull(
+            $user->oauthProviders()->where('provider', 'facebook')->first(),
+        );
     }
 
     public function test_oauth_login_stores_provider_data()
@@ -458,10 +465,212 @@ class OAuthLoginControllerTest extends TestCase
         $response->assertStatus(200);
 
         $user = User::where('email', 'providerdata@example.com')->first();
-        $oauthProvider = $user->oauthProviders()->where('provider', 'google')->first();
+        $oauthProvider = $user
+            ->oauthProviders()
+            ->where('provider', 'google')
+            ->first();
 
-        $this->assertEquals('Provider Test', $oauthProvider->provider_data['name']);
-        $this->assertEquals('providertest', $oauthProvider->provider_data['nickname']);
-        $this->assertEquals('https://example.com/avatar.jpg', $oauthProvider->provider_data['avatar']);
+        $this->assertEquals(
+            'Provider Test',
+            $oauthProvider->provider_data['name'],
+        );
+        $this->assertEquals(
+            'providertest',
+            $oauthProvider->provider_data['nickname'],
+        );
+        $this->assertEquals(
+            'https://example.com/avatar.jpg',
+            $oauthProvider->provider_data['avatar'],
+        );
+    }
+
+    public function test_oauth_check_returns_true_for_existing_user_with_oauth_link()
+    {
+        $user = User::factory()->create(['email' => 'existing@example.com']);
+        $user->assignRole(Role::Client->value);
+        $user->client()->create();
+
+        OAuthProvider::create([
+            'user_id' => $user->id,
+            'provider' => 'google',
+            'provider_user_id' => 'google-check-123',
+        ]);
+
+        $mockUser = $this->mockSocialiteUser([
+            'id' => 'google-check-123',
+            'email' => 'existing@example.com',
+            'name' => 'Existing User',
+        ]);
+
+        Socialite::shouldReceive('driver->stateless->userFromToken')
+            ->once()
+            ->andReturn($mockUser);
+
+        $response = $this->postJson(route('api.v1.auth.oauth.check'), [
+            'data' => [
+                'attributes' => [
+                    'provider' => 'google',
+                    'oauthToken' => 'mock-oauth-token',
+                ],
+            ],
+        ]);
+
+        $response->assertStatus(200)->assertJson([
+            'data' => [
+                'type' => 'oauth-check',
+                'attributes' => [
+                    'exists' => true,
+                    'provider' => 'google',
+                    'email' => 'existing@example.com',
+                    'role' => 'client',
+                    'userId' => $user->id,
+                ],
+            ],
+        ]);
+    }
+
+    public function test_oauth_check_returns_true_for_existing_user_with_matching_email()
+    {
+        $user = User::factory()->create(['email' => 'emailmatch@example.com']);
+        $user->assignRole(Role::Cleaner->value);
+        $user->cleaner()->create([
+            'available_days' => ['monday', 'tuesday'],
+            'time_slots' => ['morning'],
+            'max_hours_per_week' => 40,
+            'accepts_urgent_offers' => true,
+            'years_of_experience' => 2,
+            'has_cleaning_supplies' => true,
+            'comfortable_with_pets' => true,
+            'service_radius' => 10,
+            'agreed_to_terms' => true,
+        ]);
+
+        $mockUser = $this->mockSocialiteUser([
+            'id' => 'google-new-provider',
+            'email' => 'emailmatch@example.com',
+            'name' => 'Email Match User',
+        ]);
+
+        Socialite::shouldReceive('driver->stateless->userFromToken')
+            ->once()
+            ->andReturn($mockUser);
+
+        $response = $this->postJson(route('api.v1.auth.oauth.check'), [
+            'data' => [
+                'attributes' => [
+                    'provider' => 'google',
+                    'oauthToken' => 'mock-oauth-token',
+                ],
+            ],
+        ]);
+
+        $response->assertStatus(200)->assertJson([
+            'data' => [
+                'type' => 'oauth-check',
+                'attributes' => [
+                    'exists' => true,
+                    'provider' => 'google',
+                    'email' => 'emailmatch@example.com',
+                    'role' => 'cleaner',
+                    'userId' => $user->id,
+                ],
+            ],
+        ]);
+    }
+
+    public function test_oauth_check_returns_false_for_new_user()
+    {
+        $mockUser = $this->mockSocialiteUser([
+            'id' => 'google-new-user',
+            'email' => 'newuser@example.com',
+            'name' => 'New User',
+            'nickname' => 'newuser',
+        ]);
+
+        Socialite::shouldReceive('driver->stateless->userFromToken')
+            ->once()
+            ->andReturn($mockUser);
+
+        $response = $this->postJson(route('api.v1.auth.oauth.check'), [
+            'data' => [
+                'attributes' => [
+                    'provider' => 'google',
+                    'oauthToken' => 'mock-oauth-token',
+                ],
+            ],
+        ]);
+
+        $response->assertStatus(200)->assertJson([
+            'data' => [
+                'type' => 'oauth-check',
+                'attributes' => [
+                    'exists' => false,
+                    'provider' => 'google',
+                    'email' => 'newuser@example.com',
+                    'name' => 'New User',
+                ],
+            ],
+        ]);
+
+        // Ensure role and userId are null for new users
+        $this->assertNull($response->json('data.attributes.role'));
+        $this->assertNull($response->json('data.attributes.userId'));
+    }
+
+    public function test_oauth_check_validates_required_fields()
+    {
+        $response = $this->postJson(route('api.v1.auth.oauth.check'), [
+            'data' => [
+                'attributes' => [],
+            ],
+        ]);
+
+        $response
+            ->assertStatus(422)
+            ->assertJsonValidationErrors([
+                'data.attributes.provider',
+                'data.attributes.oauthToken',
+            ]);
+    }
+
+    public function test_oauth_check_validates_provider_value()
+    {
+        $response = $this->postJson(route('api.v1.auth.oauth.check'), [
+            'data' => [
+                'attributes' => [
+                    'provider' => 'invalid-provider',
+                    'oauthToken' => 'token',
+                ],
+            ],
+        ]);
+
+        $response
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['data.attributes.provider']);
+    }
+
+    public function test_oauth_check_handles_invalid_token()
+    {
+        Socialite::shouldReceive('driver->stateless->userFromToken')
+            ->once()
+            ->andThrow(new \Laravel\Socialite\Two\InvalidStateException);
+
+        $response = $this->postJson(route('api.v1.auth.oauth.check'), [
+            'data' => [
+                'attributes' => [
+                    'provider' => 'google',
+                    'oauthToken' => 'invalid-token',
+                ],
+            ],
+        ]);
+
+        $response->assertStatus(401)->assertJson([
+            'errors' => [
+                [
+                    'status' => '401',
+                    'indicator' => 'OAUTH_INVALID_TOKEN',
+                ],
+            ],
+        ]);
     }
 }
