@@ -14,19 +14,19 @@ class UpsertGadm extends Command
 {
     protected $signature = 'upsert:gadm';
 
-    protected $description = 'Upserts GADM data located in storage/gadm (geo polygons)';
+    protected $description = 'Upserts GADM data located in data/gadm (geo polygons)';
 
     public function handle()
     {
-        if (! file_exists(storage_path('gadm'))) {
-            $this->Error('GADM data not found in storage/gadm');
+        if (! file_exists(base_path('data/gadm'))) {
+            $this->Error('GADM data not found in data/gadm');
 
             return;
         }
 
         $this->info('Upserting GADM data');
-        $files = glob(storage_path('gadm').'/*.json');
-        $this->info('Found '.count($files).' files in storage/gadm');
+        $files = glob(base_path('data/gadm').'/*.json');
+        $this->info('Found '.count($files).' files in data/gadm');
 
         DB::transaction(function () use ($files) {
             foreach ($files as $key => $file) {
