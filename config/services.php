@@ -37,7 +37,7 @@ return [
 
     'firebase' => [
         'base_url' => env('FIREBASE_BASE_URL', 'https://fcm.googleapis.com/v1/projects/'),
-        'service_file' => storage_path('../'.env('FIREBASE_SERVICE_FILE', '../firebase/dev.json')),
+        'service_file' => storage_path('../' . env('FIREBASE_SERVICE_FILE', '../firebase/dev.json')),
         'project_id' => env('FIREBASE_PROJECT_ID'),
         'messaging' => [],
     ],
@@ -55,13 +55,13 @@ return [
     ],
 
     'apple' => [
-        'client_id' => env('APPLE_CLIENT_ID'),
-        'client_secret' => env('APPLE_CLIENT_SECRET'),
-        'key_id' => env('APPLE_KEY_ID'),
-        'team_id' => env('APPLE_TEAM_ID'),
-        'private_key' => env('APPLE_PRIVATE_KEY'),
-        'passphrase' => env('APPLE_PASSPHRASE'),
-        'redirect' => env('APPLE_REDIRECT_URI'),
+        'client_id' => env('APPLE_CLIENT_ID'), // Required. Bundle ID from Identifier in Apple Developer.
+        'client_secret' => env('APPLE_CLIENT_SECRET'), // Empty. We create it from private key.
+        'key_id' => env('APPLE_KEY_ID'), // Required. Key ID from Keys in Apple Developer.
+        'team_id' => env('APPLE_TEAM_ID'), // Required. App ID Prefix from Identifier in Apple Developer.
+        'private_key' => env('APPLE_PRIVATE_KEY'), // Required. Must be absolute path, e.g. /var/www/cert/AuthKey_XYZ.p8
+        'passphrase' => env('APPLE_PASSPHRASE'), // Optional. Set if your private key have a passphrase.
+        'redirect' => env('APPLE_REDIRECT_URI') // Required.
     ],
 
 ];
