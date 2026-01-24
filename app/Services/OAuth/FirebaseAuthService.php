@@ -3,7 +3,10 @@
 namespace App\Services\OAuth;
 
 use App\Support\FirebaseUserAdapter;
-use Google\Client;
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 use Laravel\Socialite\Contracts\User as SocialiteUser;
 
 class FirebaseAuthService extends BaseOAuthService
@@ -28,28 +31,43 @@ class FirebaseAuthService extends BaseOAuthService
 
     public function getUserFromToken(string $token): SocialiteUser
     {
-        $client = new Client;
-        // The service file contains credentials to initialize the client,
-        // but for verifying ID tokens we just need to verify the signature against Google's public keys.
-        // However, passing the service file doesn't hurt and might be needed for other interactions.
-        $client->setAuthConfig(config('services.firebase.service_file'));
+        $projectId = config('services.firebase.project_id');
+        $keys = $this->getPublicKeys();
 
         try {
-            $payload = $client->verifyIdToken($token);
+            $decoded = JWT::decode($token, $keys);
         } catch (\Exception $e) {
             throw new \InvalidArgumentException('Invalid Firebase ID Token: '.$e->getMessage());
         }
 
-        if (! $payload) {
-            throw new \InvalidArgumentException('Invalid Firebase ID Token');
-        }
+        // Convert stdClass to array recursively
+        $payload = json_decode(json_encode($decoded), true);
 
         // Verify audience matches Project ID
-        $projectId = config('services.firebase.project_id');
         if (($payload['aud'] ?? '') !== $projectId) {
             throw new \InvalidArgumentException('Token audience does not match Project ID');
         }
 
-        return new FirebaseUserAdapter($payload);
+        // Verify issuer
+        if (($payload['iss'] ?? '') !== "https://securetoken.google.com/{$projectId}") {
+            throw new \InvalidArgumentException('Token issuer does not match Project ID');
+        }
+
+        return new FirebaseUserAdapter($payload, $this->providerName ?? null);
+    }
+
+    protected function getPublicKeys(): array
+    {
+        $keys = Cache::remember('firebase_public_keys', 3600, function () {
+            $response = Http::get('https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com');
+
+            if ($response->failed()) {
+                throw new \RuntimeException('Failed to fetch Firebase public keys');
+            }
+
+            return $response->json();
+        });
+
+        return array_map(fn ($key) => new Key($key, 'RS256'), $keys);
     }
 }
