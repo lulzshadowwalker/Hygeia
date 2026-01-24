@@ -8,9 +8,7 @@ use App\Http\Requests\V1\OAuthCheckRequest;
 use App\Http\Resources\V1\OAuthCheckResource;
 use App\Models\OAuthProvider;
 use App\Models\User;
-use App\Services\OAuth\AppleOAuthService;
-use App\Services\OAuth\FacebookOAuthService;
-use App\Services\OAuth\GoogleOAuthService;
+use App\Services\OAuth\FirebaseAuthService;
 use App\Support\OAuthCheckResult;
 use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\JsonResponse;
@@ -19,9 +17,7 @@ use Illuminate\Http\JsonResponse;
 class OAuthCheckController extends Controller
 {
     public function __construct(
-        protected GoogleOAuthService $googleOAuthService,
-        protected FacebookOAuthService $facebookOAuthService,
-        protected AppleOAuthService $appleOAuthService,
+        protected FirebaseAuthService $firebaseAuthService,
     ) {
         //
     }
@@ -50,18 +46,15 @@ class OAuthCheckController extends Controller
         $provider = $request->provider();
         $oauthToken = $request->oauthToken();
 
-        $oauthService = match ($provider) {
-            'google' => $this->googleOAuthService,
-            'facebook' => $this->facebookOAuthService,
-            'apple' => $this->appleOAuthService,
-            default => throw new \InvalidArgumentException(
-                "Unsupported OAuth provider: {$provider}",
-            ),
-        };
+        if (! in_array($provider, ['google', 'facebook', 'apple'])) {
+            throw new \InvalidArgumentException("Unsupported OAuth provider: {$provider}");
+        }
+
+        $this->firebaseAuthService->setProviderName($provider);
 
         try {
             // Get user info from OAuth provider
-            $oauthUser = $oauthService->getUserFromToken($oauthToken);
+            $oauthUser = $this->firebaseAuthService->getUserFromToken($oauthToken);
 
             // Check if OAuth provider record exists
             $oauthProvider = OAuthProvider::where('provider', $provider)
@@ -128,7 +121,7 @@ class OAuthCheckController extends Controller
             )
                 ->response()
                 ->setStatusCode(200);
-        } catch (\Laravel\Socialite\Two\InvalidStateException $e) {
+        } catch (\InvalidArgumentException $e) {
             return response()->json(
                 [
                     'errors' => [
@@ -136,7 +129,7 @@ class OAuthCheckController extends Controller
                             'status' => '401',
                             'code' => 'Unauthorized',
                             'title' => 'OAuth authentication failed',
-                            'detail' => 'Invalid OAuth token or state mismatch',
+                            'detail' => $e->getMessage(),
                             'indicator' => 'OAUTH_INVALID_TOKEN',
                         ],
                     ],

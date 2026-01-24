@@ -6,9 +6,7 @@ use App\Enums\Role;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\V1\OAuthLoginRequest;
 use App\Http\Resources\V1\AuthTokenResource;
-use App\Services\OAuth\AppleOAuthService;
-use App\Services\OAuth\FacebookOAuthService;
-use App\Services\OAuth\GoogleOAuthService;
+use App\Services\OAuth\FirebaseAuthService;
 use App\Support\AccessToken;
 use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\JsonResponse;
@@ -17,21 +15,19 @@ use Illuminate\Http\JsonResponse;
 class OAuthLoginController extends Controller
 {
     public function __construct(
-        protected GoogleOAuthService $googleOAuthService,
-        protected FacebookOAuthService $facebookOAuthService,
-        protected AppleOAuthService $appleOAuthService,
+        protected FirebaseAuthService $firebaseAuthService,
     ) {}
 
     /**
      * OAuth Login/Register
      *
-     * Handle OAuth authentication for Google, Facebook, and Apple.
+     * Handle OAuth authentication for Google, Facebook, and Apple via Firebase.
      * This endpoint handles both login (for existing users) and registration (for new users).
      *
      * The mobile app should:
-     * 1. Authenticate the user with the OAuth provider (Google/Facebook/Apple)
-     * 2. Obtain an access token from the provider
-     * 3. Send that token to this endpoint along with the desired role
+     * 1. Authenticate the user with the OAuth provider (Google/Facebook/Apple) using Firebase Auth
+     * 2. Obtain a Firebase ID token
+     * 3. Send that token to this endpoint along with the desired role and provider name
      * 4. For cleaners, include additional required fields in additionalData
      */
     public function store(OAuthLoginRequest $request): JsonResponse
@@ -42,15 +38,14 @@ class OAuthLoginController extends Controller
         $additionalData = $request->additionalData();
         $deviceToken = $request->deviceToken();
 
-        $oauthService = match ($provider) {
-            'google' => $this->googleOAuthService,
-            'facebook' => $this->facebookOAuthService,
-            'apple' => $this->appleOAuthService,
-            default => throw new \InvalidArgumentException("Unsupported OAuth provider: {$provider}"),
-        };
+        if (! in_array($provider, ['google', 'facebook', 'apple'])) {
+            throw new \InvalidArgumentException("Unsupported OAuth provider: {$provider}");
+        }
+
+        $this->firebaseAuthService->setProviderName($provider);
 
         try {
-            $user = $oauthService->handleOAuthCallback(
+            $user = $this->firebaseAuthService->handleOAuthCallback(
                 oauthToken: $oauthToken,
                 role: $role,
                 additionalData: $additionalData,
@@ -68,14 +63,14 @@ class OAuthLoginController extends Controller
                 ),
             )->response()
                 ->setStatusCode(200);
-        } catch (\Laravel\Socialite\Two\InvalidStateException $e) {
+        } catch (\InvalidArgumentException $e) {
             return response()->json([
                 'errors' => [
                     [
                         'status' => '401',
                         'code' => 'Unauthorized',
                         'title' => 'OAuth authentication failed',
-                        'detail' => 'Invalid OAuth token or state mismatch',
+                        'detail' => $e->getMessage(),
                         'indicator' => 'OAUTH_INVALID_TOKEN',
                     ],
                 ],

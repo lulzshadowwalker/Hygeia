@@ -6,11 +6,12 @@ use App\Enums\Role;
 use App\Models\OAuthProvider;
 use App\Models\Service;
 use App\Models\User;
+use App\Services\OAuth\FirebaseAuthService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Socialite\Contracts\User as SocialiteUser;
-use Laravel\Socialite\Facades\Socialite;
 use Mockery;
+use Mockery\MockInterface;
 use Tests\TestCase;
 use Tests\Traits\WithRoles;
 
@@ -45,6 +46,23 @@ class OAuthLoginControllerTest extends TestCase
         return $user;
     }
 
+    protected function mockFirebaseAuth(SocialiteUser $user, ?string $provider = null)
+    {
+        $this->mock(FirebaseAuthService::class, function (MockInterface $mock) use ($user, $provider) {
+            $mock->makePartial();
+            if ($provider) {
+                $mock->shouldReceive('setProviderName')->with($provider)->andReturnSelf();
+                $mock->shouldReceive('getProviderName')->andReturn($provider);
+            } else {
+                $mock->shouldReceive('setProviderName')->andReturnSelf();
+            }
+
+            $mock->shouldReceive('getUserFromToken')
+                ->once()
+                ->andReturn($user);
+        });
+    }
+
     public function test_new_user_can_register_as_client_with_google_oauth()
     {
         $mockUser = $this->mockSocialiteUser([
@@ -53,9 +71,7 @@ class OAuthLoginControllerTest extends TestCase
             'name' => 'Client User',
         ]);
 
-        Socialite::shouldReceive('driver->stateless->userFromToken')
-            ->once()
-            ->andReturn($mockUser);
+        $this->mockFirebaseAuth($mockUser, 'google');
 
         $response = $this->postJson(route('api.v1.auth.oauth.login'), [
             'data' => [
@@ -94,9 +110,7 @@ class OAuthLoginControllerTest extends TestCase
             'name' => 'Cleaner User',
         ]);
 
-        Socialite::shouldReceive('driver->stateless->userFromToken')
-            ->once()
-            ->andReturn($mockUser);
+        $this->mockFirebaseAuth($mockUser, 'facebook');
 
         $response = $this->postJson(route('api.v1.auth.oauth.login'), [
             'data' => [
@@ -176,9 +190,7 @@ class OAuthLoginControllerTest extends TestCase
             'token' => 'new-apple-token',
         ]);
 
-        Socialite::shouldReceive('driver->stateless->userFromToken')
-            ->once()
-            ->andReturn($mockUser);
+        $this->mockFirebaseAuth($mockUser, 'apple');
 
         $response = $this->postJson(route('api.v1.auth.oauth.login'), [
             'data' => [
@@ -215,9 +227,7 @@ class OAuthLoginControllerTest extends TestCase
             'name' => 'Link User',
         ]);
 
-        Socialite::shouldReceive('driver->stateless->userFromToken')
-            ->once()
-            ->andReturn($mockUser);
+        $this->mockFirebaseAuth($mockUser, 'google');
 
         $response = $this->postJson(route('api.v1.auth.oauth.login'), [
             'data' => [
@@ -250,9 +260,7 @@ class OAuthLoginControllerTest extends TestCase
             'email' => 'device@example.com',
         ]);
 
-        Socialite::shouldReceive('driver->stateless->userFromToken')
-            ->once()
-            ->andReturn($mockUser);
+        $this->mockFirebaseAuth($mockUser, 'google');
 
         $deviceToken = 'test-device-token-123';
 
@@ -345,9 +353,7 @@ class OAuthLoginControllerTest extends TestCase
             'nickname' => 'johndoe', // Same nickname as existing user
         ]);
 
-        Socialite::shouldReceive('driver->stateless->userFromToken')
-            ->once()
-            ->andReturn($mockUser);
+        $this->mockFirebaseAuth($mockUser, 'google');
 
         $response = $this->postJson(route('api.v1.auth.oauth.login'), [
             'data' => [
@@ -373,9 +379,7 @@ class OAuthLoginControllerTest extends TestCase
             'email' => 'verified@example.com',
         ]);
 
-        Socialite::shouldReceive('driver->stateless->userFromToken')
-            ->once()
-            ->andReturn($mockUser);
+        $this->mockFirebaseAuth($mockUser, 'google');
 
         $response = $this->postJson(route('api.v1.auth.oauth.login'), [
             'data' => [
@@ -412,9 +416,7 @@ class OAuthLoginControllerTest extends TestCase
             'email' => 'multi@example.com',
         ]);
 
-        Socialite::shouldReceive('driver->stateless->userFromToken')
-            ->once()
-            ->andReturn($mockUser);
+        $this->mockFirebaseAuth($mockUser, 'facebook');
 
         $response = $this->postJson(route('api.v1.auth.oauth.login'), [
             'data' => [
@@ -448,9 +450,7 @@ class OAuthLoginControllerTest extends TestCase
             'avatar' => 'https://example.com/avatar.jpg',
         ]);
 
-        Socialite::shouldReceive('driver->stateless->userFromToken')
-            ->once()
-            ->andReturn($mockUser);
+        $this->mockFirebaseAuth($mockUser, 'google');
 
         $response = $this->postJson(route('api.v1.auth.oauth.login'), [
             'data' => [
@@ -502,9 +502,7 @@ class OAuthLoginControllerTest extends TestCase
             'name' => 'Existing User',
         ]);
 
-        Socialite::shouldReceive('driver->stateless->userFromToken')
-            ->once()
-            ->andReturn($mockUser);
+        $this->mockFirebaseAuth($mockUser, 'google');
 
         $response = $this->postJson(route('api.v1.auth.oauth.check'), [
             'data' => [
@@ -551,9 +549,7 @@ class OAuthLoginControllerTest extends TestCase
             'name' => 'Email Match User',
         ]);
 
-        Socialite::shouldReceive('driver->stateless->userFromToken')
-            ->once()
-            ->andReturn($mockUser);
+        $this->mockFirebaseAuth($mockUser, 'google');
 
         $response = $this->postJson(route('api.v1.auth.oauth.check'), [
             'data' => [
@@ -587,9 +583,7 @@ class OAuthLoginControllerTest extends TestCase
             'nickname' => 'newuser',
         ]);
 
-        Socialite::shouldReceive('driver->stateless->userFromToken')
-            ->once()
-            ->andReturn($mockUser);
+        $this->mockFirebaseAuth($mockUser, 'google');
 
         $response = $this->postJson(route('api.v1.auth.oauth.check'), [
             'data' => [
@@ -651,9 +645,13 @@ class OAuthLoginControllerTest extends TestCase
 
     public function test_oauth_check_handles_invalid_token()
     {
-        Socialite::shouldReceive('driver->stateless->userFromToken')
-            ->once()
-            ->andThrow(new \Laravel\Socialite\Two\InvalidStateException);
+        $this->mock(FirebaseAuthService::class, function (MockInterface $mock) {
+            $mock->makePartial();
+            $mock->shouldReceive('setProviderName')->andReturnSelf();
+            $mock->shouldReceive('getUserFromToken')
+                ->once()
+                ->andThrow(new \InvalidArgumentException('Invalid token'));
+        });
 
         $response = $this->postJson(route('api.v1.auth.oauth.check'), [
             'data' => [
