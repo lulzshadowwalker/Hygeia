@@ -6,16 +6,19 @@ use App\Enums\BookingStatus;
 use App\Enums\BookingUrgency;
 use App\Filters\QueryFilter;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Booking extends Model
+class Booking extends Model implements HasMedia
 {
     /** @use HasFactory<\Database\Factories\BookingFactory> */
-    use HasFactory;
+    use HasFactory, InteractsWithMedia;
 
     protected $fillable = [
         'client_id',
@@ -108,5 +111,16 @@ class Booking extends Model
     public function chatRooms(): HasMany
     {
         return $this->hasMany(ChatRoom::class);
+    }
+
+    const MEDIA_COLLECTION_IMAGES = 'images';
+
+    public function images(): Attribute
+    {
+        return Attribute::get(function () {
+            return $this->getMedia(self::MEDIA_COLLECTION_IMAGES)->map(function ($media) {
+                return $media->getUrl();
+            })->toArray();
+        });
     }
 }

@@ -29,6 +29,7 @@ class BookingResource extends JsonResource
                 'location' => $this->location,
                 'lat' => $this->lat,
                 'lng' => $this->lng,
+                'images' => $this->images,
                 'createdAt' => optional($this->created_at)->toIso8601String(),
                 'updatedAt' => optional($this->updated_at)->toIso8601String(),
             ],

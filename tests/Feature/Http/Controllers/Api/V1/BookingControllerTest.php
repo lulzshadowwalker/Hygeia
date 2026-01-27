@@ -9,6 +9,7 @@ use App\Models\Extra;
 use App\Models\Pricing;
 use App\Models\Service;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
 use Tests\Traits\WithRoles;
 
@@ -26,6 +27,9 @@ class BookingControllerTest extends TestCase
 
         $pricing = $service->pricings->first();
 
+        $image1 = UploadedFile::fake()->image('photo-1.jpg');
+        $image2 = UploadedFile::fake()->image('photo-2.jpg');
+
         $this->actingAs($client->user)
             ->postJson(route('api.v1.bookings.store'), [
                 'data' => [
@@ -37,6 +41,10 @@ class BookingControllerTest extends TestCase
                             'lat' => 40.712776,
                             'lng' => -74.005974,
                         ],
+                        'images' => [
+                            $image1,
+                            $image2,
+                        ]
                     ],
                     'relationships' => [
                         'service' => [
@@ -65,6 +73,11 @@ class BookingControllerTest extends TestCase
             'lng' => -74.005974,
             'scheduled_at' => null,
         ]);
+
+        $booking = $client->bookings()->first();
+        $this->assertNotNull($booking->images);
+        $this->assertNotEmpty($booking->images);
+        $this->assertCount(2, $booking->images);
     }
 
     public function test_client_can_create_booking_with_no_extras(): void

@@ -92,6 +92,10 @@ class BookingController extends ApiController
                     ->attach($extraId, ['amount' => $extra->amount]);
             }
 
+            foreach ($request->images() as $image) {
+                $booking->addMedia($image)->toMediaCollection(Booking::MEDIA_COLLECTION_IMAGES);
+            }
+
             return BookingResource::make($booking);
         });
     }

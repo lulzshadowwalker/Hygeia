@@ -22,6 +22,8 @@ class StoreBookingRequest extends BaseFormRequest
                 new Enum(BookingUrgency::class),
             ],
             'data.attributes.location.description' => 'sometimes|nullable|string|max:255',
+            'data.attributes.images' => 'sometimes|array|max:5',
+            'data.attributes.images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:5120',
             'data.attributes.location.lat' => 'sometimes|nullable|numeric|between:-90,90',
             'data.attributes.location.lng' => 'sometimes|nullable|numeric|between:-180,180',
             'data.attributes.scheduledAt' => [
@@ -91,5 +93,10 @@ class StoreBookingRequest extends BaseFormRequest
     public function lng(): ?float
     {
         return $this->input('data.attributes.location.lng');
+    }
+
+    public function images(): array
+    {
+        return $this->file('data.attributes.images', []);
     }
 }
