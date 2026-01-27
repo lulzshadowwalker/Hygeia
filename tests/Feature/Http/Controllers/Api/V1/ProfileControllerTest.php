@@ -2,9 +2,11 @@
 
 namespace Tests\Feature\Http\Controllers\Api\V1;
 
+use App\Enums\BookingStatus;
 use App\Enums\Role;
 use App\Http\Resources\V1\CleanerResource;
 use App\Http\Resources\V1\ClientResource;
+use App\Models\Booking;
 use App\Models\Cleaner;
 use App\Models\Client;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -26,6 +28,22 @@ class ProfileControllerTest extends TestCase
         $this->getJson(route('api.v1.profile.index'))
             ->assertOk()
             ->assertExactJson($resource->response()->getData(true));
+    }
+
+    public function test_it_includes_latest_cleaner_in_client_profile(): void
+    {
+        $client = Client::factory()->create();
+        $client->user->assignRole(Role::Client);
+        $this->actingAs($client->user);
+
+        $cleaner = Cleaner::factory()->create();
+        Booking::factory()->for($cleaner)->for($client)->create([
+            'status' => BookingStatus::Completed,
+        ]);
+
+        $this->getJson(route('api.v1.profile.index'))
+            ->assertOk()
+            ->assertJsonPath('data.includes.latestCleaner.id', (string) $cleaner->id);
     }
 
     public function test_it_returns_cleaner_profile(): void

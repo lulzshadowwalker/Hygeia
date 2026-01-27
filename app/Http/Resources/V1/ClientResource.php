@@ -14,6 +14,8 @@ class ClientResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $booking = $this->bookings()->completed()->latest()->first();
+
         return [
             'type' => 'client',
             'id' => (string) $this->id,
@@ -23,6 +25,9 @@ class ClientResource extends JsonResource
                 'email' => $this->user->email,
                 'avatar' => $this->user->avatar,
                 'status' => $this->user->status->value,
+            ],
+            'includes' => [
+                'latestCleaner' => $this->when($booking, fn () => new CleanerResource($booking->cleaner)),
             ],
         ];
     }
