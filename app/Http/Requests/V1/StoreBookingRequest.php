@@ -3,7 +3,9 @@
 namespace App\Http\Requests\V1;
 
 use App\Enums\BookingUrgency;
+use App\Enums\ServiceType;
 use App\Http\Requests\BaseFormRequest;
+use App\Models\Service;
 use Illuminate\Validation\Rules\Enum;
 
 class StoreBookingRequest extends BaseFormRequest
@@ -31,7 +33,7 @@ class StoreBookingRequest extends BaseFormRequest
                 function ($attribute, $value, $fail) {
                     if (
                         $this->input('data.attributes.urgency') ===
-                            BookingUrgency::Scheduled->value &&
+                        BookingUrgency::Scheduled->value &&
                         empty($value)
                     ) {
                         $fail(
@@ -41,9 +43,52 @@ class StoreBookingRequest extends BaseFormRequest
                 },
             ],
             'data.relationships.service.data.id' => 'required|exists:services,id',
-            'data.relationships.pricing.data.id' => 'required|exists:pricings,id',
+            'data.relationships.pricing.data.id' => [
+                'nullable',
+                'exists:pricings,id',
+            ],
+            'data.attributes.area' => [
+                'nullable',
+                'numeric',
+                'min:1',
+            ],
             'data.relationships.extras.data.*.id' => 'sometimes|required|exists:extras,id',
         ];
+    }
+
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator) {
+            $serviceId = $this->input('data.relationships.service.data.id');
+
+            if (! $serviceId) {
+                return;
+            }
+
+            $service = Service::find($serviceId);
+
+            if (! $service) {
+                return;
+            }
+
+            if ($service->type === ServiceType::Residential) {
+                if (empty($this->input('data.attributes.area'))) {
+                    $validator->errors()->add(
+                        'data.attributes.area',
+                        'The area field is required for residential services.'
+                    );
+                }
+
+                return;
+            }
+
+            if (empty($this->input('data.relationships.pricing.data.id'))) {
+                $validator->errors()->add(
+                    'data.relationships.pricing.data.id',
+                    'The pricing field is required for this service type.'
+                );
+            }
+        });
     }
 
     public function hasCleaningMaterials(): bool
@@ -61,9 +106,16 @@ class StoreBookingRequest extends BaseFormRequest
         return (int) $this->input('data.relationships.service.data.id');
     }
 
-    public function pricingId(): int
+    public function pricingId(): ?int
     {
-        return (int) $this->input('data.relationships.pricing.data.id');
+        $id = $this->input('data.relationships.pricing.data.id');
+
+        return $id ? (int) $id : null;
+    }
+
+    public function area(): ?float
+    {
+        return $this->input('data.attributes.area');
     }
 
     public function extraIds(): array

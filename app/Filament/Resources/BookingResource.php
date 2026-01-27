@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Enums\BookingStatus;
 use App\Enums\BookingUrgency;
+use App\Enums\ServiceType;
 use App\Filament\Resources\BookingResource\Pages;
 use App\Filament\Resources\BookingResource\RelationManagers;
 use App\Models\Booking;
@@ -55,10 +56,58 @@ class BookingResource extends Resource
                             ->preload()
                             ->required()
                             ->reactive()
-                            ->afterStateUpdated(fn ($state, callable $set) => $set('pricing_id', null)),
+                            ->afterStateUpdated(function ($state, callable $set) {
+                                $set('pricing_id', null);
+                                $set('area', null);
+                                $set('amount', null);
+                            }),
+
+                        Forms\Components\TextInput::make('area')
+                            ->label('Area (sqm)')
+                            ->numeric()
+                            ->suffix('sqm')
+                            ->visible(function (callable $get) {
+                                $serviceId = $get('service_id');
+                                if (! $serviceId) {
+                                    return false;
+                                }
+                                $service = \App\Models\Service::find($serviceId);
+
+                                return $service && $service->type === ServiceType::Residential;
+                            })
+                            ->required(function (callable $get) {
+                                $serviceId = $get('service_id');
+                                if (! $serviceId) {
+                                    return false;
+                                }
+                                $service = \App\Models\Service::find($serviceId);
+
+                                return $service && $service->type === ServiceType::Residential;
+                            })
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                $serviceId = $get('service_id');
+                                if ($serviceId && $state) {
+                                    $service = \App\Models\Service::find($serviceId);
+                                    if ($service && $service->price_per_meter) {
+                                        $amount = $state * $service->price_per_meter;
+                                        $set('selected_amount', $amount);
+                                        $set('amount', $amount);
+                                    }
+                                }
+                            }),
 
                         Forms\Components\Select::make('pricing_id')
                             ->label('Pricing Tier')
+                            ->visible(function (callable $get) {
+                                $serviceId = $get('service_id');
+                                if (! $serviceId) {
+                                    return true; // Show by default or until service is selected
+                                }
+                                $service = \App\Models\Service::find($serviceId);
+
+                                return ! $service || $service->type !== ServiceType::Residential;
+                            })
                             ->options(function (callable $get) {
                                 $serviceId = $get('service_id');
                                 if (! $serviceId) {
@@ -70,7 +119,15 @@ class BookingResource extends Resource
                                     ->pluck('amount', 'id')
                                     ->map(fn ($amount) => 'Ft '.number_format($amount, 0));
                             })
-                            ->required()
+                            ->required(function (callable $get) {
+                                $serviceId = $get('service_id');
+                                if (! $serviceId) {
+                                    return false;
+                                }
+                                $service = \App\Models\Service::find($serviceId);
+
+                                return ! $service || $service->type !== ServiceType::Residential;
+                            })
                             ->reactive()
                             ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                 if ($state) {
@@ -156,6 +213,12 @@ class BookingResource extends Resource
                     ->label('Service')
                     ->sortable()
                     ->searchable(),
+
+                Tables\Columns\TextColumn::make('area')
+                    ->label('Area')
+                    ->suffix(' sqm')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 Tables\Columns\TextColumn::make('amount')
                     ->label('Amount')

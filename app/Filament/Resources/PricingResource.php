@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\ServiceType;
 use App\Filament\Resources\PricingResource\Pages;
 use App\Models\Pricing;
 use Filament\Forms;
@@ -34,7 +35,7 @@ class PricingResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('service_id')
                             ->label('Service')
-                            ->relationship('service', 'name')
+                            ->relationship('service', 'name', fn (Builder $query) => $query->where('type', '!=', ServiceType::Residential))
                             ->searchable()
                             ->preload()
                             ->required(),

@@ -96,7 +96,9 @@ class DatabaseSeeder extends Seeder
                 ->state(['type' => $type->value])
                 ->create()
                 ->each(function ($service) {
-                    Pricing::factory()->count(3)->create(['service_id' => $service->id]);
+                    if ($service->type !== ServiceType::Residential) {
+                        Pricing::factory()->count(3)->create(['service_id' => $service->id]);
+                    }
                 });
         }
 

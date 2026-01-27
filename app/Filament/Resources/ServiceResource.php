@@ -44,7 +44,19 @@ class ServiceResource extends Resource
                             ->options(ServiceType::class)
                             ->required()
                             ->native(false)
-                            ->default(ServiceType::Residential),
+                            ->default(ServiceType::Residential)
+                            ->live()
+                            ->afterStateHydrated(function ($state, callable $set) {
+                                $type = $state?->value ?? ServiceType::Residential->value;
+                                $set('type', $type);
+                            }),
+
+                        Forms\Components\TextInput::make('price_per_meter')
+                            ->label('Price per Meter')
+                            ->numeric()
+                            ->prefix('Ft')
+                            ->visible(fn (Forms\Get $get) => $get('type') === ServiceType::Residential->value)
+                            ->required(fn (Forms\Get $get) => $get('type') === ServiceType::Residential->value),
                     ])->columns(1),
             ]);
     }
@@ -69,6 +81,17 @@ class ServiceResource extends Resource
                 Tables\Columns\TextColumn::make('pricings_count')
                     ->label('Pricing Tiers')
                     ->counts('pricings')
+                    ->sortable()
+                    ->formatStateUsing(fn ($state, Service $record) => $record->type === ServiceType::Residential ? 'N/A' : $state),
+
+                Tables\Columns\TextColumn::make('price_per_meter')
+                    ->label('Pricing Per Meter')
+                    ->sortable()
+                    ->formatStateUsing(fn ($state, Service $record) => $record->type === ServiceType::Residential ? number_format($state, 2).' HUF' : 'N/A'),
+
+                Tables\Columns\TextColumn::make('price_per_meter')
+                    ->label('Pricing Per Meter')
+                    ->formatStateUsing(fn ($state) => $state.' HUF')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('bookings_count')

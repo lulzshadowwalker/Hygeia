@@ -66,13 +66,26 @@ class BookingController extends ApiController
         $this->authorize('create', Booking::class);
 
         return DB::transaction(function () use ($request) {
-            $pricing = Pricing::findOrFail($request->pricingId());
+            $service = \App\Models\Service::findOrFail($request->serviceId());
+            $amount = 0;
+            $pricingId = null;
+
+            if ($service->type === \App\Enums\ServiceType::Residential) {
+                $area = $request->area();
+                $amount = $area * $service->price_per_meter;
+            } else {
+                $pricing = Pricing::findOrFail($request->pricingId());
+                $amount = $pricing->amount;
+                $pricingId = $pricing->id;
+            }
 
             $booking = Booking::create([
                 'client_id' => Auth::user()->client->id,
                 'service_id' => $request->serviceId(),
-                'pricing_id' => $request->pricingId(),
-                'selected_amount' => $pricing->amount,
+                'pricing_id' => $pricingId,
+                'selected_amount' => $amount,
+                'area' => $request->area(),
+                'price_per_meter' => $service->price_per_meter,
                 'urgency' => $request->urgency()->value,
                 'scheduled_at' => $request->scheduledAt(),
                 'has_cleaning_material' => $request->hasCleaningMaterials(),
@@ -81,7 +94,7 @@ class BookingController extends ApiController
                 'lng' => $request->lng(),
 
                 //  TODO: Calculate booking price action class
-                'amount' => $pricing->amount,
+                'amount' => $amount,
                 'status' => BookingStatus::Pending,
             ]);
 

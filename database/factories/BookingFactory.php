@@ -26,6 +26,7 @@ class BookingFactory extends Factory
             'client_id' => Client::factory(),
             'service_id' => Service::factory(),
             'pricing_id' => Pricing::factory(),
+            'price_per_meter' => $this->faker->optional()->randomFloat(2, 1, 10),
             'selected_amount' => $this->faker->randomFloat(2, 10, 100),
             'urgency' => $this->faker->randomElement(BookingUrgency::values()),
             'scheduled_at' => $this->faker->dateTimeBetween(

@@ -17,12 +17,16 @@ class Service extends Model
     protected $fillable = [
         'name',
         'type',
+        'price_per_meter',
     ];
 
     protected function casts(): array
     {
         return [
             'type' => ServiceType::class,
+
+            //  TODO: Add a money cast
+            'price_per_meter' => 'decimal:2',
         ];
     }
 

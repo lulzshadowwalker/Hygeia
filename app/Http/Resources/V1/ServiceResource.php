@@ -20,6 +20,7 @@ class ServiceResource extends JsonResource
             'attributes' => [
                 'name' => $this->name,
                 'type' => $this->type->value,
+                'pricePerMeter' => (string) $this->price_per_meter,
             ],
             'includes' => [
                 'pricings' => $this->whenLoaded('pricings', function () {

@@ -18,7 +18,16 @@ class ServiceFactory extends BaseFactory
     {
         return [
             'name' => $this->localized(fn (): string => $this->faker->word()),
-            'type' => $this->faker->randomElement(ServiceType::values()),
+            'type' => ServiceType::Commercial,
+            'price_per_meter' => null,
         ];
+    }
+
+    public function residential(): self
+    {
+        return $this->state(fn (array $attributes) => [
+            'type' => ServiceType::Residential,
+            'price_per_meter' => $this->faker->randomFloat(2, 10, 100),
+        ]);
     }
 }

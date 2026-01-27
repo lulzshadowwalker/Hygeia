@@ -23,8 +23,10 @@ class BookingResource extends JsonResource
                 'scheduledAt' => optional(
                     $this->scheduled_at,
                 )->toIso8601String(),
-                'selectedAmount' => $this->selected_amount,
-                'amount' => $this->amount,
+                'selectedAmount' => (string) $this->selected_amount,
+                'amount' => (string) $this->amount,
+                'area' => (int) $this->area,
+                'pricePerMeter' => (string) $this->price_per_meter,
                 'status' => $this->status?->value,
                 'location' => $this->location,
                 'lat' => $this->lat,
