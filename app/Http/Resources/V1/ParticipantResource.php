@@ -17,8 +17,8 @@ class ParticipantResource extends JsonResource
     {
         $resource = match (true) {
             $this->resource->isAdmin => AdminResource::make($this->resource),
-            $this->resource->isClient => ClientResource::make($this->resource),
-            $this->resource->isCleaner => CleanerResource::make($this->resource),
+            $this->resource->isClient => ClientResource::make($this->resource->client),
+            $this->resource->isCleaner => CleanerResource::make($this->resource->cleaner),
             default => throw new InvalidArgumentException('Invalid user type')
         };
 

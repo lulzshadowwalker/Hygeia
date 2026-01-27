@@ -20,8 +20,8 @@ class ProfileControllerTest extends TestCase
         $client = Client::factory()->create();
         $client->user->assignRole(Role::Client);
         $this->actingAs($client->user);
-        // TODO: use client model and not the user model in ClientResource
-        $resource = ClientResource::make($client->user);
+
+        $resource = ClientResource::make($client);
 
         $this->getJson(route('api.v1.profile.index'))
             ->assertOk()

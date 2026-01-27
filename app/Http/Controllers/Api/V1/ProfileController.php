@@ -27,7 +27,7 @@ class ProfileController extends Controller
 
         switch (true) {
             case $user->isClient:
-                return ClientResource::make($user);
+                return ClientResource::make($user->client);
             case $user->isCleaner:
                 return CleanerResource::make($user->cleaner);
             default:
@@ -83,7 +83,7 @@ class ProfileController extends Controller
                     ->toMediaCollection(User::MEDIA_COLLECTION_AVATAR);
             }
 
-            return ClientResource::make($user->fresh());
+            return ClientResource::make($user->fresh()->client);
         });
     }
 

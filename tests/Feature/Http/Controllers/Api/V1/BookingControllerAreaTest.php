@@ -51,7 +51,7 @@ class BookingControllerAreaTest extends TestCase
                 ],
             ])
             ->assertCreated()
-            ->assertJsonPath('data.attributes.amount', 5000) // 50 * 100
+            ->assertJsonPath('data.attributes.amount', '5000') // 50 * 100
             ->assertJsonPath('data.attributes.area', 50)
             ->assertJsonPath('data.attributes.pricePerMeter', '100.00');
 
@@ -59,7 +59,7 @@ class BookingControllerAreaTest extends TestCase
             'service_id' => $service->id,
             'area' => 50,
             'price_per_meter' => 100,
-            'amount' => 5000,
+            'amount' => '5000',
         ]);
     }
 

@@ -18,11 +18,11 @@ class ClientResource extends JsonResource
             'type' => 'client',
             'id' => (string) $this->id,
             'attributes' => [
-                'name' => $this->name,
-                'phone' => $this->phone,
-                'email' => $this->email,
-                'avatar' => $this->avatar,
-                'status' => $this->status->value,
+                'name' => $this->user->name,
+                'phone' => $this->user->phone,
+                'email' => $this->user->email,
+                'avatar' => $this->user->avatar,
+                'status' => $this->user->status->value,
             ],
         ];
     }

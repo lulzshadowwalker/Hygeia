@@ -32,7 +32,7 @@ class OfferResource extends JsonResource
                 'updatedAt' => optional($this->updated_at)->toIso8601String(),
             ],
             'includes' => [
-                // 'client' => new ClientResource($this->client->user),
+                // 'client' => new ClientResource($this->client),
                 'service' => new ServiceResource($this->service),
                 'pricing' => new PricingResource($this->pricing),
                 'extras' => ExtraResource::collection($this->extras),

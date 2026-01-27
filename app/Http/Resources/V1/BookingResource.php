@@ -36,7 +36,7 @@ class BookingResource extends JsonResource
                 'updatedAt' => optional($this->updated_at)->toIso8601String(),
             ],
             'includes' => [
-                'client' => new ClientResource($this->client->user),
+                'client' => new ClientResource($this->client),
                 'cleaner' => new CleanerResource($this->cleaner),
                 'service' => new ServiceResource($this->service),
                 'pricing' => new PricingResource($this->pricing),
