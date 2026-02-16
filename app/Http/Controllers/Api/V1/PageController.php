@@ -7,8 +7,10 @@ use App\Http\Resources\V1\PageResource;
 use App\Models\Page;
 use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 #[Group('Content')]
+// TODO: Remove cache layer later
 class PageController extends Controller
 {
     /**
@@ -20,7 +22,9 @@ class PageController extends Controller
      */
     public function index()
     {
-        return PageResource::collection(Page::all());
+        return Cache::remember('pages', 3600, function () {
+            return PageResource::collection(Page::all());
+        });
     }
 
     /**
@@ -32,6 +36,8 @@ class PageController extends Controller
      */
     public function show(Request $request, Page $page)
     {
-        return PageResource::make($page);
+        return Cache::remember('page_'.$page->id, 3600, function () use ($page) {
+            return PageResource::make($page);
+        });
     }
 }
