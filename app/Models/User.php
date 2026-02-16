@@ -142,7 +142,7 @@ class User extends Authenticatable implements FilamentUser, HasMedia
 
         $this->addMediaCollection(self::MEDIA_COLLECTION_AVATAR)
             ->singleFile()
-            ->useFallbackUrl("https://ui-avatars.com/api/?name={$name}");
+            ->useFallbackUrl("https://ui-avatars.com/api/?name={$name}&background=random&color=fff&bold=true&size=128");
     }
 
     /**
