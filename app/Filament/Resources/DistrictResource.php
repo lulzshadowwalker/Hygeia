@@ -26,37 +26,37 @@ class DistrictResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('District Information')
-                    ->description('Define the district name and associated city')
-                    ->aside()
-                    ->schema([
-                        Forms\Components\TextInput::make('name')
-                            ->label('District Name')
-                            ->required()
-                            ->placeholder('e.g., District V, Belváros')
-                            ->translatable(),
+        return $form->schema([
+            Forms\Components\Section::make('District Information')
+                ->description('Define the district name and associated city')
+                ->aside()
+                ->schema([
+                    Forms\Components\TextInput::make('name')
+                        ->label('District Name')
+                        ->required()
+                        ->placeholder('e.g., District V, Belváros')
+                        ->translatable(),
 
-                        Forms\Components\Select::make('city_id')
-                            ->label('City')
-                            ->relationship('city', 'name')
-                            ->searchable()
-                            ->preload()
-                            ->required(),
-                    ])->columns(1),
+                    Forms\Components\Select::make('city_id')
+                        ->label('City')
+                        ->relationship('city', 'name')
+                        ->searchable()
+                        ->preload()
+                        ->required(),
+                ])
+                ->columns(1),
 
-                Forms\Components\Section::make('Geographic Boundaries')
-                    ->description('Define the geographic boundaries for service area mapping')
-                    ->aside()
-                    ->schema([
-                        Forms\Components\Textarea::make('boundaries')
-                            ->label('Boundary Coordinates')
-                            ->placeholder('Geographic boundary data (Polygon format)')
-                            ->helperText('This field is used for geographic service area calculations')
-                            ->columnSpanFull(),
-                    ])->columns(1),
-            ]);
+            // Forms\Components\Section::make('Geographic Boundaries')
+            //     ->description('Define the geographic boundaries for service area mapping')
+            //     ->aside()
+            //     ->schema([
+            //         Forms\Components\Textarea::make('boundaries')
+            //             ->label('Boundary Coordinates')
+            //             ->placeholder('Geographic boundary data (Polygon format)')
+            //             ->helperText('This field is used for geographic service area calculations')
+            //             ->columnSpanFull(),
+            //     ])->columns(1),
+        ]);
     }
 
     public static function table(Table $table): Table
@@ -75,7 +75,11 @@ class DistrictResource extends Resource
 
                 Tables\Columns\IconColumn::make('has_boundaries')
                     ->label('Has Boundaries')
-                    ->getStateUsing(fn (Model $record): bool => ! is_null($record->boundaries))
+                    ->getStateUsing(
+                        fn (Model $record): bool => ! is_null(
+                            $record->boundaries,
+                        ),
+                    )
                     ->boolean()
                     ->trueColor('success')
                     ->falseColor('warning'),
@@ -99,11 +103,19 @@ class DistrictResource extends Resource
                     ->preload(),
 
                 Tables\Filters\Filter::make('has_boundaries')
-                    ->query(fn (Builder $query): Builder => $query->whereNotNull('boundaries'))
+                    ->query(
+                        fn (Builder $query): Builder => $query->whereNotNull(
+                            'boundaries',
+                        ),
+                    )
                     ->label('With Geographic Boundaries'),
 
                 Tables\Filters\Filter::make('missing_boundaries')
-                    ->query(fn (Builder $query): Builder => $query->whereNull('boundaries'))
+                    ->query(
+                        fn (Builder $query): Builder => $query->whereNull(
+                            'boundaries',
+                        ),
+                    )
                     ->label('Missing Boundaries'),
             ])
             ->actions([
@@ -121,8 +133,7 @@ class DistrictResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()
-            ->with('city');
+        return parent::getEloquentQuery()->with('city');
     }
 
     public static function getRelations(): array
