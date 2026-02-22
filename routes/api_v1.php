@@ -35,6 +35,7 @@ use App\Http\Controllers\Api\V1\SupportTicketController;
 use App\Http\Controllers\Api\V1\UsernameController;
 use App\Http\Controllers\Api\V1\UserPreferenceController;
 use App\Http\Middleware\CleanerMiddleware;
+use App\Http\Middleware\ClientMiddleware;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/auth/login', [LoginController::class, 'store'])->name(
@@ -103,6 +104,13 @@ Route::get('/me/dashboard', [CleanerDashboardController::class, 'index'])
 Route::get('/cleaners', [CleanerController::class, 'index'])->name(
     'api.v1.cleaner.index',
 );
+Route::get('/cleaners/favorites', [
+    FavoriteCleanerController::class,
+    'index',
+])
+    ->middleware('auth:sanctum')
+    ->middleware(ClientMiddleware::class)
+    ->name('api.v1.cleaners.favorites.index');
 Route::get('/cleaners/{cleaner}', [CleanerController::class, 'show'])->name(
     'api.v1.cleaner.show',
 );

@@ -3,12 +3,25 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\V1\CleanerResource;
 use App\Models\Cleaner;
 use Dedoc\Scramble\Attributes\Group;
 
 #[Group('Cleaners')]
 class FavoriteCleanerController extends Controller
 {
+    /**
+     * List favorite cleaners
+     *
+     * List all favorite cleaners for the authenticated client.
+     */
+    public function index()
+    {
+        return CleanerResource::collection(
+            auth()->user()->client->favoriteCleaners
+        );
+    }
+
     /**
      * Add a cleaner to favorites
      *
