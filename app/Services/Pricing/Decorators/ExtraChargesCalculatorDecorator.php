@@ -29,6 +29,7 @@ class ExtraChargesCalculatorDecorator implements BookingPriceCalculator
         return new BookingPriceBreakdown(
             selectedAmount: $breakdown->selectedAmount,
             extrasAmount: $combinedExtras,
+            discountAmount: $breakdown->discountAmount,
             totalAmount: $totalAmount,
             currency: $breakdown->currency,
         );

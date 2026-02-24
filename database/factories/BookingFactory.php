@@ -7,6 +7,7 @@ use App\Enums\BookingUrgency;
 use App\Models\Cleaner;
 use App\Models\Client;
 use App\Models\Pricing;
+use App\Models\Promocode;
 use App\Models\Service;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -26,6 +27,7 @@ class BookingFactory extends Factory
             'client_id' => Client::factory(),
             'service_id' => Service::factory(),
             'pricing_id' => Pricing::factory(),
+            'promocode_id' => $this->faker->boolean(20) ? Promocode::factory() : null,
             'price_per_meter' => $this->faker->optional()->randomFloat(2, 1, 10),
             'selected_amount' => $this->faker->randomFloat(2, 10, 100),
             'urgency' => $this->faker->randomElement(BookingUrgency::values()),

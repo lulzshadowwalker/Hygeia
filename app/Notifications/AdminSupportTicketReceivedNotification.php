@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Filament\Resources\SupportTicketResource;
 use App\Models\SupportTicket;
+use App\Models\User;
 use Filament\Notifications\Actions\Action;
 use Filament\Notifications\Notification as FilamentNotification;
 use Illuminate\Bus\Queueable;
@@ -22,7 +23,13 @@ class AdminSupportTicketReceivedNotification extends Notification implements Sho
 
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        $channels = ['database'];
+
+        if ($notifiable instanceof User && $notifiable->wantsEmailNotifications()) {
+            $channels[] = 'mail';
+        }
+
+        return $channels;
     }
 
     public function toMail(object $notifiable): MailMessage

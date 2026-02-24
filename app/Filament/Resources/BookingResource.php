@@ -8,6 +8,7 @@ use App\Filament\Resources\BookingResource\Pages;
 use App\Filament\Resources\BookingResource\RelationManagers;
 use App\Models\Booking;
 use App\Models\Pricing;
+use App\Models\Promocode;
 use App\Models\Service;
 use App\Services\Pricing\BookingPricingData;
 use App\Services\Pricing\BookingPricingEngine;
@@ -143,6 +144,17 @@ class BookingResource extends Resource
                             ->prefix('Ft')
                             ->disabled()
                             ->dehydrated(),
+
+                        Forms\Components\Select::make('promocode_id')
+                            ->label('Promocode')
+                            ->relationship('promocode', 'code')
+                            ->searchable()
+                            ->preload()
+                            ->nullable()
+                            ->reactive()
+                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                self::recalculateAmounts($set, $get);
+                            }),
                     ])->columns(1),
 
                 Forms\Components\Section::make('Booking Details')
@@ -340,6 +352,7 @@ class BookingResource extends Resource
         }
 
         $pricing = null;
+        $promocode = null;
         $area = $get('area');
 
         if ($service->usesAreaRangePricing()) {
@@ -359,12 +372,18 @@ class BookingResource extends Resource
             }
         }
 
+        $promocodeId = $get('promocode_id');
+        if ($promocodeId) {
+            $promocode = Promocode::find($promocodeId);
+        }
+
         try {
             $breakdown = app(BookingPricingEngine::class)->calculate(new BookingPricingData(
                 service: $service,
                 pricing: $pricing,
                 area: $area !== null ? (float) $area : null,
                 extras: collect(),
+                promocode: $promocode,
                 currency: $service->currency ?? 'HUF',
             ));
         } catch (InvalidArgumentException) {
