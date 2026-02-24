@@ -21,7 +21,9 @@ class ServiceResource extends JsonResource
             'attributes' => [
                 'name' => $this->name,
                 'type' => $this->type->value,
+                'pricingModel' => $this->effectivePricingModel()->value,
                 'pricePerMeter' => $this->price_per_meter instanceof Money ? $this->price_per_meter->getAmount()->__toString() : (string) $this->price_per_meter,
+                'minArea' => $this->min_area,
                 'currency' => $this->currency,
             ],
             'includes' => [

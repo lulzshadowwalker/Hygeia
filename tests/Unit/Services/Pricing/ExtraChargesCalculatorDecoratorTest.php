@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Services\Pricing;
 
+use App\Enums\ServicePricingModel;
 use App\Enums\ServiceType;
 use App\Models\Extra;
 use App\Models\Service;
@@ -18,8 +19,10 @@ class ExtraChargesCalculatorDecoratorTest extends TestCase
     public function test_it_adds_extras_on_top_of_base_amount(): void
     {
         $service = Service::factory()->create([
-            'type' => ServiceType::Residential,
+            'type' => ServiceType::Commercial,
+            'pricing_model' => ServicePricingModel::PricePerMeter,
             'price_per_meter' => 100,
+            'min_area' => 5,
         ]);
 
         $extras = Extra::factory()->count(2)->create([

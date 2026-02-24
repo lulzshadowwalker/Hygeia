@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\ServicePricingModel;
 use App\Enums\ServiceType;
 use App\Filament\Resources\ServiceResource\Pages;
 use App\Filament\Resources\ServiceResource\RelationManagers;
@@ -37,8 +38,7 @@ class ServiceResource extends Resource
                         Forms\Components\TextInput::make('name')
                             ->label('Service Name')
                             ->required()
-                            ->placeholder('e.g., Home Cleaning, Office Cleaning')
-                            ->translatable(),
+                            ->placeholder('e.g., Home Cleaning, Office Cleaning'),
 
                         Forms\Components\Select::make('type')
                             ->label('Service Type')
@@ -47,17 +47,56 @@ class ServiceResource extends Resource
                             ->native(false)
                             ->default(ServiceType::Residential)
                             ->live()
-                            ->afterStateHydrated(function ($state, callable $set) {
+                            ->afterStateHydrated(function ($state, callable $set): void {
                                 $type = $state?->value ?? ServiceType::Residential->value;
                                 $set('type', $type);
+                            })
+                            ->afterStateUpdated(function ($state, callable $set): void {
+                                if ($state === ServiceType::Residential->value) {
+                                    $set('pricing_model', ServicePricingModel::AreaRange->value);
+                                    $set('price_per_meter', null);
+                                    $set('min_area', null);
+                                }
                             }),
+
+                        Forms\Components\Select::make('pricing_model')
+                            ->label('Pricing Model')
+                            ->options(ServicePricingModel::class)
+                            ->required()
+                            ->native(false)
+                            ->default(ServicePricingModel::AreaRange)
+                            ->disabled(fn (Forms\Get $get): bool => $get('type') === ServiceType::Residential->value)
+                            ->dehydrated()
+                            ->live()
+                            ->afterStateHydrated(function ($state, callable $set, Forms\Get $get): void {
+                                $type = $get('type');
+                                if ($type === ServiceType::Residential->value) {
+                                    $set('pricing_model', ServicePricingModel::AreaRange->value);
+
+                                    return;
+                                }
+
+                                $model = $state?->value ?? ServicePricingModel::AreaRange->value;
+                                $set('pricing_model', $model);
+                            }),
+
+                        Forms\Components\TextInput::make('min_area')
+                            ->label('Minimum Area (sqm)')
+                            ->numeric()
+                            ->suffix('sqm')
+                            ->visible(fn (Forms\Get $get): bool => $get('type') === ServiceType::Commercial->value
+                                && $get('pricing_model') === ServicePricingModel::PricePerMeter->value)
+                            ->required(fn (Forms\Get $get): bool => $get('type') === ServiceType::Commercial->value
+                                && $get('pricing_model') === ServicePricingModel::PricePerMeter->value),
 
                         Forms\Components\TextInput::make('price_per_meter')
                             ->label('Price per Meter')
                             ->numeric()
                             ->prefix('Ft')
-                            ->visible(fn (Forms\Get $get) => $get('type') === ServiceType::Residential->value)
-                            ->required(fn (Forms\Get $get) => $get('type') === ServiceType::Residential->value),
+                            ->visible(fn (Forms\Get $get): bool => $get('type') === ServiceType::Commercial->value
+                                && $get('pricing_model') === ServicePricingModel::PricePerMeter->value)
+                            ->required(fn (Forms\Get $get): bool => $get('type') === ServiceType::Commercial->value
+                                && $get('pricing_model') === ServicePricingModel::PricePerMeter->value),
                     ])->columns(1),
             ]);
     }
@@ -79,17 +118,31 @@ class ServiceResource extends Resource
                     ->color(fn ($state): string => $state->getColor())
                     ->icon(fn ($state): string => $state->getIcon()),
 
+                Tables\Columns\TextColumn::make('pricing_model')
+                    ->label('Pricing Model')
+                    ->badge()
+                    ->getStateUsing(fn (Service $record) => $record->effectivePricingModel())
+                    ->formatStateUsing(fn ($state): string => $state->getLabel())
+                    ->color(fn ($state): string => $state->getColor())
+                    ->icon(fn ($state): string => $state->getIcon()),
+
+                Tables\Columns\TextColumn::make('min_area')
+                    ->label('Min Area')
+                    ->suffix(' sqm')
+                    ->sortable()
+                    ->formatStateUsing(fn ($state, Service $record): string => $record->usesPricePerMeterPricing() && $state !== null ? (string) $state : 'N/A'),
+
                 Tables\Columns\TextColumn::make('pricings_count')
                     ->label('Pricing Tiers')
                     ->counts('pricings')
                     ->sortable()
-                    ->formatStateUsing(fn ($state, Service $record) => $record->type === ServiceType::Residential ? 'N/A' : $state),
+                    ->formatStateUsing(fn ($state, Service $record) => $record->usesAreaRangePricing() ? $state : 'N/A'),
 
                 Tables\Columns\TextColumn::make('price_per_meter')
                     ->label('Pricing Per Meter')
                     ->sortable()
                     ->formatStateUsing(function ($state, Service $record): string {
-                        if ($record->type !== ServiceType::Residential || $state === null) {
+                        if (! $record->usesPricePerMeterPricing() || $state === null) {
                             return 'N/A';
                         }
 
@@ -120,6 +173,10 @@ class ServiceResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('type')
                     ->options(ServiceType::class)
+                    ->native(false),
+                Tables\Filters\SelectFilter::make('pricing_model')
+                    ->label('Pricing Model')
+                    ->options(ServicePricingModel::class)
                     ->native(false),
             ])
             ->actions([

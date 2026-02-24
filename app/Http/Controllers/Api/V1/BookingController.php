@@ -71,12 +71,20 @@ class BookingController extends ApiController
 
         return DB::transaction(function () use ($request) {
             $service = \App\Models\Service::findOrFail($request->serviceId());
-            $pricingId = null;
             $pricing = null;
+            $pricingId = null;
+            $area = null;
+            $pricePerMeter = null;
 
-            if ($service->type !== \App\Enums\ServiceType::Residential) {
-                $pricing = Pricing::findOrFail($request->pricingId());
+            if ($service->usesAreaRangePricing()) {
+                $pricing = Pricing::query()
+                    ->whereKey($request->pricingId())
+                    ->where('service_id', $service->id)
+                    ->firstOrFail();
                 $pricingId = $pricing->id;
+            } else {
+                $area = $request->area();
+                $pricePerMeter = $service->price_per_meter;
             }
 
             $extras = Extra::query()->whereIn('id', $request->extraIds())->get();
@@ -94,8 +102,8 @@ class BookingController extends ApiController
                 'service_id' => $request->serviceId(),
                 'pricing_id' => $pricingId,
                 'selected_amount' => $breakdown->selectedAmount,
-                'area' => $request->area(),
-                'price_per_meter' => $service->price_per_meter,
+                'area' => $area,
+                'price_per_meter' => $pricePerMeter,
                 'urgency' => $request->urgency()->value,
                 'scheduled_at' => $request->scheduledAt(),
                 'has_cleaning_material' => $request->hasCleaningMaterials(),
