@@ -27,6 +27,7 @@ use App\Http\Controllers\Api\V1\OfferController;
 use App\Http\Controllers\Api\V1\PageController;
 use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\Api\V1\ProfileReviewController;
+use App\Http\Controllers\Api\V1\PromocodeValidationController;
 use App\Http\Controllers\Api\V1\RegisterCleanerController;
 use App\Http\Controllers\Api\V1\RegisterClientController;
 use App\Http\Controllers\Api\V1\ResetPasswordController;
@@ -190,6 +191,11 @@ Route::get('/extras', [ExtraController::class, 'index'])->name(
 Route::get('/extras/{extra}', [ExtraController::class, 'show'])->name(
     'api.v1.extras.show',
 );
+
+Route::post('/promocodes/validate', [PromocodeValidationController::class, 'store'])
+    ->middleware('auth:sanctum')
+    ->middleware(ClientMiddleware::class)
+    ->name('api.v1.promocodes.validate');
 
 Route::post('/bookings', [BookingController::class, 'store'])
     ->middleware('auth:sanctum')

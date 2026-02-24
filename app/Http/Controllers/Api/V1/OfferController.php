@@ -19,7 +19,7 @@ class OfferController extends ApiController
      */
     public function index()
     {
-        $offers = Booking::with(['service', 'pricing', 'extras'])
+        $offers = Booking::with(['service', 'pricing', 'extras', 'promocode'])
             ->where('status', BookingStatus::Pending->value)
             ->get();
 
@@ -36,6 +36,8 @@ class OfferController extends ApiController
         if ($offer->status !== BookingStatus::Pending) {
             throw new ModelNotFoundException('Offer not found.');
         }
+
+        $offer->load(['service', 'pricing', 'extras', 'promocode']);
 
         return OfferResource::make($offer);
     }

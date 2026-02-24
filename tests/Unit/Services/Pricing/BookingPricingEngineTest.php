@@ -40,6 +40,7 @@ class BookingPricingEngineTest extends TestCase
 
         $this->assertSame('3000.00', $breakdown->selectedAmount->getAmount()->__toString());
         $this->assertSame('500.00', $breakdown->extrasAmount->getAmount()->__toString());
+        $this->assertSame('0.00', $breakdown->discountAmount->getAmount()->__toString());
         $this->assertSame('3500.00', $breakdown->totalAmount->getAmount()->__toString());
         $this->assertSame('HUF', $breakdown->currency);
     }
@@ -66,6 +67,7 @@ class BookingPricingEngineTest extends TestCase
 
         $this->assertSame('2400.00', $breakdown->selectedAmount->getAmount()->__toString());
         $this->assertSame('600.00', $breakdown->extrasAmount->getAmount()->__toString());
+        $this->assertSame('0.00', $breakdown->discountAmount->getAmount()->__toString());
         $this->assertSame('3000.00', $breakdown->totalAmount->getAmount()->__toString());
         $this->assertSame('HUF', $breakdown->currency);
     }
