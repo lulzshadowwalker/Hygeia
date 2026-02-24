@@ -22,7 +22,7 @@ class ServiceResource extends JsonResource
                 'name' => $this->name,
                 'type' => $this->type->value,
                 'pricePerMeter' => $this->price_per_meter instanceof Money ? $this->price_per_meter->getAmount()->__toString() : (string) $this->price_per_meter,
-                'pricePerMeterCurrency' => $this->currency,
+                'currency' => $this->currency,
             ],
             'includes' => [
                 'pricings' => $this->whenLoaded('pricings', function () {

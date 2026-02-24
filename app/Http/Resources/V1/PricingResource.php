@@ -19,7 +19,7 @@ class PricingResource extends JsonResource
             'id' => (string) $this->id,
             'attributes' => [
                 'amount' => $this->amount instanceof Money ? $this->amount->getAmount()->__toString() : (string) $this->amount,
-                'amountCurrency' => $this->currency,
+                'currency' => $this->currency,
                 'minArea' => $this->min_area,
                 'maxArea' => $this->max_area,
             ],

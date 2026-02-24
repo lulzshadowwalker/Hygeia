@@ -53,9 +53,7 @@ class BookingControllerAreaTest extends TestCase
             ->assertCreated()
             ->assertJsonPath('data.attributes.amount', '5000.00')
             ->assertJsonPath('data.attributes.selectedAmount', '5000.00')
-            ->assertJsonPath('data.attributes.amountCurrency', 'HUF')
-            ->assertJsonPath('data.attributes.selectedAmountCurrency', 'HUF')
-            ->assertJsonPath('data.attributes.pricePerMeterCurrency', 'HUF')
+            ->assertJsonPath('data.attributes.currency', 'HUF')
             ->assertJsonPath('data.attributes.area', 50)
             ->assertJsonPath('data.attributes.pricePerMeter', '100.00');
 

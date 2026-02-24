@@ -95,9 +95,7 @@ class BookingControllerTest extends TestCase
         }
 
         $response
-            ->assertJsonPath('data.attributes.selectedAmountCurrency', 'HUF')
-            ->assertJsonPath('data.attributes.amountCurrency', 'HUF')
-            ->assertJsonPath('data.attributes.pricePerMeterCurrency', 'HUF');
+            ->assertJsonPath('data.attributes.currency', 'HUF');
     }
 
     public function test_client_can_create_booking_with_no_extras(): void
@@ -155,9 +153,7 @@ class BookingControllerTest extends TestCase
         ]);
 
         $response
-            ->assertJsonPath('data.attributes.selectedAmountCurrency', 'HUF')
-            ->assertJsonPath('data.attributes.amountCurrency', 'HUF')
-            ->assertJsonPath('data.attributes.pricePerMeterCurrency', 'HUF');
+            ->assertJsonPath('data.attributes.currency', 'HUF');
     }
 
     public function test_cleaner_cannot_create_booking(): void

@@ -21,7 +21,7 @@ class ExtraResource extends JsonResource
             'attributes' => [
                 'name' => $this->name,
                 'amount' => $this->amount instanceof Money ? $this->amount->getAmount()->__toString() : (string) $this->amount,
-                'amountCurrency' => $this->currency,
+                'currency' => $this->currency,
             ],
         ];
     }
