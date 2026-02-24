@@ -131,6 +131,9 @@ class User extends Authenticatable implements FilamentUser, HasMedia
 
         $preferences = $this->preferences()->firstOrCreate([
             'user_id' => $this->id,
+        ], [
+            'email_notifications' => true,
+            'push_notifications' => true,
         ]);
 
         $this->setRelation('preferences', $preferences);
