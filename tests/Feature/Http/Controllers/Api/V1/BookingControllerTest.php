@@ -2,11 +2,14 @@
 
 namespace Tests\Feature\Http\Controllers\Api\V1;
 
+use App\Enums\BookingStatus;
 use App\Enums\Role;
+use App\Models\Booking;
 use App\Models\Cleaner;
 use App\Models\Client;
 use App\Models\Extra;
 use App\Models\Pricing;
+use App\Models\Promocode;
 use App\Models\Service;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -154,6 +157,143 @@ class BookingControllerTest extends TestCase
 
         $response
             ->assertJsonPath('data.attributes.currency', 'HUF');
+    }
+
+    public function test_client_can_create_booking_with_valid_promocode(): void
+    {
+        $service = Service::factory()->has(Pricing::factory())->create();
+        $client = Client::factory()->create();
+        $client->user->assignRole(Role::Client);
+        $pricing = $service->pricings->first();
+
+        $promocode = Promocode::factory()->create([
+            'code' => 'SAVE20',
+            'discount_percentage' => 20,
+            'max_discount_amount' => 1000,
+            'currency' => 'HUF',
+        ]);
+
+        $pricingAmount = (float) $pricing->getRawOriginal('amount');
+        $expectedDiscount = min($pricingAmount * 0.2, 1000);
+        $expectedTotal = $pricingAmount - $expectedDiscount;
+
+        $this->actingAs($client->user)
+            ->postJson(route('api.v1.bookings.store'), [
+                'data' => [
+                    'attributes' => [
+                        'hasCleaningMaterials' => true,
+                        'urgency' => 'flexible',
+                        'promocodeCode' => 'save20',
+                        'location' => [
+                            'description' => '123 Main St, Springfield',
+                            'lat' => 40.712776,
+                            'lng' => -74.005974,
+                        ],
+                    ],
+                    'relationships' => [
+                        'service' => [
+                            'data' => ['id' => $service->id],
+                        ],
+                        'pricing' => [
+                            'data' => ['id' => $pricing->id],
+                        ],
+                        'extras' => [
+                            'data' => [],
+                        ],
+                    ],
+                ],
+            ])
+            ->assertCreated()
+            ->assertJsonPath('data.attributes.discountAmount', number_format($expectedDiscount, 2, '.', ''));
+
+        $this->assertDatabaseHas('bookings', [
+            'client_id' => $client->id,
+            'promocode_id' => $promocode->id,
+            'amount' => number_format($expectedTotal, 2, '.', ''),
+        ]);
+    }
+
+    public function test_client_cannot_create_booking_with_invalid_promocode(): void
+    {
+        $service = Service::factory()->has(Pricing::factory())->create();
+        $client = Client::factory()->create();
+        $client->user->assignRole(Role::Client);
+        $pricing = $service->pricings->first();
+
+        $this->actingAs($client->user)
+            ->postJson(route('api.v1.bookings.store'), [
+                'data' => [
+                    'attributes' => [
+                        'hasCleaningMaterials' => true,
+                        'urgency' => 'flexible',
+                        'promocodeCode' => 'DOESNOTEXIST',
+                        'location' => [
+                            'description' => '123 Main St, Springfield',
+                            'lat' => 40.712776,
+                            'lng' => -74.005974,
+                        ],
+                    ],
+                    'relationships' => [
+                        'service' => [
+                            'data' => ['id' => $service->id],
+                        ],
+                        'pricing' => [
+                            'data' => ['id' => $pricing->id],
+                        ],
+                        'extras' => [
+                            'data' => [],
+                        ],
+                    ],
+                ],
+            ])
+            ->assertUnprocessable()
+            ->assertJsonPath('errors.0.meta.reason', 'not_found');
+    }
+
+    public function test_client_cannot_create_booking_when_promocode_global_cap_is_reached(): void
+    {
+        $service = Service::factory()->has(Pricing::factory())->create();
+        $client = Client::factory()->create();
+        $client->user->assignRole(Role::Client);
+        $pricing = $service->pricings->first();
+
+        $promocode = Promocode::factory()->create([
+            'max_global_uses' => 1,
+        ]);
+
+        Booking::factory()->create([
+            'promocode_id' => $promocode->id,
+            'status' => BookingStatus::Pending->value,
+        ]);
+
+        $this->actingAs($client->user)
+            ->postJson(route('api.v1.bookings.store'), [
+                'data' => [
+                    'attributes' => [
+                        'hasCleaningMaterials' => true,
+                        'urgency' => 'flexible',
+                        'promocodeCode' => $promocode->code,
+                        'location' => [
+                            'description' => '123 Main St, Springfield',
+                            'lat' => 40.712776,
+                            'lng' => -74.005974,
+                        ],
+                    ],
+                    'relationships' => [
+                        'service' => [
+                            'data' => ['id' => $service->id],
+                        ],
+                        'pricing' => [
+                            'data' => ['id' => $pricing->id],
+                        ],
+                        'extras' => [
+                            'data' => [],
+                        ],
+                    ],
+                ],
+            ])
+            ->assertUnprocessable()
+            ->assertJsonPath('errors.0.meta.reason', 'usage_limit_reached');
     }
 
     public function test_cleaner_cannot_create_booking(): void

@@ -3,6 +3,7 @@
 namespace App\Services\Pricing;
 
 use App\Models\Pricing;
+use App\Models\Promocode;
 use App\Models\Service;
 use Illuminate\Support\Collection;
 
@@ -13,6 +14,7 @@ class BookingPricingData
         public readonly ?Pricing $pricing,
         public readonly ?float $area,
         public readonly Collection $extras,
+        public readonly ?Promocode $promocode = null,
         public readonly string $currency = 'HUF',
     ) {}
 }

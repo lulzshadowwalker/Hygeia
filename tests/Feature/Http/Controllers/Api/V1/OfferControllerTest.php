@@ -21,6 +21,7 @@ class OfferControllerTest extends TestCase
         $cleaner->user->assignRole(Role::Cleaner->value);
 
         $offers = Booking::factory()->count(5)->create(['status' => BookingStatus::Pending->value]);
+        $offers->load(['service', 'pricing', 'extras', 'promocode']);
         $resource = OfferResource::collection($offers);
 
         $this->actingAs($cleaner->user)
@@ -50,6 +51,7 @@ class OfferControllerTest extends TestCase
         $cleaner->user->assignRole(Role::Cleaner->value);
 
         $offer = Booking::factory()->create(['status' => BookingStatus::Pending->value]);
+        $offer->load(['service', 'pricing', 'extras', 'promocode']);
         $resource = OfferResource::make($offer);
 
         $this->actingAs($cleaner->user)

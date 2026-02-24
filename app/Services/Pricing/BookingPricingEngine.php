@@ -3,6 +3,7 @@
 namespace App\Services\Pricing;
 
 use App\Services\Pricing\Decorators\ExtraChargesCalculatorDecorator;
+use App\Services\Pricing\Decorators\PromoCodeCalculatorDecorator;
 
 class BookingPricingEngine
 {
@@ -10,8 +11,10 @@ class BookingPricingEngine
 
     public function __construct(?BookingPriceCalculator $calculator = null)
     {
-        $this->calculator = $calculator ?? new ExtraChargesCalculatorDecorator(
-            new BaseBookingPriceCalculator
+        $this->calculator = $calculator ?? new PromoCodeCalculatorDecorator(
+            new ExtraChargesCalculatorDecorator(
+                new BaseBookingPriceCalculator
+            )
         );
     }
 

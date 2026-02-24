@@ -31,6 +31,7 @@ class BaseBookingPriceCalculator implements BookingPriceCalculator
         return new BookingPriceBreakdown(
             selectedAmount: $selectedAmount,
             extrasAmount: $extrasAmount,
+            discountAmount: Money::zero($currency),
             totalAmount: $selectedAmount,
             currency: $currency,
         );

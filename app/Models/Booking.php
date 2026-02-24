@@ -25,6 +25,7 @@ class Booking extends Model implements HasMedia
         'client_id',
         'service_id',
         'pricing_id',
+        'promocode_id',
         'area',
         'price_per_meter',
         'selected_amount',
@@ -51,6 +52,7 @@ class Booking extends Model implements HasMedia
             'scheduled_at' => 'datetime',
             'has_cleaning_material' => 'boolean',
             'area' => 'integer',
+            'promocode_id' => 'integer',
             'price_per_meter' => MoneyCast::class,
             'selected_amount' => MoneyCast::class,
             'amount' => MoneyCast::class,
@@ -74,6 +76,11 @@ class Booking extends Model implements HasMedia
     public function pricing(): BelongsTo
     {
         return $this->belongsTo(Pricing::class);
+    }
+
+    public function promocode(): BelongsTo
+    {
+        return $this->belongsTo(Promocode::class)->withTrashed();
     }
 
     public function extras(): BelongsToMany
