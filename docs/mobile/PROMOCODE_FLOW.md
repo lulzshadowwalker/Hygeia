@@ -104,7 +104,7 @@ Request body (promocode is optional):
     "attributes": {
       "hasCleaningMaterials": true,
       "urgency": "flexible",
-      "promocodeCode": "SAVE20",
+      "promocode": "SAVE20",
       "location": {
         "description": "Budapest, ...",
         "lat": 47.4979,
@@ -154,7 +154,7 @@ Example:
 3. If `valid=true`, app updates displayed pricing using returned breakdown.
 4. If `valid=false`, app reads `reason` and shows localized user message.
 5. User confirms booking.
-6. App sends booking request with optional `promocodeCode`.
+6. App sends booking request with optional `promocode`.
 7. If booking returns `422` with reason enum, show localized message and keep user on checkout.
 
 ## Reason enums
@@ -184,7 +184,7 @@ Requirements:
 2) On apply, call POST /api/v1/promocodes/validate with current booking context (service/pricing/area/extras + code).
 3) If valid=true, display returned pricing breakdown (selectedAmount, extrasAmount, discountAmount, totalAmount, currency).
 4) If valid=false, read reason enum and show localized user-facing message.
-5) On booking confirmation, send POST /api/v1/bookings with optional promocodeCode.
+5) On booking confirmation, send POST /api/v1/bookings with optional promocode.
 6) If booking returns 422 with errors[0].meta.reason, show localized error and keep checkout state.
 7) Preserve user input and allow retry with a different code.
 

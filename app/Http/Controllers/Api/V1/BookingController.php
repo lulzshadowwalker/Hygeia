@@ -94,9 +94,9 @@ class BookingController extends ApiController
                 $pricingId = $pricing->id;
             }
 
-            if ($request->promocodeCode()) {
+            if ($request->promocode()) {
                 $promocodeValidation = $this->promocodeValidator->validate(
-                    $request->promocodeCode(),
+                    $request->promocode(),
                     lockForUpdate: true,
                 );
 

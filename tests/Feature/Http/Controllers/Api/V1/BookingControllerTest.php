@@ -183,7 +183,7 @@ class BookingControllerTest extends TestCase
                     'attributes' => [
                         'hasCleaningMaterials' => true,
                         'urgency' => 'flexible',
-                        'promocodeCode' => 'save20',
+                        'promocode' => 'save20',
                         'location' => [
                             'description' => '123 Main St, Springfield',
                             'lat' => 40.712776,
@@ -226,7 +226,7 @@ class BookingControllerTest extends TestCase
                     'attributes' => [
                         'hasCleaningMaterials' => true,
                         'urgency' => 'flexible',
-                        'promocodeCode' => 'DOESNOTEXIST',
+                        'promocode' => 'DOESNOTEXIST',
                         'location' => [
                             'description' => '123 Main St, Springfield',
                             'lat' => 40.712776,
@@ -272,7 +272,7 @@ class BookingControllerTest extends TestCase
                     'attributes' => [
                         'hasCleaningMaterials' => true,
                         'urgency' => 'flexible',
-                        'promocodeCode' => $promocode->code,
+                        'promocode' => $promocode->code,
                         'location' => [
                             'description' => '123 Main St, Springfield',
                             'lat' => 40.712776,

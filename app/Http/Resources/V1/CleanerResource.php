@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\V1;
 
+use App\Models\District;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -14,32 +15,45 @@ class CleanerResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        //  TODO: Implement cleaner resource with real data
+        $user = $this->user;
+        $serviceArea = $this->serviceArea ?? ($this->service_area_id ? District::find($this->service_area_id) : null);
+
+        $isFavorite = false;
+        $authenticatedUser = $request->user();
+
+        if ($authenticatedUser?->isClient) {
+            $client = $authenticatedUser->client;
+
+            if ($client) {
+                $isFavorite = $client->favoriteCleaners()
+                    ->whereKey($this->id)
+                    ->exists();
+            }
+        }
+
         return [
             'type' => 'cleaner',
             'id' => (string) $this->id,
             'attributes' => [
-                'name' => 'John Doe',
-                'phone' => '+962791234567',
-                'email' => 'email@example.com',
-                'avatar' => 'https://ui-avatars.com/api/?name=John+Doe',
-                'status' => 'active',
-                'availableDays' => ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'],
-                'maxHoursPerWeek' => 40,
-                'timeSlots' => ['morning', 'afternoon', 'evening'],
-                'yearsOfExperience' => 5,
-                'hasCleaningSupplies' => true,
-                'comfortableWithPets' => true,
-                'serviceRadius' => 10,
-                'agreedToTerms' => true,
-
-                //  TODO: Implement isFavorite attribute based on the current authenticated user
-                'isFavorite' => false,
+                'name' => $user?->name,
+                'phone' => $user?->phone,
+                'email' => $user?->email,
+                'avatar' => $user?->avatar,
+                'status' => $user?->status?->value,
+                'availableDays' => $this->available_days ?? [],
+                'maxHoursPerWeek' => $this->max_hours_per_week,
+                'timeSlots' => $this->time_slots ?? [],
+                'yearsOfExperience' => $this->years_of_experience,
+                'hasCleaningSupplies' => (bool) $this->has_cleaning_supplies,
+                'comfortableWithPets' => (bool) $this->comfortable_with_pets,
+                'serviceRadius' => $this->service_radius,
+                'agreedToTerms' => (bool) $this->agreed_to_terms,
+                'isFavorite' => $isFavorite,
             ],
             'includes' => [
                 'previousServices' => ServiceResource::collection($this->previousServices ?? []),
                 'preferredServices' => ServiceResource::collection($this->preferredServices ?? []),
-                'serviceArea' => $this->serviceArea ? DistrictResource::make($this->serviceArea) : null,
+                'serviceArea' => $serviceArea ? DistrictResource::make($serviceArea) : null,
             ],
         ];
     }

@@ -26,7 +26,7 @@ class StoreBookingRequest extends BaseFormRequest
             'data.attributes.location.description' => 'sometimes|nullable|string|max:255',
             'data.attributes.images' => 'sometimes|array|max:5',
             'data.attributes.images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:5120',
-            'data.attributes.promocodeCode' => 'nullable|string|max:255',
+            'data.attributes.promocode' => 'nullable|string|max:255',
             'data.attributes.location.lat' => 'sometimes|nullable|numeric|between:-90,90',
             'data.attributes.location.lng' => 'sometimes|nullable|numeric|between:-180,180',
             'data.attributes.scheduledAt' => [
@@ -153,9 +153,9 @@ class StoreBookingRequest extends BaseFormRequest
         return $this->file('data.attributes.images', []);
     }
 
-    public function promocodeCode(): ?string
+    public function promocode(): ?string
     {
-        $code = $this->input('data.attributes.promocodeCode');
+        $code = $this->input('data.attributes.promocode');
 
         if (! is_string($code)) {
             return null;
