@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\V1;
 
+use Brick\Money\Money;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -19,7 +20,8 @@ class ExtraResource extends JsonResource
             'id' => (string) $this->id,
             'attributes' => [
                 'name' => $this->name,
-                'amount' => $this->amount,
+                'amount' => $this->amount instanceof Money ? $this->amount->getAmount()->__toString() : (string) $this->amount,
+                'currency' => $this->currency,
             ],
         ];
     }

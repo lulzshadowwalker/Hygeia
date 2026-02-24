@@ -85,7 +85,7 @@ class PricingResource extends Resource
 
                 Tables\Columns\TextColumn::make('amount')
                     ->label('Price')
-                    ->money('HUF')
+                    ->money(fn (Pricing $record): string => $record->currency ?? 'HUF')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('bookings_count')

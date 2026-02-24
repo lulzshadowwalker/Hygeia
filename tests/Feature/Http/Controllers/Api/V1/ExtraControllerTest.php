@@ -22,6 +22,8 @@ class ExtraControllerTest extends TestCase
         $response = $this->getJson(route('api.v1.extras.index'));
         $response->assertOk()
             ->assertExactJson($resource->response()->getData(true));
+
+        $response->assertJsonPath('data.0.attributes.currency', 'HUF');
     }
 
     public function test_it_shows_single_extra(): void
@@ -33,5 +35,7 @@ class ExtraControllerTest extends TestCase
         $response = $this->getJson(route('api.v1.extras.show', $extra));
         $response->assertOk()
             ->assertExactJson($resource->response()->getData(true));
+
+        $response->assertJsonPath('data.attributes.currency', 'HUF');
     }
 }

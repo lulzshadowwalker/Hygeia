@@ -21,6 +21,7 @@ class PricingFactory extends Factory
             'min_area' => $this->faker->numberBetween(0, 90),
             'max_area' => $this->faker->numberBetween(100, 200),
             'amount' => $this->faker->randomFloat(2, 50, 9980),
+            'currency' => 'HUF',
             'service_id' => Service::factory(),
         ];
     }

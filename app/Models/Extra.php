@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\MoneyCast;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -15,12 +16,20 @@ class Extra extends Model
     protected $fillable = [
         'name',
         'amount',
+        'currency',
     ];
 
-    protected $casts = [
-        //  TODO: Use a money cast
-        'amount' => 'decimal:2',
+    protected $attributes = [
+        'currency' => 'HUF',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'amount' => MoneyCast::class,
+            'currency' => 'string',
+        ];
+    }
 
     public array $translatable = [
         'name',
@@ -28,6 +37,9 @@ class Extra extends Model
 
     public function bookings(): BelongsToMany
     {
-        return $this->belongsToMany(Booking::class);
+        return $this->belongsToMany(Booking::class)
+            ->using(BookingExtra::class)
+            ->withPivot(['amount', 'currency'])
+            ->withTimestamps();
     }
 }

@@ -2,9 +2,12 @@
 
 namespace App\Models;
 
+use App\Casts\MoneyCast;
 use App\Enums\ServiceType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Translatable\HasTranslations;
 
 class Service extends Model
@@ -18,30 +21,33 @@ class Service extends Model
         'name',
         'type',
         'price_per_meter',
+        'currency',
+    ];
+
+    protected $attributes = [
+        'currency' => 'HUF',
     ];
 
     protected function casts(): array
     {
         return [
             'type' => ServiceType::class,
-
-            //  TODO: Add a money cast
-            'price_per_meter' => 'decimal:2',
+            'price_per_meter' => MoneyCast::class,
+            'currency' => 'string',
         ];
     }
 
-    public function pricings()
+    public function pricings(): HasMany
     {
         return $this->hasMany(Pricing::class);
     }
 
-    public function bookings()
+    public function bookings(): HasMany
     {
         return $this->hasMany(Booking::class);
     }
 
-    // cleaners who have previously used this service
-    public function previousCleaners()
+    public function previousCleaners(): BelongsToMany
     {
         return $this->belongsToMany(
             Cleaner::class,
@@ -51,7 +57,7 @@ class Service extends Model
         )->withTimestamps();
     }
 
-    public function preferredByCleaners()
+    public function preferredByCleaners(): BelongsToMany
     {
         return $this->belongsToMany(
             Cleaner::class,

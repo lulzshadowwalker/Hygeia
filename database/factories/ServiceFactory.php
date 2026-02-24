@@ -20,6 +20,7 @@ class ServiceFactory extends BaseFactory
             'name' => $this->localized(fn (): string => $this->faker->word()),
             'type' => ServiceType::Commercial,
             'price_per_meter' => null,
+            'currency' => 'HUF',
         ];
     }
 

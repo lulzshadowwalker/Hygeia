@@ -25,6 +25,8 @@ class ServiceControllerTest extends TestCase
         $response = $this->getJson(route('api.v1.services.index'));
         $response->assertOk()
             ->assertExactJson($resource->response()->getData(true));
+
+        $response->assertJsonPath('data.0.attributes.currency', 'HUF');
     }
 
     public function test_it_filters_services_by_type(): void
@@ -45,6 +47,7 @@ class ServiceControllerTest extends TestCase
 
         $this->assertCount(1, $response->json());
         $this->assertEquals($service1->id, $response->json()['data'][0]['id']);
+        $response->assertJsonPath('data.0.attributes.currency', 'HUF');
     }
 
     public function test_it_shows_single_service(): void
@@ -58,5 +61,7 @@ class ServiceControllerTest extends TestCase
         $response = $this->getJson(route('api.v1.services.show', $service));
         $response->assertOk()
             ->assertExactJson($resource->response()->getData(true));
+
+        $response->assertJsonPath('data.attributes.currency', 'HUF');
     }
 }

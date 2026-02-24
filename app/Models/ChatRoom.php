@@ -54,13 +54,11 @@ class ChatRoom extends Model
         return $this->participants()->where('user_id', $user->id)->exists();
     }
 
-    //  TODO: Refactor this to use an Action class instead
     public function addParticipant(User $user): void
     {
         $this->participants()->attach($user->id);
     }
 
-    //  TODO: Refactor this to use an Action class instead
     public function removeParticipant(User $user): void
     {
         $this->participants()->detach($user->id);

@@ -6,6 +6,7 @@ use App\Enums\ServiceType;
 use App\Filament\Resources\ServiceResource\Pages;
 use App\Filament\Resources\ServiceResource\RelationManagers;
 use App\Models\Service;
+use Brick\Money\Money;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -87,12 +88,17 @@ class ServiceResource extends Resource
                 Tables\Columns\TextColumn::make('price_per_meter')
                     ->label('Pricing Per Meter')
                     ->sortable()
-                    ->formatStateUsing(fn ($state, Service $record) => $record->type === ServiceType::Residential ? number_format($state, 2).' HUF' : 'N/A'),
+                    ->formatStateUsing(function ($state, Service $record): string {
+                        if ($record->type !== ServiceType::Residential || $state === null) {
+                            return 'N/A';
+                        }
 
-                Tables\Columns\TextColumn::make('price_per_meter')
-                    ->label('Pricing Per Meter')
-                    ->formatStateUsing(fn ($state) => $state.' HUF')
-                    ->sortable(),
+                        if ($state instanceof Money) {
+                            return $state->getAmount()->toScale(2).' '.($record->currency ?? 'HUF');
+                        }
+
+                        return number_format((float) $state, 2).' '.($record->currency ?? 'HUF');
+                    }),
 
                 Tables\Columns\TextColumn::make('bookings_count')
                     ->label('Total Bookings')

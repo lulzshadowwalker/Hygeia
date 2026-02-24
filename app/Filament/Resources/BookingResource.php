@@ -9,6 +9,11 @@ use App\Filament\Resources\BookingResource\Pages;
 use App\Filament\Resources\BookingResource\RelationManagers;
 use App\Models\Booking;
 use App\Models\Pricing;
+use App\Models\Service;
+use App\Services\Pricing\BookingPricingData;
+use App\Services\Pricing\BookingPricingEngine;
+use Brick\Math\RoundingMode;
+use Brick\Money\Money;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -60,6 +65,7 @@ class BookingResource extends Resource
                                 $set('pricing_id', null);
                                 $set('area', null);
                                 $set('amount', null);
+                                $set('selected_amount', null);
                             }),
 
                         Forms\Components\TextInput::make('area')
@@ -71,7 +77,7 @@ class BookingResource extends Resource
                                 if (! $serviceId) {
                                     return false;
                                 }
-                                $service = \App\Models\Service::find($serviceId);
+                                $service = Service::find($serviceId);
 
                                 return $service && $service->type === ServiceType::Residential;
                             })
@@ -80,21 +86,13 @@ class BookingResource extends Resource
                                 if (! $serviceId) {
                                     return false;
                                 }
-                                $service = \App\Models\Service::find($serviceId);
+                                $service = Service::find($serviceId);
 
                                 return $service && $service->type === ServiceType::Residential;
                             })
                             ->live(onBlur: true)
                             ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                $serviceId = $get('service_id');
-                                if ($serviceId && $state) {
-                                    $service = \App\Models\Service::find($serviceId);
-                                    if ($service && $service->price_per_meter) {
-                                        $amount = $state * $service->price_per_meter;
-                                        $set('selected_amount', $amount);
-                                        $set('amount', $amount);
-                                    }
-                                }
+                                self::recalculateAmounts($set, $get);
                             }),
 
                         Forms\Components\Select::make('pricing_id')
@@ -102,9 +100,9 @@ class BookingResource extends Resource
                             ->visible(function (callable $get) {
                                 $serviceId = $get('service_id');
                                 if (! $serviceId) {
-                                    return true; // Show by default or until service is selected
+                                    return true;
                                 }
-                                $service = \App\Models\Service::find($serviceId);
+                                $service = Service::find($serviceId);
 
                                 return ! $service || $service->type !== ServiceType::Residential;
                             })
@@ -117,26 +115,26 @@ class BookingResource extends Resource
                                 return Pricing::where('service_id', $serviceId)
                                     ->get()
                                     ->pluck('amount', 'id')
-                                    ->map(fn ($amount) => 'Ft '.number_format($amount, 0));
+                                    ->map(function (mixed $amount): string {
+                                        if ($amount instanceof Money) {
+                                            $amount = $amount->getAmount()->toScale(2, RoundingMode::HALF_UP)->toFloat();
+                                        }
+
+                                        return 'Ft '.number_format((float) $amount, 0);
+                                    });
                             })
                             ->required(function (callable $get) {
                                 $serviceId = $get('service_id');
                                 if (! $serviceId) {
                                     return false;
                                 }
-                                $service = \App\Models\Service::find($serviceId);
+                                $service = Service::find($serviceId);
 
                                 return ! $service || $service->type !== ServiceType::Residential;
                             })
                             ->reactive()
                             ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                if ($state) {
-                                    $pricing = Pricing::find($state);
-                                    if ($pricing) {
-                                        $set('selected_amount', $pricing->amount);
-                                        $set('amount', $pricing->amount); // Base amount before extras
-                                    }
-                                }
+                                self::recalculateAmounts($set, $get);
                             }),
 
                         Forms\Components\TextInput::make('selected_amount')
@@ -222,7 +220,7 @@ class BookingResource extends Resource
 
                 Tables\Columns\TextColumn::make('amount')
                     ->label('Amount')
-                    ->money('HUF')
+                    ->money(fn (Booking $record): string => $record->currency ?? 'HUF')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('urgency')
@@ -330,5 +328,45 @@ class BookingResource extends Resource
             'view' => Pages\ViewBooking::route('/{record}'),
             'edit' => Pages\EditBooking::route('/{record}/edit'),
         ];
+    }
+
+    private static function recalculateAmounts(callable $set, callable $get): void
+    {
+        $serviceId = $get('service_id');
+        $service = $serviceId ? Service::find($serviceId) : null;
+
+        if (! $service) {
+            return;
+        }
+
+        $pricing = null;
+        $area = $get('area');
+
+        if ($service->type === ServiceType::Residential) {
+            if (! $area) {
+                return;
+            }
+        } else {
+            $pricingId = $get('pricing_id');
+            if (! $pricingId) {
+                return;
+            }
+            $pricing = Pricing::find($pricingId);
+
+            if (! $pricing) {
+                return;
+            }
+        }
+
+        $breakdown = app(BookingPricingEngine::class)->calculate(new BookingPricingData(
+            service: $service,
+            pricing: $pricing,
+            area: $area !== null ? (float) $area : null,
+            extras: collect(),
+            currency: $service->currency ?? 'HUF',
+        ));
+
+        $set('selected_amount', $breakdown->selectedAmount->getAmount()->toScale(2, RoundingMode::HALF_UP)->__toString());
+        $set('amount', $breakdown->totalAmount->getAmount()->toScale(2, RoundingMode::HALF_UP)->__toString());
     }
 }

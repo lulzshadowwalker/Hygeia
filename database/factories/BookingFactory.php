@@ -35,6 +35,7 @@ class BookingFactory extends Factory
             ),
             'has_cleaning_material' => $this->faker->boolean(),
             'amount' => $this->faker->randomFloat(2, 10, 100),
+            'currency' => 'HUF',
             'status' => $this->faker->randomElement(BookingStatus::values()),
             'cleaner_id' => $this->faker->boolean() ? null : Cleaner::factory(),
             'location' => $this->faker->address,

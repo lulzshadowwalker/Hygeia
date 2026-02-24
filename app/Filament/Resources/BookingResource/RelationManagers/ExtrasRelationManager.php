@@ -23,7 +23,7 @@ class ExtrasRelationManager extends RelationManager
                     ->maxLength(255),
                 Forms\Components\TextInput::make('amount')
                     ->numeric()
-                    ->prefix('$')
+                    ->prefix('Ft')
                     ->required(),
             ]);
     }
@@ -39,11 +39,11 @@ class ExtrasRelationManager extends RelationManager
                     ->sortable(),
                 Tables\Columns\TextColumn::make('amount')
                     ->label('Price')
-                    ->money('USD')
+                    ->money(fn ($record): string => $record->currency ?? 'HUF')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('pivot.amount')
                     ->label('Applied Amount')
-                    ->money('USD')
+                    ->money(fn ($record): string => $record->pivot->currency ?? $record->currency ?? 'HUF')
                     ->placeholder('Same as base price'),
             ])
             ->filters([
@@ -56,7 +56,7 @@ class ExtrasRelationManager extends RelationManager
                         Forms\Components\TextInput::make('amount')
                             ->label('Custom Amount (optional)')
                             ->numeric()
-                            ->prefix('$')
+                            ->prefix('Ft')
                             ->placeholder('Leave empty to use base price'),
                     ]),
             ])

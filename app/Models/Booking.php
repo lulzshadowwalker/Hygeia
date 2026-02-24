@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\MoneyCast;
 use App\Enums\BookingStatus;
 use App\Enums\BookingUrgency;
 use App\Filters\QueryFilter;
@@ -35,6 +36,11 @@ class Booking extends Model implements HasMedia
         'location',
         'lat',
         'lng',
+        'currency',
+    ];
+
+    protected $attributes = [
+        'currency' => 'HUF',
     ];
 
     protected function casts(): array
@@ -45,10 +51,13 @@ class Booking extends Model implements HasMedia
             'scheduled_at' => 'datetime',
             'has_cleaning_material' => 'boolean',
             'area' => 'integer',
-            'price_per_meter' => 'decimal:2',
+            'price_per_meter' => MoneyCast::class,
+            'selected_amount' => MoneyCast::class,
+            'amount' => MoneyCast::class,
             'location' => 'string',
             'lat' => 'decimal:7',
             'lng' => 'decimal:7',
+            'currency' => 'string',
         ];
     }
 
@@ -69,7 +78,10 @@ class Booking extends Model implements HasMedia
 
     public function extras(): BelongsToMany
     {
-        return $this->belongsToMany(Extra::class);
+        return $this->belongsToMany(Extra::class)
+            ->using(BookingExtra::class)
+            ->withPivot(['amount', 'currency'])
+            ->withTimestamps();
     }
 
     public function cleaner(): BelongsTo

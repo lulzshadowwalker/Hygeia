@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\V1;
 
+use Brick\Money\Money;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -23,10 +24,11 @@ class BookingResource extends JsonResource
                 'scheduledAt' => optional(
                     $this->scheduled_at,
                 )->toIso8601String(),
-                'selectedAmount' => (string) $this->selected_amount,
-                'amount' => (string) $this->amount,
+                'selectedAmount' => $this->selected_amount instanceof Money ? $this->selected_amount->getAmount()->__toString() : (string) $this->selected_amount,
+                'amount' => $this->amount instanceof Money ? $this->amount->getAmount()->__toString() : (string) $this->amount,
                 'area' => (int) $this->area,
-                'pricePerMeter' => (string) $this->price_per_meter,
+                'pricePerMeter' => $this->price_per_meter instanceof Money ? $this->price_per_meter->getAmount()->__toString() : (string) $this->price_per_meter,
+                'currency' => $this->currency,
                 'status' => $this->status?->value,
                 'location' => $this->location,
                 'lat' => $this->lat,
