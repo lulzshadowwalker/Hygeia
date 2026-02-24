@@ -12,27 +12,41 @@ class InvoiceControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_it_lists_all_invoices(): void
+    public function test_it_lists_all_invoices_for_the_current_user(): void
     {
-        $this->actingAs(User::factory()->create());
+        $user = User::factory()->create();
+        $this->actingAs($user);
 
-        Invoice::factory()->count(3)->create();
-        $resource = InvoiceResource::collection(Invoice::all());
+        $invoices = Invoice::factory()->count(3)->for($user)->create();
+        Invoice::factory()->count(2)->create();
+        $resource = InvoiceResource::collection($invoices);
 
         $response = $this->getJson(route('api.v1.invoices.index'));
         $response->assertOk()
             ->assertExactJson($resource->response()->getData(true));
     }
 
-    public function test_it_shows_single_invoice(): void
+    public function test_it_shows_single_invoice_for_the_current_user(): void
     {
-        $this->actingAs(User::factory()->create());
+        $user = User::factory()->create();
+        $this->actingAs($user);
 
-        $invoice = Invoice::factory()->create();
+        $invoice = Invoice::factory()->for($user)->create();
         $resource = InvoiceResource::make($invoice);
 
         $response = $this->getJson(route('api.v1.invoices.show', $invoice));
         $response->assertOk()
             ->assertExactJson($resource->response()->getData(true));
+    }
+
+    public function test_user_cannot_see_other_users_invoice(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        $otherUserInvoice = Invoice::factory()->create();
+
+        $response = $this->getJson(route('api.v1.invoices.show', $otherUserInvoice));
+        $response->assertForbidden();
     }
 }
