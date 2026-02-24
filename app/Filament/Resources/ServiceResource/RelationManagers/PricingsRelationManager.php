@@ -60,7 +60,7 @@ class PricingsRelationManager extends RelationManager
 
                 Tables\Columns\TextColumn::make('amount')
                     ->label('Price')
-                    ->money('HUF')
+                    ->money(fn ($record): string => $record->currency ?? 'HUF')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('bookings_count')

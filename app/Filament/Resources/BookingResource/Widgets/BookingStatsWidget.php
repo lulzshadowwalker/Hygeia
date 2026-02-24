@@ -33,7 +33,7 @@ class BookingStatsWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-check-circle')
                 ->color('success'),
 
-            Stat::make('Total Revenue', '$'.number_format($totalRevenue, 2))
+            Stat::make('Total Revenue', number_format($totalRevenue, 2).' HUF')
                 ->description('From completed bookings')
                 ->descriptionIcon('heroicon-m-currency-dollar')
                 ->color('success'),

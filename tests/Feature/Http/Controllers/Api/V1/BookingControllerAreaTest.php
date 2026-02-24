@@ -30,7 +30,7 @@ class BookingControllerAreaTest extends TestCase
                     'attributes' => [
                         'hasCleaningMaterials' => true,
                         'urgency' => 'flexible',
-                        'area' => 50, // 50 sqm
+                        'area' => 50,
                         'location' => [
                             'description' => '123 Main St, Springfield',
                             'lat' => 40.712776,
@@ -42,7 +42,7 @@ class BookingControllerAreaTest extends TestCase
                             'data' => ['id' => $service->id],
                         ],
                         'pricing' => [
-                            'data' => null, // No pricing ID needed
+                            'data' => null,
                         ],
                         'extras' => [
                             'data' => [],
@@ -51,15 +51,21 @@ class BookingControllerAreaTest extends TestCase
                 ],
             ])
             ->assertCreated()
-            ->assertJsonPath('data.attributes.amount', '5000') // 50 * 100
+            ->assertJsonPath('data.attributes.amount', '5000.00')
+            ->assertJsonPath('data.attributes.selectedAmount', '5000.00')
+            ->assertJsonPath('data.attributes.amountCurrency', 'HUF')
+            ->assertJsonPath('data.attributes.selectedAmountCurrency', 'HUF')
+            ->assertJsonPath('data.attributes.pricePerMeterCurrency', 'HUF')
             ->assertJsonPath('data.attributes.area', 50)
             ->assertJsonPath('data.attributes.pricePerMeter', '100.00');
 
         $this->assertDatabaseHas('bookings', [
             'service_id' => $service->id,
             'area' => 50,
-            'price_per_meter' => 100,
-            'amount' => '5000',
+            'price_per_meter' => '100.00',
+            'selected_amount' => '5000.00',
+            'amount' => '5000.00',
+            'currency' => 'HUF',
         ]);
     }
 
@@ -79,7 +85,6 @@ class BookingControllerAreaTest extends TestCase
                     'attributes' => [
                         'hasCleaningMaterials' => true,
                         'urgency' => 'flexible',
-                        // 'area' => 50, // Missing area
                         'location' => [
                             'description' => '123 Main St, Springfield',
                             'lat' => 40.712776,

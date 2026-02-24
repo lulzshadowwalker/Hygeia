@@ -30,7 +30,7 @@ class BookingControllerTest extends TestCase
         $image1 = UploadedFile::fake()->image('photo-1.jpg');
         $image2 = UploadedFile::fake()->image('photo-2.jpg');
 
-        $this->actingAs($client->user)
+        $response = $this->actingAs($client->user)
             ->postJson(route('api.v1.bookings.store'), [
                 'data' => [
                     'attributes' => [
@@ -44,7 +44,7 @@ class BookingControllerTest extends TestCase
                         'images' => [
                             $image1,
                             $image2,
-                        ]
+                        ],
                     ],
                     'relationships' => [
                         'service' => [
@@ -63,11 +63,16 @@ class BookingControllerTest extends TestCase
             ])
             ->assertCreated();
 
+        $pricingAmount = (float) $pricing->getRawOriginal('amount');
+        $extrasTotal = $extras->sum(fn (Extra $extra): float => (float) $extra->getRawOriginal('amount'));
+
         $this->assertDatabaseHas('bookings', [
             'has_cleaning_material' => true,
             'urgency' => 'flexible',
             'pricing_id' => $pricing->id,
-            'selected_amount' => $pricing->amount,
+            'selected_amount' => number_format($pricingAmount, 2, '.', ''),
+            'amount' => number_format($pricingAmount + $extrasTotal, 2, '.', ''),
+            'currency' => 'HUF',
             'location' => '123 Main St, Springfield',
             'lat' => 40.712776,
             'lng' => -74.005974,
@@ -78,6 +83,21 @@ class BookingControllerTest extends TestCase
         $this->assertNotNull($booking->images);
         $this->assertNotEmpty($booking->images);
         $this->assertCount(2, $booking->images);
+        $this->assertSame('HUF', $booking->currency);
+
+        foreach ($extras as $extra) {
+            $this->assertDatabaseHas('booking_extra', [
+                'booking_id' => $booking->id,
+                'extra_id' => $extra->id,
+                'amount' => $extra->getRawOriginal('amount'),
+                'currency' => 'HUF',
+            ]);
+        }
+
+        $response
+            ->assertJsonPath('data.attributes.selectedAmountCurrency', 'HUF')
+            ->assertJsonPath('data.attributes.amountCurrency', 'HUF')
+            ->assertJsonPath('data.attributes.pricePerMeterCurrency', 'HUF');
     }
 
     public function test_client_can_create_booking_with_no_extras(): void
@@ -89,13 +109,12 @@ class BookingControllerTest extends TestCase
 
         $pricing = $service->pricings->first();
 
-        $this->actingAs($client->user)
+        $response = $this->actingAs($client->user)
             ->postJson(route('api.v1.bookings.store'), [
                 'data' => [
                     'attributes' => [
                         'hasCleaningMaterials' => true,
                         'urgency' => 'flexible',
-                        // "location" => "123 Main St, Springfield",
                         'location' => [
                             'description' => '123 Main St, Springfield',
                             'lat' => 40.712776,
@@ -117,17 +136,16 @@ class BookingControllerTest extends TestCase
             ])
             ->assertCreated();
 
+        $pricingAmount = (float) $pricing->getRawOriginal('amount');
+
         $this->assertDatabaseHas('bookings', [
             'has_cleaning_material' => true,
             'urgency' => 'flexible',
-
             'pricing_id' => $pricing->id,
-            'selected_amount' => $pricing->amount,
-
+            'selected_amount' => number_format($pricingAmount, 2, '.', ''),
             'scheduled_at' => null,
-
-            //  TODO: Price calculator action class
-            'amount' => $pricing->amount,
+            'amount' => number_format($pricingAmount, 2, '.', ''),
+            'currency' => 'HUF',
             'status' => 'pending',
             'client_id' => $client->id,
             'service_id' => $service->id,
@@ -135,6 +153,11 @@ class BookingControllerTest extends TestCase
             'lat' => 40.712776,
             'lng' => -74.005974,
         ]);
+
+        $response
+            ->assertJsonPath('data.attributes.selectedAmountCurrency', 'HUF')
+            ->assertJsonPath('data.attributes.amountCurrency', 'HUF')
+            ->assertJsonPath('data.attributes.pricePerMeterCurrency', 'HUF');
     }
 
     public function test_cleaner_cannot_create_booking(): void
@@ -183,14 +206,15 @@ class BookingControllerTest extends TestCase
         $client = Client::factory()->create();
         $client->user->assignRole(Role::Client);
         $pricing = $service->pricings->first();
+        $pricingAmount = $pricing->getRawOriginal('amount');
 
         $booking = $client->bookings()->create([
             'service_id' => $service->id,
             'pricing_id' => $pricing->id,
-            'selected_amount' => $pricing->amount,
+            'selected_amount' => $pricingAmount,
             'urgency' => 'flexible',
             'has_cleaning_material' => true,
-            'amount' => $pricing->amount,
+            'amount' => $pricingAmount,
             'status' => 'pending',
             'location' => '123 Main St, Springfield',
             'lat' => 40.712776,
@@ -209,14 +233,15 @@ class BookingControllerTest extends TestCase
         $client = Client::factory()->create();
         $client->user->assignRole(Role::Client);
         $pricing = $service->pricings->first();
+        $pricingAmount = $pricing->getRawOriginal('amount');
 
         $booking = $client->bookings()->create([
             'service_id' => $service->id,
             'pricing_id' => $pricing->id,
-            'selected_amount' => $pricing->amount,
+            'selected_amount' => $pricingAmount,
             'urgency' => 'flexible',
             'has_cleaning_material' => true,
-            'amount' => $pricing->amount,
+            'amount' => $pricingAmount,
             'status' => 'pending',
             'location' => '123 Main St, Springfield',
             'lat' => 40.712776,
@@ -237,14 +262,15 @@ class BookingControllerTest extends TestCase
         $client2 = Client::factory()->create();
         $client2->user->assignRole(Role::Client);
         $pricing = $service->pricings->first();
+        $pricingAmount = $pricing->getRawOriginal('amount');
 
         $booking = $client1->bookings()->create([
             'service_id' => $service->id,
             'pricing_id' => $pricing->id,
-            'selected_amount' => $pricing->amount,
+            'selected_amount' => $pricingAmount,
             'urgency' => 'flexible',
             'has_cleaning_material' => true,
-            'amount' => $pricing->amount,
+            'amount' => $pricingAmount,
             'status' => 'pending',
             'location' => '123 Main St, Springfield',
             'lat' => 40.712776,

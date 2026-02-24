@@ -14,6 +14,7 @@ class ExtraFactory extends BaseFactory
         return [
             'name' => $this->localized(fn (): string => $this->faker->word()),
             'amount' => $this->faker->randomFloat(2, 50, 99),
+            'currency' => 'HUF',
         ];
     }
 }

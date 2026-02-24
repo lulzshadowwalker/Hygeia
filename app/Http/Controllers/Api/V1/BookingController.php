@@ -10,6 +10,8 @@ use App\Http\Resources\V1\BookingResource;
 use App\Models\Booking;
 use App\Models\Extra;
 use App\Models\Pricing;
+use App\Services\Pricing\BookingPricingData;
+use App\Services\Pricing\BookingPricingEngine;
 use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -17,6 +19,8 @@ use Illuminate\Support\Facades\DB;
 #[Group('Bookings')]
 class BookingController extends ApiController
 {
+    public function __construct(private readonly BookingPricingEngine $pricingEngine) {}
+
     /**
      * List bookings
      *
@@ -67,23 +71,29 @@ class BookingController extends ApiController
 
         return DB::transaction(function () use ($request) {
             $service = \App\Models\Service::findOrFail($request->serviceId());
-            $amount = 0;
             $pricingId = null;
+            $pricing = null;
 
-            if ($service->type === \App\Enums\ServiceType::Residential) {
-                $area = $request->area();
-                $amount = $area * $service->price_per_meter;
-            } else {
+            if ($service->type !== \App\Enums\ServiceType::Residential) {
                 $pricing = Pricing::findOrFail($request->pricingId());
-                $amount = $pricing->amount;
                 $pricingId = $pricing->id;
             }
+
+            $extras = Extra::query()->whereIn('id', $request->extraIds())->get();
+
+            $breakdown = $this->pricingEngine->calculate(new BookingPricingData(
+                service: $service,
+                pricing: $pricing,
+                area: $request->area(),
+                extras: $extras,
+                currency: $service->currency ?? 'HUF',
+            ));
 
             $booking = Booking::create([
                 'client_id' => Auth::user()->client->id,
                 'service_id' => $request->serviceId(),
                 'pricing_id' => $pricingId,
-                'selected_amount' => $amount,
+                'selected_amount' => $breakdown->selectedAmount,
                 'area' => $request->area(),
                 'price_per_meter' => $service->price_per_meter,
                 'urgency' => $request->urgency()->value,
@@ -92,17 +102,18 @@ class BookingController extends ApiController
                 'location' => $request->location(),
                 'lat' => $request->lat(),
                 'lng' => $request->lng(),
-
-                //  TODO: Calculate booking price action class
-                'amount' => $amount,
+                'amount' => $breakdown->totalAmount,
+                'currency' => $breakdown->currency,
                 'status' => BookingStatus::Pending,
             ]);
 
-            foreach ($request->extraIds() as $extraId) {
-                $extra = Extra::findOrFail($extraId);
+            foreach ($extras as $extra) {
                 $booking
                     ->extras()
-                    ->attach($extraId, ['amount' => $extra->amount]);
+                    ->attach($extra->id, [
+                        'amount' => $extra->amount,
+                        'currency' => $extra->currency,
+                    ]);
             }
 
             foreach ($request->images() as $image) {

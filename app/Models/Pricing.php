@@ -2,8 +2,11 @@
 
 namespace App\Models;
 
+use App\Casts\MoneyCast;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Pricing extends Model
 {
@@ -14,7 +17,12 @@ class Pricing extends Model
         'min_area',
         'max_area',
         'amount',
+        'currency',
         'service_id',
+    ];
+
+    protected $attributes = [
+        'currency' => 'HUF',
     ];
 
     protected function casts(): array
@@ -22,18 +30,17 @@ class Pricing extends Model
         return [
             'min_area' => 'integer',
             'max_area' => 'integer',
-
-            // TODO: Use a money cast
-            'amount' => 'decimal:2',
+            'amount' => MoneyCast::class,
+            'currency' => 'string',
         ];
     }
 
-    public function service()
+    public function service(): BelongsTo
     {
         return $this->belongsTo(Service::class);
     }
 
-    public function bookings()
+    public function bookings(): HasMany
     {
         return $this->hasMany(Booking::class);
     }
