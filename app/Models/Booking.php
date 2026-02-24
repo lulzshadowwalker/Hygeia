@@ -6,6 +6,8 @@ use App\Casts\MoneyCast;
 use App\Enums\BookingStatus;
 use App\Enums\BookingUrgency;
 use App\Filters\QueryFilter;
+use App\Observers\BookingObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -16,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
+#[ObservedBy(BookingObserver::class)]
 class Booking extends Model implements HasMedia
 {
     /** @use HasFactory<\Database\Factories\BookingFactory> */

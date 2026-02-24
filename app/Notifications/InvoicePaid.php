@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\Invoice;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -19,7 +20,11 @@ class InvoicePaid extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        if ($notifiable instanceof User && $notifiable->wantsEmailNotifications()) {
+            return ['mail'];
+        }
+
+        return [];
     }
 
     public function toMail(object $notifiable): MailMessage

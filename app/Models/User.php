@@ -119,6 +119,38 @@ class User extends Authenticatable implements FilamentUser, HasMedia
         return $this->hasOne(UserPreferences::class);
     }
 
+    public function notificationPreferences(): UserPreferences
+    {
+        $preferences = $this->relationLoaded('preferences')
+            ? $this->getRelation('preferences')
+            : null;
+
+        if ($preferences instanceof UserPreferences) {
+            return $preferences;
+        }
+
+        $preferences = $this->preferences()->firstOrCreate([
+            'user_id' => $this->id,
+        ], [
+            'email_notifications' => true,
+            'push_notifications' => true,
+        ]);
+
+        $this->setRelation('preferences', $preferences);
+
+        return $preferences;
+    }
+
+    public function wantsEmailNotifications(): bool
+    {
+        return $this->notificationPreferences()->email_notifications;
+    }
+
+    public function wantsPushNotifications(): bool
+    {
+        return $this->notificationPreferences()->push_notifications;
+    }
+
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);
@@ -206,6 +238,11 @@ class User extends Authenticatable implements FilamentUser, HasMedia
     public function callbackRequests(): HasMany
     {
         return $this->hasMany(CallbackRequest::class);
+    }
+
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(Invoice::class);
     }
 
     /**

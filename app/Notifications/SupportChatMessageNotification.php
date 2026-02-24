@@ -3,6 +3,8 @@
 namespace App\Notifications;
 
 use App\Models\Message;
+use App\Models\User;
+use App\Notifications\Channels\PushChannel;
 use App\Support\PushNotification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -27,7 +29,21 @@ class SupportChatMessageNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return $notifiable->preferences->notificationChannels;
+        if (! $notifiable instanceof User) {
+            return [];
+        }
+
+        $channels = [];
+
+        if ($notifiable->wantsEmailNotifications()) {
+            $channels[] = 'mail';
+        }
+
+        if ($notifiable->wantsPushNotifications()) {
+            $channels[] = PushChannel::class;
+        }
+
+        return $channels;
     }
 
     /**
@@ -44,12 +60,13 @@ class SupportChatMessageNotification extends Notification
 
     public function toPush(object $notifiable): PushNotification
     {
-        return new PushNotification(
-            // title: __('notifications.support-chat-message.title'),
-            // better way to get translation for specific locale:
-            title: trans('notifications.support-chat-message.title', [], $notifiable->preferences->language),
-            body: $this->message->content,
+        $locale = $notifiable instanceof User
+            ? $notifiable->notificationPreferences()->language->value
+            : app()->getLocale();
 
+        return new PushNotification(
+            title: trans('notifications.support-chat-message.title', [], $locale),
+            body: $this->message->content,
         );
     }
 }
