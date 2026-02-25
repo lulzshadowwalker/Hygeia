@@ -24,6 +24,7 @@ class Booking extends Model implements HasMedia
 
     protected $fillable = [
         'client_id',
+        'promocode_id',
         'service_id',
         'pricing_id',
         'area',
@@ -60,6 +61,7 @@ class Booking extends Model implements HasMedia
             'cash_received_at' => 'datetime',
             'has_cleaning_material' => 'boolean',
             'area' => 'integer',
+            'promocode_id' => 'integer',
             'price_per_meter' => MoneyCast::class,
             'selected_amount' => MoneyCast::class,
             'amount' => MoneyCast::class,
@@ -76,6 +78,11 @@ class Booking extends Model implements HasMedia
     public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class);
+    }
+
+    public function promocode(): BelongsTo
+    {
+        return $this->belongsTo(Promocode::class);
     }
 
     public function service(): BelongsTo

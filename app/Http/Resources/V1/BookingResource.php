@@ -30,6 +30,7 @@ class BookingResource extends JsonResource
                 'pricePerMeter' => $this->price_per_meter instanceof Money ? $this->price_per_meter->getAmount()->__toString() : (string) $this->price_per_meter,
                 'currency' => $this->currency,
                 'status' => $this->status?->value,
+                'discountAmount' => $this->calculateDiscountAmount(),
                 'paymentMethod' => $this->payment_method?->value,
                 'isCashReceived' => $this->cash_received_at !== null,
                 'cashReceivedAt' => optional($this->cash_received_at)->toIso8601String(),
@@ -49,7 +50,29 @@ class BookingResource extends JsonResource
                 'service' => new ServiceResource($this->service),
                 'pricing' => new PricingResource($this->pricing),
                 'extras' => ExtraResource::collection($this->extras),
+                'promocode' => $this->whenLoaded('promocode', fn () => new PromocodeResource($this->promocode)),
             ],
         ];
+    }
+
+    protected function calculateDiscountAmount(): string
+    {
+        if (! $this->selected_amount instanceof Money || ! $this->amount instanceof Money) {
+            return '0.00';
+        }
+
+        $extrasTotal = $this->extras->reduce(
+            fn (Money $carry, $extra) => $carry->plus($extra->pivot->amount instanceof Money ? $extra->pivot->amount : Money::of('0', $this->currency ?? 'HUF')),
+            Money::of('0', $this->currency ?? 'HUF')
+        );
+
+        $beforeDiscount = $this->selected_amount->plus($extrasTotal);
+        $discount = $beforeDiscount->minus($this->amount);
+
+        if ($discount->isNegative()) {
+            return '0.00';
+        }
+
+        return $discount->getAmount()->toScale(2)->__toString();
     }
 }
