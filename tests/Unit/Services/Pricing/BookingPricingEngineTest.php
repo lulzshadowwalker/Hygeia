@@ -102,4 +102,31 @@ class BookingPricingEngineTest extends TestCase
         $this->assertSame('3600.00', $breakdown->totalAmount->getAmount()->__toString());
         $this->assertSame('HUF', $breakdown->currency);
     }
+
+    public function test_it_adds_cleaning_supplies_surcharge_when_client_has_no_supplies(): void
+    {
+        $service = Service::factory()->create([
+            'type' => ServiceType::Commercial,
+            'pricing_model' => ServicePricingModel::AreaRange,
+        ]);
+
+        $pricing = Pricing::factory()->for($service)->create([
+            'amount' => 3000,
+        ]);
+
+        $engine = new BookingPricingEngine;
+        $breakdown = $engine->calculate(new BookingPricingData(
+            service: $service,
+            pricing: $pricing,
+            area: null,
+            extras: collect(),
+            hasCleaningMaterials: false,
+            currency: 'HUF',
+        ));
+
+        $this->assertSame('3000.00', $breakdown->selectedAmount->getAmount()->__toString());
+        $this->assertSame('2000.00', $breakdown->extrasAmount->getAmount()->__toString());
+        $this->assertSame('5000.00', $breakdown->totalAmount->getAmount()->__toString());
+        $this->assertSame('HUF', $breakdown->currency);
+    }
 }

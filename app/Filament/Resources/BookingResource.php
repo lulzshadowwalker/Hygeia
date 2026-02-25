@@ -175,7 +175,7 @@ class BookingResource extends Resource
 
                         Forms\Components\Toggle::make('has_cleaning_material')
                             ->label('Client has cleaning materials')
-                            ->default(false),
+                            ->default(true),
 
                         Forms\Components\TextInput::make('amount')
                             ->label('Total Amount')
@@ -383,6 +383,7 @@ class BookingResource extends Resource
                 pricing: $pricing,
                 area: $area !== null ? (float) $area : null,
                 extras: collect(),
+                hasCleaningMaterials: $get('has_cleaning_material') ?? true,
                 promocode: $promocode,
                 currency: $service->currency ?? 'HUF',
             ));

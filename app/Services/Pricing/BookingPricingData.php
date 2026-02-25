@@ -14,6 +14,7 @@ class BookingPricingData
         public readonly ?Pricing $pricing,
         public readonly ?float $area,
         public readonly Collection $extras,
+        public readonly bool $hasCleaningMaterials = true,
         public readonly ?Promocode $promocode = null,
         public readonly string $currency = 'HUF',
     ) {}

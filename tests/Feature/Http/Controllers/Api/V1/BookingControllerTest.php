@@ -281,6 +281,91 @@ class BookingControllerTest extends TestCase
             ->assertJsonValidationErrors(['data.attributes.area']);
     }
 
+    public function test_client_without_cleaning_materials_gets_fixed_surcharge(): void
+    {
+        $service = Service::factory()->has(Pricing::factory())->create();
+        $client = Client::factory()->create();
+        $client->user->assignRole(Role::Client);
+        $pricing = $service->pricings->first();
+        $pricingAmount = (float) $pricing->getRawOriginal('amount');
+        $expectedSelectedAmount = number_format($pricingAmount, 2, '.', '');
+        $expectedTotalAmount = number_format($pricingAmount + 2000, 2, '.', '');
+
+        $this->actingAs($client->user)
+            ->postJson(route('api.v1.bookings.store'), [
+                'data' => [
+                    'attributes' => [
+                        'hasCleaningMaterials' => false,
+                        'urgency' => 'flexible',
+                        'location' => [
+                            'description' => '123 Main St, Springfield',
+                            'lat' => 40.712776,
+                            'lng' => -74.005974,
+                        ],
+                    ],
+                    'relationships' => [
+                        'service' => [
+                            'data' => ['id' => $service->id],
+                        ],
+                        'pricing' => [
+                            'data' => ['id' => $pricing->id],
+                        ],
+                        'extras' => [
+                            'data' => [],
+                        ],
+                    ],
+                ],
+            ])
+            ->assertCreated()
+            ->assertJsonPath('data.attributes.selectedAmount', $expectedSelectedAmount)
+            ->assertJsonPath('data.attributes.amount', $expectedTotalAmount);
+
+        $this->assertDatabaseHas('bookings', [
+            'client_id' => $client->id,
+            'service_id' => $service->id,
+            'pricing_id' => $pricing->id,
+            'has_cleaning_material' => false,
+            'selected_amount' => $expectedSelectedAmount,
+            'amount' => $expectedTotalAmount,
+            'currency' => 'HUF',
+        ]);
+    }
+
+    public function test_client_without_cleaning_supplies_alias_gets_fixed_surcharge(): void
+    {
+        $service = Service::factory()->has(Pricing::factory())->create();
+        $client = Client::factory()->create();
+        $client->user->assignRole(Role::Client);
+        $pricing = $service->pricings->first();
+        $pricingAmount = (float) $pricing->getRawOriginal('amount');
+        $expectedTotalAmount = number_format($pricingAmount + 2000, 2, '.', '');
+
+        $this->actingAs($client->user)
+            ->postJson(route('api.v1.bookings.store'), [
+                'data' => [
+                    'attributes' => [
+                        'hasCleaningSupplies' => false,
+                        'urgency' => 'flexible',
+                        'location' => [
+                            'description' => '123 Main St, Springfield',
+                            'lat' => 40.712776,
+                            'lng' => -74.005974,
+                        ],
+                    ],
+                    'relationships' => [
+                        'service' => [
+                            'data' => ['id' => $service->id],
+                        ],
+                        'pricing' => [
+                            'data' => ['id' => $pricing->id],
+                        ],
+                    ],
+                ],
+            ])
+            ->assertCreated()
+            ->assertJsonPath('data.attributes.amount', $expectedTotalAmount);
+    }
+
     public function test_client_can_create_booking_with_valid_promocode(): void
     {
         $service = Service::factory()->has(Pricing::factory())->create();

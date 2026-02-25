@@ -129,6 +129,7 @@ class BookingController extends ApiController
                     pricing: $pricing,
                     area: $request->area(),
                     extras: $extras,
+                    hasCleaningMaterials: $request->hasCleaningMaterials(),
                     promocode: $promocode,
                     currency: $service->currency ?? 'HUF',
                 ));

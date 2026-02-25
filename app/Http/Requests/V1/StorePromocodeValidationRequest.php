@@ -12,6 +12,8 @@ class StorePromocodeValidationRequest extends BaseFormRequest
     {
         return [
             'data.attributes.code' => ['required', 'string', 'max:255'],
+            'data.attributes.hasCleaningMaterials' => ['nullable', 'boolean'],
+            'data.attributes.hasCleaningSupplies' => ['nullable', 'boolean'],
             'data.relationships.service.data.id' => ['required', 'exists:services,id'],
             'data.relationships.pricing.data.id' => ['nullable', 'exists:pricings,id'],
             'data.attributes.area' => ['nullable', 'numeric', 'min:1'],
@@ -83,5 +85,14 @@ class StorePromocodeValidationRequest extends BaseFormRequest
             ->filter()
             ->map(fn ($id) => (int) $id)
             ->toArray();
+    }
+
+    public function hasCleaningMaterials(): bool
+    {
+        if ($this->has('data.attributes.hasCleaningMaterials')) {
+            return (bool) $this->input('data.attributes.hasCleaningMaterials');
+        }
+
+        return (bool) $this->input('data.attributes.hasCleaningSupplies', true);
     }
 }

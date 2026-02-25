@@ -18,7 +18,8 @@ class StoreBookingRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'data.attributes.hasCleaningMaterials' => 'required|boolean',
+            'data.attributes.hasCleaningMaterials' => 'nullable|boolean',
+            'data.attributes.hasCleaningSupplies' => 'nullable|boolean',
             'data.attributes.urgency' => [
                 'required',
                 new Enum(BookingUrgency::class),
@@ -60,6 +61,16 @@ class StoreBookingRequest extends BaseFormRequest
     public function withValidator($validator): void
     {
         $validator->after(function ($validator) {
+            if (
+                ! $this->has('data.attributes.hasCleaningMaterials')
+                && ! $this->has('data.attributes.hasCleaningSupplies')
+            ) {
+                $validator->errors()->add(
+                    'data.attributes.hasCleaningMaterials',
+                    'The has cleaning materials field is required.'
+                );
+            }
+
             $serviceId = $this->input('data.relationships.service.data.id');
 
             if (! $serviceId) {
@@ -139,7 +150,11 @@ class StoreBookingRequest extends BaseFormRequest
 
     public function hasCleaningMaterials(): bool
     {
-        return $this->input('data.attributes.hasCleaningMaterials', false);
+        if ($this->has('data.attributes.hasCleaningMaterials')) {
+            return (bool) $this->input('data.attributes.hasCleaningMaterials');
+        }
+
+        return (bool) $this->input('data.attributes.hasCleaningSupplies', true);
     }
 
     public function urgency(): BookingUrgency
