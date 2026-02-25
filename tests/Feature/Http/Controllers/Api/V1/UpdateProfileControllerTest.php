@@ -153,6 +153,31 @@ class UpdateProfileControllerTest extends TestCase
             ]);
     }
 
+    public function test_client_cannot_update_profile_with_phone_that_is_already_taken(): void
+    {
+        $client = Client::factory()->create();
+        $client->user->assignRole(Role::Client);
+
+        $duplicatePhone = '+962792009991';
+        $otherClient = Client::factory()->create();
+        $otherClient->user->assignRole(Role::Client);
+        $otherClient->user->update(['phone' => $duplicatePhone]);
+
+        $response = $this->actingAs($client->user)
+            ->patchJson(route('api.v1.profile.update'), [
+                'data' => [
+                    'attributes' => [
+                        'phone' => $duplicatePhone,
+                    ],
+                ],
+            ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors([
+                'data.attributes.phone',
+            ]);
+    }
+
     public function test_validation_errors_for_cleaner_update()
     {
         $cleaner = Cleaner::factory()->create();
@@ -178,6 +203,31 @@ class UpdateProfileControllerTest extends TestCase
                 'data.attributes.serviceRadius',
                 'data.attributes.availableDays',
                 'data.attributes.timeSlots.0',
+            ]);
+    }
+
+    public function test_cleaner_cannot_update_profile_with_phone_that_is_already_taken(): void
+    {
+        $cleaner = Cleaner::factory()->create();
+        $cleaner->user->assignRole(Role::Cleaner);
+
+        $duplicatePhone = '+962792009992';
+        $otherCleaner = Cleaner::factory()->create();
+        $otherCleaner->user->assignRole(Role::Cleaner);
+        $otherCleaner->user->update(['phone' => $duplicatePhone]);
+
+        $response = $this->actingAs($cleaner->user)
+            ->patchJson(route('api.v1.profile.update'), [
+                'data' => [
+                    'attributes' => [
+                        'phone' => $duplicatePhone,
+                    ],
+                ],
+            ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors([
+                'data.attributes.phone',
             ]);
     }
 
