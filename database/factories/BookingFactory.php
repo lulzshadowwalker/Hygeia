@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Enums\BookingStatus;
 use App\Enums\BookingUrgency;
+use App\Enums\PaymentMethod;
 use App\Models\Cleaner;
 use App\Models\Client;
 use App\Models\Pricing;
@@ -39,6 +40,7 @@ class BookingFactory extends Factory
             'amount' => $this->faker->randomFloat(2, 10, 100),
             'currency' => 'HUF',
             'status' => $this->faker->randomElement(BookingStatus::values()),
+            'payment_method' => PaymentMethod::Cod,
             'cleaner_id' => $this->faker->boolean() ? null : Cleaner::factory(),
             'location' => $this->faker->address,
             'lat' => $this->faker->latitude,

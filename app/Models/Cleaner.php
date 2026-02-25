@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use Bavix\Wallet\Interfaces\Wallet;
+use Bavix\Wallet\Interfaces\WalletFloat;
+use Bavix\Wallet\Traits\HasWalletFloat;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -14,9 +17,9 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class Cleaner extends Model implements HasMedia
+class Cleaner extends Model implements HasMedia, Wallet, WalletFloat
 {
-    use HasFactory, InteractsWithMedia;
+    use HasFactory, HasWalletFloat, InteractsWithMedia;
 
     /**
      * The attributes that are mass assignable.
@@ -122,7 +125,7 @@ class Cleaner extends Model implements HasMedia
         return $this->morphMany(Favorite::class, 'favoriteable');
     }
 
-    public function reviews(): morphMany
+    public function reviews(): MorphMany
     {
         return $this->morphMany(Review::class, 'reviewable');
     }

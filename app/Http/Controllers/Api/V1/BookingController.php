@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Contracts\ResponseBuilder;
 use App\Enums\BookingStatus;
+use App\Enums\PaymentMethod;
 use App\Enums\PromocodeValidationReason;
 use App\Filters\BookingFilter;
 use App\Http\Controllers\Api\ApiController;
@@ -157,6 +158,7 @@ class BookingController extends ApiController
                 'amount' => $breakdown->totalAmount,
                 'currency' => $breakdown->currency,
                 'status' => BookingStatus::Pending,
+                'payment_method' => PaymentMethod::Cod,
             ]);
 
             foreach ($extras as $extra) {

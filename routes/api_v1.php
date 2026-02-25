@@ -11,7 +11,9 @@ use App\Http\Controllers\Api\V1\ChatRoomController;
 use App\Http\Controllers\Api\V1\CleanerController;
 use App\Http\Controllers\Api\V1\CleanerDashboardController;
 use App\Http\Controllers\Api\V1\CleanerReviewController;
+use App\Http\Controllers\Api\V1\CleanerWalletController;
 use App\Http\Controllers\Api\V1\CompleteBookingController;
+use App\Http\Controllers\Api\V1\ConfirmCashReceivedController;
 use App\Http\Controllers\Api\V1\DistrictController;
 use App\Http\Controllers\Api\V1\ExtraController;
 use App\Http\Controllers\Api\V1\FaqController;
@@ -101,6 +103,14 @@ Route::get('/me/dashboard', [CleanerDashboardController::class, 'index'])
     ->middleware('auth:sanctum')
     ->middleware(CleanerMiddleware::class)
     ->name('api.v1.profile.dashboard');
+Route::get('/me/wallet', [CleanerWalletController::class, 'show'])
+    ->middleware('auth:sanctum')
+    ->middleware(CleanerMiddleware::class)
+    ->name('api.v1.profile.wallet.show');
+Route::get('/me/wallet/transactions', [CleanerWalletController::class, 'transactions'])
+    ->middleware('auth:sanctum')
+    ->middleware(CleanerMiddleware::class)
+    ->name('api.v1.profile.wallet.transactions.index');
 
 Route::get('/cleaners', [CleanerController::class, 'index'])->name(
     'api.v1.cleaner.index',
@@ -213,6 +223,13 @@ Route::post('/bookings/{booking}/complete', [
     ->middleware('auth:sanctum')
     ->middleware(CleanerMiddleware::class)
     ->name('api.v1.bookings.complete');
+Route::post('/bookings/{booking}/cash-received', [
+    ConfirmCashReceivedController::class,
+    'store',
+])
+    ->middleware('auth:sanctum')
+    ->middleware(CleanerMiddleware::class)
+    ->name('api.v1.bookings.cash-received');
 
 Route::post('/offers/{offer}/accept', [AcceptOfferController::class, 'store'])
     ->middleware('auth:sanctum')

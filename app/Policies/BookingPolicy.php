@@ -67,4 +67,17 @@ class BookingPolicy
 
         return true;
     }
+
+    public function confirmCashReceived(User $user, Booking $booking): bool
+    {
+        if ($user->isAdmin) {
+            return true;
+        }
+
+        if (! $user->isCleaner) {
+            return false;
+        }
+
+        return $user->cleaner->id === $booking->cleaner_id;
+    }
 }
