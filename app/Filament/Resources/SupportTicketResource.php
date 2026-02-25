@@ -94,6 +94,10 @@ class SupportTicketResource extends Resource
                             ->label('Name')
                             ->disabled(),
 
+                        Forms\Components\TextInput::make('user.id')
+                            ->label('Client ID')
+                            ->disabled(),
+
                         Forms\Components\Textarea::make('message')
                             ->label('Message')
                             ->required()
@@ -120,7 +124,7 @@ class SupportTicketResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('user.name')
                     ->label('Author')
-                    ->description(fn ($record) => $record->user->email)
+                    ->description(fn ($record) => 'Client ID: '.$record->user->id.' | Email: '.$record->user->email)
                     ->sortable()
                     ->searchable(
                         query: function (Builder $query, $search) {
