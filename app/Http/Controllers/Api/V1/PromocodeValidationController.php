@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Contracts\ResponseBuilder;
 use App\Enums\PromocodeValidationReason;
-use App\Enums\ServiceType;
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\V1\StorePromocodeValidationRequest;
 use App\Http\Resources\V1\PromocodeValidationResource;
@@ -33,8 +32,11 @@ class PromocodeValidationController extends ApiController
         $service = Service::findOrFail($request->serviceId());
         $pricing = null;
 
-        if ($service->type !== ServiceType::Residential) {
-            $pricing = Pricing::findOrFail($request->pricingId());
+        if ($service->usesAreaRangePricing()) {
+            $pricing = Pricing::query()
+                ->whereKey($request->pricingId())
+                ->where('service_id', $service->id)
+                ->firstOrFail();
         }
 
         $extras = Extra::query()->whereIn('id', $request->extraIds())->get();

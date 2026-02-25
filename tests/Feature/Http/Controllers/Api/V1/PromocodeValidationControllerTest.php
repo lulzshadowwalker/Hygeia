@@ -4,6 +4,7 @@ namespace Tests\Feature\Http\Controllers\Api\V1;
 
 use App\Enums\BookingStatus;
 use App\Enums\Role;
+use App\Enums\ServicePricingModel;
 use App\Enums\ServiceType;
 use App\Models\Booking;
 use App\Models\Client;
@@ -103,6 +104,42 @@ class PromocodeValidationControllerTest extends TestCase
             ->assertJsonValidationErrors(['data.attributes.code']);
     }
 
+    public function test_client_can_validate_promocode_for_per_meter_service_without_pricing_id(): void
+    {
+        $service = Service::factory()->commercialPerMeter()->create([
+            'type' => ServiceType::Commercial,
+            'pricing_model' => ServicePricingModel::PricePerMeter,
+            'price_per_meter' => 100,
+            'min_area' => 10,
+        ]);
+        $extras = Extra::factory()->count(2)->create(['amount' => 100]);
+        $client = Client::factory()->create();
+        $client->user->assignRole(Role::Client);
+        $promocode = Promocode::factory()->create([
+            'code' => 'EID50',
+            'discount_percentage' => 50,
+            'max_discount_amount' => 500,
+            'currency' => 'HUF',
+        ]);
+
+        $this->actingAs($client->user)
+            ->postJson(route('api.v1.promocodes.validate'), $this->payload(
+                serviceId: $service->id,
+                pricingId: null,
+                extraIds: $extras->pluck('id')->all(),
+                code: $promocode->code,
+                area: 20,
+            ))
+            ->assertOk()
+            ->assertJsonPath('data.attributes.valid', true)
+            ->assertJsonPath('data.attributes.reason', null)
+            ->assertJsonPath('data.attributes.pricing.selectedAmount', '2000.00')
+            ->assertJsonPath('data.attributes.pricing.extrasAmount', '200.00')
+            ->assertJsonPath('data.attributes.pricing.discountAmount', '500.00')
+            ->assertJsonPath('data.attributes.pricing.totalAmount', '1700.00')
+            ->assertJsonPath('data.attributes.pricing.currency', 'HUF');
+    }
+
     private function prepareBookingData(): array
     {
         $service = Service::factory()->create([
@@ -117,9 +154,9 @@ class PromocodeValidationControllerTest extends TestCase
         return [$client, $service, $pricing, $extras];
     }
 
-    private function payload(int $serviceId, int $pricingId, array $extraIds, string $code): array
+    private function payload(int $serviceId, ?int $pricingId, array $extraIds, string $code, ?float $area = null): array
     {
-        return [
+        $payload = [
             'data' => [
                 'attributes' => [
                     'code' => $code,
@@ -128,14 +165,23 @@ class PromocodeValidationControllerTest extends TestCase
                     'service' => [
                         'data' => ['id' => $serviceId],
                     ],
-                    'pricing' => [
-                        'data' => ['id' => $pricingId],
-                    ],
                     'extras' => [
                         'data' => collect($extraIds)->map(fn (int $id) => ['id' => $id])->all(),
                     ],
                 ],
             ],
         ];
+
+        if ($pricingId !== null) {
+            $payload['data']['relationships']['pricing'] = [
+                'data' => ['id' => $pricingId],
+            ];
+        }
+
+        if ($area !== null) {
+            $payload['data']['attributes']['area'] = $area;
+        }
+
+        return $payload;
     }
 }
