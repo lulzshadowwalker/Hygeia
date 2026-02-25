@@ -25,26 +25,28 @@ class ExtraResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('Extra Service Details')
-                    ->description('Define additional services that can be added to bookings')
-                    ->aside()
-                    ->schema([
-                        Forms\Components\TextInput::make('name')
-                            ->label('Extra Service Name')
-                            ->required()
-                            ->placeholder('e.g., Deep Cleaning, Pet Hair Removal')
-                            ->translatable(),
+        return $form->schema([
+            Forms\Components\Section::make('Extra Service Details')
+                ->description(
+                    'Define additional services that can be added to bookings',
+                )
+                ->aside()
+                ->schema([
+                    Forms\Components\TextInput::make('name')
+                        ->label('Extra Service Name')
+                        ->required()
+                        ->placeholder('e.g., Deep Cleaning, Pet Hair Removal')
+                        ->translatable(),
 
-                        Forms\Components\TextInput::make('amount')
-                            ->label('Price')
-                            ->numeric()
-                            ->prefix('Ft')
-                            ->required()
-                            ->placeholder('Additional cost for this service'),
-                    ])->columns(1),
-            ]);
+                    Forms\Components\TextInput::make('amount')
+                        ->label('Price')
+                        ->numeric()
+                        ->prefix('HUF')
+                        ->required()
+                        ->placeholder('Additional cost for this service'),
+                ])
+                ->columns(1),
+        ]);
     }
 
     public static function table(Table $table): Table
@@ -58,7 +60,9 @@ class ExtraResource extends Resource
 
                 Tables\Columns\TextColumn::make('amount')
                     ->label('Price')
-                    ->money(fn (Extra $record): string => $record->currency ?? 'HUF')
+                    ->money(
+                        fn (Extra $record): string => $record->currency ?? 'HUF',
+                    )
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('bookings_count')
@@ -80,7 +84,13 @@ class ExtraResource extends Resource
             ])
             ->filters([
                 Tables\Filters\Filter::make('popular')
-                    ->query(fn (Builder $query): Builder => $query->has('bookings', '>=', 5))
+                    ->query(
+                        fn (Builder $query): Builder => $query->has(
+                            'bookings',
+                            '>=',
+                            5,
+                        ),
+                    )
                     ->label('Popular Extras (5+ bookings)'),
             ])
             ->actions([
@@ -97,8 +107,7 @@ class ExtraResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()
-            ->withCount('bookings');
+        return parent::getEloquentQuery()->withCount('bookings');
     }
 
     public static function getRelations(): array

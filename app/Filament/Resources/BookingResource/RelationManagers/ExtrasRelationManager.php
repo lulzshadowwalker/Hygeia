@@ -16,16 +16,15 @@ class ExtrasRelationManager extends RelationManager
 
     public function form(Form $form): Form
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('amount')
-                    ->numeric()
-                    ->prefix('Ft')
-                    ->required(),
-            ]);
+        return $form->schema([
+            Forms\Components\TextInput::make('name')
+                ->required()
+                ->maxLength(255),
+            Forms\Components\TextInput::make('amount')
+                ->numeric()
+                ->prefix('HUF')
+                ->required(),
+        ]);
     }
 
     public function table(Table $table): Table
@@ -43,26 +42,28 @@ class ExtrasRelationManager extends RelationManager
                     ->sortable(),
                 Tables\Columns\TextColumn::make('pivot.amount')
                     ->label('Applied Amount')
-                    ->money(fn ($record): string => $record->pivot->currency ?? $record->currency ?? 'HUF')
+                    ->money(
+                        fn ($record): string => $record->pivot->currency ??
+                            ($record->currency ?? 'HUF'),
+                    )
                     ->placeholder('Same as base price'),
             ])
             ->filters([
                 //
             ])
             ->headerActions([
-                Tables\Actions\AttachAction::make()
-                    ->form(fn (Tables\Actions\AttachAction $action): array => [
+                Tables\Actions\AttachAction::make()->form(
+                    fn (Tables\Actions\AttachAction $action): array => [
                         $action->getRecordSelect(),
                         Forms\Components\TextInput::make('amount')
                             ->label('Custom Amount (optional)')
                             ->numeric()
-                            ->prefix('Ft')
+                            ->prefix('HUF')
                             ->placeholder('Leave empty to use base price'),
-                    ]),
+                    ],
+                ),
             ])
-            ->actions([
-                Tables\Actions\DetachAction::make(),
-            ])
+            ->actions([Tables\Actions\DetachAction::make()])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DetachBulkAction::make(),

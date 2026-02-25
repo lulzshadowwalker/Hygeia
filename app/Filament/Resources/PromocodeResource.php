@@ -28,54 +28,62 @@ class PromocodeResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('Promocode Details')
-                    ->description('Manage promocode discounts and availability')
-                    ->aside()
-                    ->schema([
-                        Forms\Components\TextInput::make('code')
-                            ->label('Code')
-                            ->required()
-                            ->maxLength(255)
-                            ->dehydrateStateUsing(fn (string $state): string => strtoupper(trim($state)))
-                            ->unique(ignoreRecord: true),
+        return $form->schema([
+            Forms\Components\Section::make('Promocode Details')
+                ->description('Manage promocode discounts and availability')
+                ->aside()
+                ->schema([
+                    Forms\Components\TextInput::make('code')
+                        ->label('Code')
+                        ->required()
+                        ->maxLength(255)
+                        ->dehydrateStateUsing(
+                            fn (string $state): string => strtoupper(
+                                trim($state),
+                            ),
+                        )
+                        ->unique(ignoreRecord: true),
 
-                        Forms\Components\TextInput::make('discount_percentage')
-                            ->label('Discount Percentage')
-                            ->numeric()
-                            ->minValue(0.01)
-                            ->maxValue(100)
-                            ->required()
-                            ->suffix('%'),
+                    Forms\Components\TextInput::make('discount_percentage')
+                        ->label('Discount Percentage')
+                        ->numeric()
+                        ->minValue(0.01)
+                        ->maxValue(100)
+                        ->required()
+                        ->suffix('%'),
 
-                        Forms\Components\TextInput::make('max_discount_amount')
-                            ->label('Max Discount Amount')
-                            ->formatStateUsing(fn ($state) => $state instanceof Money ? $state->getAmount()->__toString() : $state)
-                            ->dehydrateStateUsing(fn ($state) => (string) $state)
-                            ->numeric()
-                            ->required()
-                            ->prefix('Ft'),
+                    Forms\Components\TextInput::make('max_discount_amount')
+                        ->label('Max Discount Amount')
+                        ->formatStateUsing(
+                            fn ($state) => $state instanceof Money
+                                ? $state->getAmount()->__toString()
+                                : $state,
+                        )
+                        ->dehydrateStateUsing(fn ($state) => (string) $state)
+                        ->numeric()
+                        ->required()
+                        ->prefix('HUF'),
 
-                        Forms\Components\DateTimePicker::make('starts_at')
-                            ->label('Starts At')
-                            ->native(false)
-                            ->nullable(),
+                    Forms\Components\DateTimePicker::make('starts_at')
+                        ->label('Starts At')
+                        ->native(false)
+                        ->nullable(),
 
-                        Forms\Components\DateTimePicker::make('expires_at')
-                            ->label('Expires At')
-                            ->native(false)
-                            ->nullable()
-                            ->after('starts_at'),
+                    Forms\Components\DateTimePicker::make('expires_at')
+                        ->label('Expires At')
+                        ->native(false)
+                        ->nullable()
+                        ->after('starts_at'),
 
-                        Forms\Components\TextInput::make('max_global_uses')
-                            ->label('Max Global Uses')
-                            ->numeric()
-                            ->nullable()
-                            ->minValue(1)
-                            ->helperText('Leave empty for unlimited usage.'),
-                    ])->columns(1),
-            ]);
+                    Forms\Components\TextInput::make('max_global_uses')
+                        ->label('Max Global Uses')
+                        ->numeric()
+                        ->nullable()
+                        ->minValue(1)
+                        ->helperText('Leave empty for unlimited usage.'),
+                ])
+                ->columns(1),
+        ]);
     }
 
     public static function table(Table $table): Table
@@ -94,7 +102,10 @@ class PromocodeResource extends Resource
 
                 Tables\Columns\TextColumn::make('max_discount_amount')
                     ->label('Max Discount')
-                    ->money(fn (Promocode $record): string => $record->currency ?? 'HUF')
+                    ->money(
+                        fn (Promocode $record): string => $record->currency ??
+                            'HUF',
+                    )
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('bookings_count')
@@ -104,7 +115,11 @@ class PromocodeResource extends Resource
 
                 Tables\Columns\TextColumn::make('max_global_uses')
                     ->label('Global Cap')
-                    ->formatStateUsing(fn ($state): string => $state ? (string) $state : 'Unlimited')
+                    ->formatStateUsing(
+                        fn ($state): string => $state
+                            ? (string) $state
+                            : 'Unlimited',
+                    )
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('active_window')
@@ -113,7 +128,11 @@ class PromocodeResource extends Resource
                         return $record->isActiveAt() ? 'Active' : 'Inactive';
                     })
                     ->badge()
-                    ->color(fn (string $state): string => $state === 'Active' ? 'success' : 'danger'),
+                    ->color(
+                        fn (string $state): string => $state === 'Active'
+                            ? 'success'
+                            : 'danger',
+                    ),
 
                 Tables\Columns\TextColumn::make('starts_at')
                     ->label('Starts')
@@ -127,9 +146,7 @@ class PromocodeResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->filters([
-                Tables\Filters\TrashedFilter::make(),
-            ])
+            ->filters([Tables\Filters\TrashedFilter::make()])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
@@ -162,9 +179,7 @@ class PromocodeResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->withoutGlobalScopes([
-                SoftDeletingScope::class,
-            ])
+            ->withoutGlobalScopes([SoftDeletingScope::class])
             ->withCount('bookings');
     }
 }

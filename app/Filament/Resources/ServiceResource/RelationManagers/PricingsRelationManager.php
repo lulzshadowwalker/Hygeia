@@ -17,8 +17,10 @@ class PricingsRelationManager extends RelationManager
 
     protected static ?string $recordTitleAttribute = 'amount';
 
-    public static function canViewForRecord(Model $ownerRecord, string $pageClass): bool
-    {
+    public static function canViewForRecord(
+        Model $ownerRecord,
+        string $pageClass,
+    ): bool {
         if (! $ownerRecord instanceof Service) {
             return false;
         }
@@ -28,30 +30,32 @@ class PricingsRelationManager extends RelationManager
 
     public function form(Form $form): Form
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('Pricing Details')
-                    ->description('Define the area range and price for this service')
-                    ->schema([
-                        Forms\Components\TextInput::make('min_area')
-                            ->label('Minimum Area (sqm)')
-                            ->numeric()
-                            ->required()
-                            ->suffix('sqm'),
+        return $form->schema([
+            Forms\Components\Section::make('Pricing Details')
+                ->description(
+                    'Define the area range and price for this service',
+                )
+                ->schema([
+                    Forms\Components\TextInput::make('min_area')
+                        ->label('Minimum Area (sqm)')
+                        ->numeric()
+                        ->required()
+                        ->suffix('sqm'),
 
-                        Forms\Components\TextInput::make('max_area')
-                            ->label('Maximum Area (sqm)')
-                            ->numeric()
-                            ->required()
-                            ->suffix('sqm'),
+                    Forms\Components\TextInput::make('max_area')
+                        ->label('Maximum Area (sqm)')
+                        ->numeric()
+                        ->required()
+                        ->suffix('sqm'),
 
-                        Forms\Components\TextInput::make('amount')
-                            ->label('Price')
-                            ->numeric()
-                            ->prefix('Ft')
-                            ->required(),
-                    ])->columns(3),
-            ]);
+                    Forms\Components\TextInput::make('amount')
+                        ->label('Price')
+                        ->numeric()
+                        ->prefix('HUF')
+                        ->required(),
+                ])
+                ->columns(3),
+        ]);
     }
 
     public function table(Table $table): Table
@@ -82,9 +86,7 @@ class PricingsRelationManager extends RelationManager
             ->filters([
                 //
             ])
-            ->headerActions([
-                Tables\Actions\CreateAction::make(),
-            ])
+            ->headerActions([Tables\Actions\CreateAction::make()])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
@@ -99,7 +101,6 @@ class PricingsRelationManager extends RelationManager
 
     public function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()
-            ->withCount('bookings');
+        return parent::getEloquentQuery()->withCount('bookings');
     }
 }

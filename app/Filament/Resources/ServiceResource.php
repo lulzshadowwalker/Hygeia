@@ -29,76 +29,116 @@ class ServiceResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('Service Information')
-                    ->description('Define the service details and type')
-                    ->aside()
-                    ->schema([
-                        Forms\Components\TextInput::make('name')
-                            ->label('Service Name')
-                            ->required()
-                            ->placeholder('e.g., Home Cleaning, Office Cleaning'),
+        return $form->schema([
+            Forms\Components\Section::make('Service Information')
+                ->description('Define the service details and type')
+                ->aside()
+                ->schema([
+                    Forms\Components\TextInput::make('name')
+                        ->label('Service Name')
+                        ->required()
+                        ->placeholder('e.g., Home Cleaning, Office Cleaning')
+                        ->translatable(),
 
-                        Forms\Components\Select::make('type')
-                            ->label('Service Type')
-                            ->options(ServiceType::class)
-                            ->required()
-                            ->native(false)
-                            ->default(ServiceType::Residential)
-                            ->live()
-                            ->afterStateHydrated(function ($state, callable $set): void {
-                                $type = $state?->value ?? ServiceType::Residential->value;
-                                $set('type', $type);
-                            })
-                            ->afterStateUpdated(function ($state, callable $set): void {
-                                if ($state === ServiceType::Residential->value) {
-                                    $set('pricing_model', ServicePricingModel::AreaRange->value);
-                                    $set('price_per_meter', null);
-                                    $set('min_area', null);
-                                }
-                            }),
+                    Forms\Components\Select::make('type')
+                        ->label('Service Type')
+                        ->options(ServiceType::class)
+                        ->required()
+                        ->native(false)
+                        ->default(ServiceType::Residential)
+                        ->live()
+                        ->afterStateHydrated(function (
+                            $state,
+                            callable $set,
+                        ): void {
+                            $type =
+                                $state?->value ??
+                                ServiceType::Residential->value;
+                            $set('type', $type);
+                        })
+                        ->afterStateUpdated(function (
+                            $state,
+                            callable $set,
+                        ): void {
+                            if ($state === ServiceType::Residential->value) {
+                                $set(
+                                    'pricing_model',
+                                    ServicePricingModel::AreaRange->value,
+                                );
+                                $set('price_per_meter', null);
+                                $set('min_area', null);
+                            }
+                        }),
 
-                        Forms\Components\Select::make('pricing_model')
-                            ->label('Pricing Model')
-                            ->options(ServicePricingModel::class)
-                            ->required()
-                            ->native(false)
-                            ->default(ServicePricingModel::AreaRange)
-                            ->disabled(fn (Forms\Get $get): bool => $get('type') === ServiceType::Residential->value)
-                            ->dehydrated()
-                            ->live()
-                            ->afterStateHydrated(function ($state, callable $set, Forms\Get $get): void {
-                                $type = $get('type');
-                                if ($type === ServiceType::Residential->value) {
-                                    $set('pricing_model', ServicePricingModel::AreaRange->value);
+                    Forms\Components\Select::make('pricing_model')
+                        ->label('Pricing Model')
+                        ->options(ServicePricingModel::class)
+                        ->required()
+                        ->native(false)
+                        ->default(ServicePricingModel::AreaRange)
+                        ->disabled(
+                            fn (Forms\Get $get): bool => $get('type') ===
+                                ServiceType::Residential->value,
+                        )
+                        ->dehydrated()
+                        ->live()
+                        ->afterStateHydrated(function (
+                            $state,
+                            callable $set,
+                            Forms\Get $get,
+                        ): void {
+                            $type = $get('type');
+                            if ($type === ServiceType::Residential->value) {
+                                $set(
+                                    'pricing_model',
+                                    ServicePricingModel::AreaRange->value,
+                                );
 
-                                    return;
-                                }
+                                return;
+                            }
 
-                                $model = $state?->value ?? ServicePricingModel::AreaRange->value;
-                                $set('pricing_model', $model);
-                            }),
+                            $model =
+                                $state?->value ??
+                                ServicePricingModel::AreaRange->value;
+                            $set('pricing_model', $model);
+                        }),
 
-                        Forms\Components\TextInput::make('min_area')
-                            ->label('Minimum Area (sqm)')
-                            ->numeric()
-                            ->suffix('sqm')
-                            ->visible(fn (Forms\Get $get): bool => $get('type') === ServiceType::Commercial->value
-                                && $get('pricing_model') === ServicePricingModel::PricePerMeter->value)
-                            ->required(fn (Forms\Get $get): bool => $get('type') === ServiceType::Commercial->value
-                                && $get('pricing_model') === ServicePricingModel::PricePerMeter->value),
+                    Forms\Components\TextInput::make('min_area')
+                        ->label('Minimum Area (sqm)')
+                        ->numeric()
+                        ->suffix('sqm')
+                        ->visible(
+                            fn (Forms\Get $get): bool => $get('type') ===
+                                ServiceType::Commercial->value &&
+                                $get('pricing_model') ===
+                                    ServicePricingModel::PricePerMeter->value,
+                        )
+                        ->required(
+                            fn (Forms\Get $get): bool => $get('type') ===
+                                ServiceType::Commercial->value &&
+                                $get('pricing_model') ===
+                                    ServicePricingModel::PricePerMeter->value,
+                        ),
 
-                        Forms\Components\TextInput::make('price_per_meter')
-                            ->label('Price per Meter')
-                            ->numeric()
-                            ->prefix('Ft')
-                            ->visible(fn (Forms\Get $get): bool => $get('type') === ServiceType::Commercial->value
-                                && $get('pricing_model') === ServicePricingModel::PricePerMeter->value)
-                            ->required(fn (Forms\Get $get): bool => $get('type') === ServiceType::Commercial->value
-                                && $get('pricing_model') === ServicePricingModel::PricePerMeter->value),
-                    ])->columns(1),
-            ]);
+                    Forms\Components\TextInput::make('price_per_meter')
+                        ->label('Price per Meter')
+                        ->numeric()
+                        ->prefix('HUF')
+                        ->visible(
+                            fn (Forms\Get $get): bool => $get('type') ===
+                                ServiceType::Commercial->value &&
+                                $get('pricing_model') ===
+                                    ServicePricingModel::PricePerMeter->value,
+                        )
+                        ->required(
+                            fn (Forms\Get $get): bool => $get('type') ===
+                                ServiceType::Commercial->value &&
+                                $get('pricing_model') ===
+                                    ServicePricingModel::PricePerMeter->value,
+                        ),
+                ])
+                ->columns(1),
+        ]);
     }
 
     public static function table(Table $table): Table
@@ -121,7 +161,9 @@ class ServiceResource extends Resource
                 Tables\Columns\TextColumn::make('pricing_model')
                     ->label('Pricing Model')
                     ->badge()
-                    ->getStateUsing(fn (Service $record) => $record->effectivePricingModel())
+                    ->getStateUsing(
+                        fn (Service $record) => $record->effectivePricingModel(),
+                    )
                     ->formatStateUsing(fn ($state): string => $state->getLabel())
                     ->color(fn ($state): string => $state->getColor())
                     ->icon(fn ($state): string => $state->getIcon()),
@@ -130,27 +172,50 @@ class ServiceResource extends Resource
                     ->label('Min Area')
                     ->suffix(' sqm')
                     ->sortable()
-                    ->formatStateUsing(fn ($state, Service $record): string => $record->usesPricePerMeterPricing() && $state !== null ? (string) $state : 'N/A'),
+                    ->formatStateUsing(
+                        fn (
+                            $state,
+                            Service $record,
+                        ): string => $record->usesPricePerMeterPricing() &&
+                        $state !== null
+                            ? (string) $state
+                            : 'N/A',
+                    ),
 
                 Tables\Columns\TextColumn::make('pricings_count')
                     ->label('Pricing Tiers')
                     ->counts('pricings')
                     ->sortable()
-                    ->formatStateUsing(fn ($state, Service $record) => $record->usesAreaRangePricing() ? $state : 'N/A'),
+                    ->formatStateUsing(
+                        fn (
+                            $state,
+                            Service $record,
+                        ) => $record->usesAreaRangePricing() ? $state : 'N/A',
+                    ),
 
                 Tables\Columns\TextColumn::make('price_per_meter')
                     ->label('Pricing Per Meter')
                     ->sortable()
-                    ->formatStateUsing(function ($state, Service $record): string {
-                        if (! $record->usesPricePerMeterPricing() || $state === null) {
+                    ->formatStateUsing(function (
+                        $state,
+                        Service $record,
+                    ): string {
+                        if (
+                            ! $record->usesPricePerMeterPricing() ||
+                            $state === null
+                        ) {
                             return 'N/A';
                         }
 
                         if ($state instanceof Money) {
-                            return $state->getAmount()->toScale(2).' '.($record->currency ?? 'HUF');
+                            return $state->getAmount()->toScale(2).
+                                ' '.
+                                ($record->currency ?? 'HUF');
                         }
 
-                        return number_format((float) $state, 2).' '.($record->currency ?? 'HUF');
+                        return number_format((float) $state, 2).
+                            ' '.
+                            ($record->currency ?? 'HUF');
                     }),
 
                 Tables\Columns\TextColumn::make('bookings_count')
@@ -193,15 +258,12 @@ class ServiceResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()
-            ->withCount(['pricings', 'bookings']);
+        return parent::getEloquentQuery()->withCount(['pricings', 'bookings']);
     }
 
     public static function getRelations(): array
     {
-        return [
-            RelationManagers\PricingsRelationManager::class,
-        ];
+        return [RelationManagers\PricingsRelationManager::class];
     }
 
     public static function getPages(): array

@@ -37,172 +37,199 @@ class BookingResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('Client Information')
-                    ->description('Select the client who is requesting this booking')
-                    ->aside()
-                    ->schema([
-                        Forms\Components\Select::make('client_id')
-                            ->label('Client')
-                            ->relationship('client.user', 'name')
-                            ->searchable()
-                            ->preload()
-                            ->required(),
-                    ])->columns(1),
+        return $form->schema([
+            Forms\Components\Section::make('Client Information')
+                ->description(
+                    'Select the client who is requesting this booking',
+                )
+                ->aside()
+                ->schema([
+                    Forms\Components\Select::make('client_id')
+                        ->label('Client')
+                        ->relationship('client.user', 'name')
+                        ->searchable()
+                        ->preload()
+                        ->required(),
+                ])
+                ->columns(1),
 
-                Forms\Components\Section::make('Service Details')
-                    ->description('Choose the service type and pricing tier for this booking')
-                    ->aside()
-                    ->schema([
-                        Forms\Components\Select::make('service_id')
-                            ->label('Service')
-                            ->relationship('service', 'name')
-                            ->searchable()
-                            ->preload()
-                            ->required()
-                            ->reactive()
-                            ->afterStateUpdated(function ($state, callable $set) {
-                                $set('pricing_id', null);
-                                $set('area', null);
-                                $set('amount', null);
-                                $set('selected_amount', null);
-                            }),
+            Forms\Components\Section::make('Service Details')
+                ->description(
+                    'Choose the service type and pricing tier for this booking',
+                )
+                ->aside()
+                ->schema([
+                    Forms\Components\Select::make('service_id')
+                        ->label('Service')
+                        ->relationship('service', 'name')
+                        ->searchable()
+                        ->preload()
+                        ->required()
+                        ->reactive()
+                        ->afterStateUpdated(function ($state, callable $set) {
+                            $set('pricing_id', null);
+                            $set('area', null);
+                            $set('amount', null);
+                            $set('selected_amount', null);
+                        }),
 
-                        Forms\Components\TextInput::make('area')
-                            ->label('Area (sqm)')
-                            ->numeric()
-                            ->suffix('sqm')
-                            ->visible(function (callable $get) {
-                                $serviceId = $get('service_id');
-                                if (! $serviceId) {
-                                    return false;
-                                }
-                                $service = Service::find($serviceId);
+                    Forms\Components\TextInput::make('area')
+                        ->label('Area (sqm)')
+                        ->numeric()
+                        ->suffix('sqm')
+                        ->visible(function (callable $get) {
+                            $serviceId = $get('service_id');
+                            if (! $serviceId) {
+                                return false;
+                            }
+                            $service = Service::find($serviceId);
 
-                                return $service && $service->usesPricePerMeterPricing();
-                            })
-                            ->required(function (callable $get) {
-                                $serviceId = $get('service_id');
-                                if (! $serviceId) {
-                                    return false;
-                                }
-                                $service = Service::find($serviceId);
+                            return $service &&
+                                $service->usesPricePerMeterPricing();
+                        })
+                        ->required(function (callable $get) {
+                            $serviceId = $get('service_id');
+                            if (! $serviceId) {
+                                return false;
+                            }
+                            $service = Service::find($serviceId);
 
-                                return $service && $service->usesPricePerMeterPricing();
-                            })
-                            ->live(onBlur: true)
-                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                self::recalculateAmounts($set, $get);
-                            }),
+                            return $service &&
+                                $service->usesPricePerMeterPricing();
+                        })
+                        ->live(onBlur: true)
+                        ->afterStateUpdated(function (
+                            $state,
+                            callable $set,
+                            callable $get,
+                        ) {
+                            self::recalculateAmounts($set, $get);
+                        }),
 
-                        Forms\Components\Select::make('pricing_id')
-                            ->label('Pricing Tier')
-                            ->visible(function (callable $get) {
-                                $serviceId = $get('service_id');
-                                if (! $serviceId) {
-                                    return false;
-                                }
-                                $service = Service::find($serviceId);
+                    Forms\Components\Select::make('pricing_id')
+                        ->label('Pricing Tier')
+                        ->visible(function (callable $get) {
+                            $serviceId = $get('service_id');
+                            if (! $serviceId) {
+                                return false;
+                            }
+                            $service = Service::find($serviceId);
 
-                                return $service && $service->usesAreaRangePricing();
-                            })
-                            ->options(function (callable $get) {
-                                $serviceId = $get('service_id');
-                                if (! $serviceId) {
-                                    return [];
-                                }
+                            return $service && $service->usesAreaRangePricing();
+                        })
+                        ->options(function (callable $get) {
+                            $serviceId = $get('service_id');
+                            if (! $serviceId) {
+                                return [];
+                            }
 
-                                return Pricing::where('service_id', $serviceId)
-                                    ->get()
-                                    ->pluck('amount', 'id')
-                                    ->map(function (mixed $amount): string {
-                                        if ($amount instanceof Money) {
-                                            $amount = $amount->getAmount()->toScale(2, RoundingMode::HALF_UP)->toFloat();
-                                        }
+                            return Pricing::where('service_id', $serviceId)
+                                ->get()
+                                ->pluck('amount', 'id')
+                                ->map(function (mixed $amount): string {
+                                    if ($amount instanceof Money) {
+                                        $amount = $amount
+                                            ->getAmount()
+                                            ->toScale(2, RoundingMode::HALF_UP)
+                                            ->toFloat();
+                                    }
 
-                                        return 'Ft '.number_format((float) $amount, 0);
-                                    });
-                            })
-                            ->required(function (callable $get) {
-                                $serviceId = $get('service_id');
-                                if (! $serviceId) {
-                                    return false;
-                                }
-                                $service = Service::find($serviceId);
+                                    return 'Ft '.
+                                        number_format((float) $amount, 0);
+                                });
+                        })
+                        ->required(function (callable $get) {
+                            $serviceId = $get('service_id');
+                            if (! $serviceId) {
+                                return false;
+                            }
+                            $service = Service::find($serviceId);
 
-                                return $service && $service->usesAreaRangePricing();
-                            })
-                            ->reactive()
-                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                self::recalculateAmounts($set, $get);
-                            }),
+                            return $service && $service->usesAreaRangePricing();
+                        })
+                        ->reactive()
+                        ->afterStateUpdated(function (
+                            $state,
+                            callable $set,
+                            callable $get,
+                        ) {
+                            self::recalculateAmounts($set, $get);
+                        }),
 
-                        Forms\Components\TextInput::make('selected_amount')
-                            ->label('Selected Amount')
-                            ->numeric()
-                            ->prefix('Ft')
-                            ->disabled()
-                            ->dehydrated(),
+                    Forms\Components\TextInput::make('selected_amount')
+                        ->label('Selected Amount')
+                        ->numeric()
+                        ->prefix('HUF')
+                        ->disabled()
+                        ->dehydrated(),
 
-                        Forms\Components\Select::make('promocode_id')
-                            ->label('Promocode')
-                            ->relationship('promocode', 'code')
-                            ->searchable()
-                            ->preload()
-                            ->nullable()
-                            ->reactive()
-                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                self::recalculateAmounts($set, $get);
-                            }),
-                    ])->columns(1),
+                    Forms\Components\Select::make('promocode_id')
+                        ->label('Promocode')
+                        ->relationship('promocode', 'code')
+                        ->searchable()
+                        ->preload()
+                        ->nullable()
+                        ->reactive()
+                        ->afterStateUpdated(function (
+                            $state,
+                            callable $set,
+                            callable $get,
+                        ) {
+                            self::recalculateAmounts($set, $get);
+                        }),
+                ])
+                ->columns(1),
 
-                Forms\Components\Section::make('Booking Details')
-                    ->description('Set the urgency level, schedule, and calculate the total amount')
-                    ->aside()
-                    ->schema([
-                        Forms\Components\Select::make('urgency')
-                            ->label('Urgency')
-                            ->options(BookingUrgency::class)
-                            ->required()
-                            ->native(false),
+            Forms\Components\Section::make('Booking Details')
+                ->description(
+                    'Set the urgency level, schedule, and calculate the total amount',
+                )
+                ->aside()
+                ->schema([
+                    Forms\Components\Select::make('urgency')
+                        ->label('Urgency')
+                        ->options(BookingUrgency::class)
+                        ->required()
+                        ->native(false),
 
-                        Forms\Components\DateTimePicker::make('scheduled_at')
-                            ->label('Scheduled Date & Time')
-                            ->native(false)
-                            ->minDate(now())
-                            ->displayFormat('M d, Y H:i'),
+                    Forms\Components\DateTimePicker::make('scheduled_at')
+                        ->label('Scheduled Date & Time')
+                        ->native(false)
+                        ->minDate(now())
+                        ->displayFormat('M d, Y H:i'),
 
-                        Forms\Components\Toggle::make('has_cleaning_material')
-                            ->label('Client has cleaning materials')
-                            ->default(true),
+                    Forms\Components\Toggle::make('has_cleaning_material')
+                        ->label('Client has cleaning materials')
+                        ->default(true),
 
-                        Forms\Components\TextInput::make('amount')
-                            ->label('Total Amount')
-                            ->numeric()
-                            ->prefix('Ft')
-                            ->required(),
-                    ])->columns(1),
+                    Forms\Components\TextInput::make('amount')
+                        ->label('Total Amount')
+                        ->numeric()
+                        ->prefix('HUF')
+                        ->required(),
+                ])
+                ->columns(1),
 
-                Forms\Components\Section::make('Status & Assignment')
-                    ->description('Manage the booking status and assign a cleaner')
-                    ->aside()
-                    ->schema([
-                        Forms\Components\Select::make('status')
-                            ->label('Status')
-                            ->options(BookingStatus::class)
-                            ->required()
-                            ->native(false)
-                            ->default(BookingStatus::Pending),
+            Forms\Components\Section::make('Status & Assignment')
+                ->description('Manage the booking status and assign a cleaner')
+                ->aside()
+                ->schema([
+                    Forms\Components\Select::make('status')
+                        ->label('Status')
+                        ->options(BookingStatus::class)
+                        ->required()
+                        ->native(false)
+                        ->default(BookingStatus::Pending),
 
-                        Forms\Components\Select::make('cleaner_id')
-                            ->label('Assigned Cleaner')
-                            ->relationship('cleaner.user', 'name')
-                            ->searchable()
-                            ->preload()
-                            ->nullable(),
-                    ])->columns(1),
-            ]);
+                    Forms\Components\Select::make('cleaner_id')
+                        ->label('Assigned Cleaner')
+                        ->relationship('cleaner.user', 'name')
+                        ->searchable()
+                        ->preload()
+                        ->nullable(),
+                ])
+                ->columns(1),
+        ]);
     }
 
     public static function table(Table $table): Table
@@ -232,7 +259,10 @@ class BookingResource extends Resource
 
                 Tables\Columns\TextColumn::make('amount')
                     ->label('Amount')
-                    ->money(fn (Booking $record): string => $record->currency ?? 'HUF')
+                    ->money(
+                        fn (Booking $record): string => $record->currency ??
+                            'HUF',
+                    )
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('urgency')
@@ -292,11 +322,19 @@ class BookingResource extends Resource
                     ->preload(),
 
                 Tables\Filters\Filter::make('scheduled')
-                    ->query(fn (Builder $query): Builder => $query->whereNotNull('scheduled_at'))
+                    ->query(
+                        fn (Builder $query): Builder => $query->whereNotNull(
+                            'scheduled_at',
+                        ),
+                    )
                     ->label('Scheduled Only'),
 
                 Tables\Filters\Filter::make('unassigned')
-                    ->query(fn (Builder $query): Builder => $query->whereNull('cleaner_id'))
+                    ->query(
+                        fn (Builder $query): Builder => $query->whereNull(
+                            'cleaner_id',
+                        ),
+                    )
                     ->label('Unassigned'),
             ])
             ->actions([
@@ -314,22 +352,23 @@ class BookingResource extends Resource
 
     public static function getWidgets(): array
     {
-        return [
-            BookingResource\Widgets\BookingStatsWidget::class,
-        ];
+        return [BookingResource\Widgets\BookingStatsWidget::class];
     }
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()
-            ->with(['client.user', 'service', 'pricing', 'cleaner.user', 'extras']);
+        return parent::getEloquentQuery()->with([
+            'client.user',
+            'service',
+            'pricing',
+            'cleaner.user',
+            'extras',
+        ]);
     }
 
     public static function getRelations(): array
     {
-        return [
-            RelationManagers\ExtrasRelationManager::class,
-        ];
+        return [RelationManagers\ExtrasRelationManager::class];
     }
 
     public static function getPages(): array
@@ -342,8 +381,10 @@ class BookingResource extends Resource
         ];
     }
 
-    private static function recalculateAmounts(callable $set, callable $get): void
-    {
+    private static function recalculateAmounts(
+        callable $set,
+        callable $get,
+    ): void {
         $serviceId = $get('service_id');
         $service = $serviceId ? Service::find($serviceId) : null;
 
@@ -378,15 +419,17 @@ class BookingResource extends Resource
         }
 
         try {
-            $breakdown = app(BookingPricingEngine::class)->calculate(new BookingPricingData(
-                service: $service,
-                pricing: $pricing,
-                area: $area !== null ? (float) $area : null,
-                extras: collect(),
-                hasCleaningMaterials: $get('has_cleaning_material') ?? true,
-                promocode: $promocode,
-                currency: $service->currency ?? 'HUF',
-            ));
+            $breakdown = app(BookingPricingEngine::class)->calculate(
+                new BookingPricingData(
+                    service: $service,
+                    pricing: $pricing,
+                    area: $area !== null ? (float) $area : null,
+                    extras: collect(),
+                    hasCleaningMaterials: $get('has_cleaning_material') ?? true,
+                    promocode: $promocode,
+                    currency: $service->currency ?? 'HUF',
+                ),
+            );
         } catch (InvalidArgumentException) {
             $set('selected_amount', null);
             $set('amount', null);
@@ -394,7 +437,19 @@ class BookingResource extends Resource
             return;
         }
 
-        $set('selected_amount', $breakdown->selectedAmount->getAmount()->toScale(2, RoundingMode::HALF_UP)->__toString());
-        $set('amount', $breakdown->totalAmount->getAmount()->toScale(2, RoundingMode::HALF_UP)->__toString());
+        $set(
+            'selected_amount',
+            $breakdown->selectedAmount
+                ->getAmount()
+                ->toScale(2, RoundingMode::HALF_UP)
+                ->__toString(),
+        );
+        $set(
+            'amount',
+            $breakdown->totalAmount
+                ->getAmount()
+                ->toScale(2, RoundingMode::HALF_UP)
+                ->__toString(),
+        );
     }
 }

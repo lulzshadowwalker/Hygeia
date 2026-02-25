@@ -28,48 +28,59 @@ class PricingResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('Service Selection')
-                    ->description('Select the service this pricing tier applies to')
-                    ->aside()
-                    ->schema([
-                        Forms\Components\Select::make('service_id')
-                            ->label('Service')
-                            ->relationship('service', 'name', fn (Builder $query) => $query
-                                ->where('pricing_model', ServicePricingModel::AreaRange->value)
-                                ->orWhere('type', ServiceType::Residential->value))
-                            ->searchable()
-                            ->preload()
-                            ->required(),
-                    ])->columns(1),
+        return $form->schema([
+            Forms\Components\Section::make('Service Selection')
+                ->description('Select the service this pricing tier applies to')
+                ->aside()
+                ->schema([
+                    Forms\Components\Select::make('service_id')
+                        ->label('Service')
+                        ->relationship(
+                            'service',
+                            'name',
+                            fn (Builder $query) => $query
+                                ->where(
+                                    'pricing_model',
+                                    ServicePricingModel::AreaRange->value,
+                                )
+                                ->orWhere(
+                                    'type',
+                                    ServiceType::Residential->value,
+                                ),
+                        )
+                        ->searchable()
+                        ->preload()
+                        ->required(),
+                ])
+                ->columns(1),
 
-                Forms\Components\Section::make('Area & Pricing')
-                    ->description('Define the area range and corresponding price')
-                    ->aside()
-                    ->schema([
-                        Forms\Components\TextInput::make('min_area')
-                            ->label('Minimum Area (sqm)')
-                            ->numeric()
-                            ->required()
-                            ->suffix('sqm')
-                            ->placeholder('e.g., 50'),
+            Forms\Components\Section::make('Area & Pricing')
+                ->description('Define the area range and corresponding price')
+                ->aside()
+                ->schema([
+                    Forms\Components\TextInput::make('min_area')
+                        ->label('Minimum Area (sqm)')
+                        ->numeric()
+                        ->required()
+                        ->suffix('sqm')
+                        ->placeholder('e.g., 50'),
 
-                        Forms\Components\TextInput::make('max_area')
-                            ->label('Maximum Area (sqm)')
-                            ->numeric()
-                            ->required()
-                            ->suffix('sqm')
-                            ->placeholder('e.g., 100'),
+                    Forms\Components\TextInput::make('max_area')
+                        ->label('Maximum Area (sqm)')
+                        ->numeric()
+                        ->required()
+                        ->suffix('sqm')
+                        ->placeholder('e.g., 100'),
 
-                        Forms\Components\TextInput::make('amount')
-                            ->label('Price')
-                            ->numeric()
-                            ->prefix('Ft')
-                            ->required()
-                            ->placeholder('Base price for this area range'),
-                    ])->columns(1),
-            ]);
+                    Forms\Components\TextInput::make('amount')
+                        ->label('Price')
+                        ->numeric()
+                        ->prefix('HUF')
+                        ->required()
+                        ->placeholder('Base price for this area range'),
+                ])
+                ->columns(1),
+        ]);
     }
 
     public static function table(Table $table): Table
@@ -83,12 +94,20 @@ class PricingResource extends Resource
 
                 Tables\Columns\TextColumn::make('area_range')
                     ->label('Area Range')
-                    ->getStateUsing(fn (Model $record): string => $record->min_area.'-'.$record->max_area.' sqm')
+                    ->getStateUsing(
+                        fn (Model $record): string => $record->min_area.
+                            '-'.
+                            $record->max_area.
+                            ' sqm',
+                    )
                     ->searchable(false),
 
                 Tables\Columns\TextColumn::make('amount')
                     ->label('Price')
-                    ->money(fn (Pricing $record): string => $record->currency ?? 'HUF')
+                    ->money(
+                        fn (Pricing $record): string => $record->currency ??
+                            'HUF',
+                    )
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('bookings_count')
