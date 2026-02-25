@@ -27,6 +27,24 @@ class ServiceResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
+    private static function resolveServiceTypeValue(mixed $state): ?string
+    {
+        if ($state instanceof ServiceType) {
+            return $state->value;
+        }
+
+        return is_string($state) ? $state : null;
+    }
+
+    private static function resolvePricingModelValue(mixed $state): ?string
+    {
+        if ($state instanceof ServicePricingModel) {
+            return $state->value;
+        }
+
+        return is_string($state) ? $state : null;
+    }
+
     public static function form(Form $form): Form
     {
         return $form->schema([
@@ -51,16 +69,14 @@ class ServiceResource extends Resource
                             $state,
                             callable $set,
                         ): void {
-                            $type =
-                                $state?->value ??
-                                ServiceType::Residential->value;
+                            $type = self::resolveServiceTypeValue($state) ?? ServiceType::Residential->value;
                             $set('type', $type);
                         })
                         ->afterStateUpdated(function (
                             $state,
                             callable $set,
                         ): void {
-                            if ($state === ServiceType::Residential->value) {
+                            if (self::resolveServiceTypeValue($state) === ServiceType::Residential->value) {
                                 $set(
                                     'pricing_model',
                                     ServicePricingModel::AreaRange->value,
@@ -77,8 +93,7 @@ class ServiceResource extends Resource
                         ->native(false)
                         ->default(ServicePricingModel::AreaRange)
                         ->disabled(
-                            fn (Forms\Get $get): bool => $get('type') ===
-                                ServiceType::Residential->value,
+                            fn (Forms\Get $get): bool => self::resolveServiceTypeValue($get('type')) === ServiceType::Residential->value,
                         )
                         ->dehydrated()
                         ->live()
@@ -87,7 +102,7 @@ class ServiceResource extends Resource
                             callable $set,
                             Forms\Get $get,
                         ): void {
-                            $type = $get('type');
+                            $type = self::resolveServiceTypeValue($get('type'));
                             if ($type === ServiceType::Residential->value) {
                                 $set(
                                     'pricing_model',
@@ -97,9 +112,7 @@ class ServiceResource extends Resource
                                 return;
                             }
 
-                            $model =
-                                $state?->value ??
-                                ServicePricingModel::AreaRange->value;
+                            $model = self::resolvePricingModelValue($state) ?? ServicePricingModel::AreaRange->value;
                             $set('pricing_model', $model);
                         }),
 
@@ -108,16 +121,12 @@ class ServiceResource extends Resource
                         ->numeric()
                         ->suffix('sqm')
                         ->visible(
-                            fn (Forms\Get $get): bool => $get('type') ===
-                                ServiceType::Commercial->value &&
-                                $get('pricing_model') ===
-                                    ServicePricingModel::PricePerMeter->value,
+                            fn (Forms\Get $get): bool => self::resolveServiceTypeValue($get('type')) === ServiceType::Commercial->value
+                                && self::resolvePricingModelValue($get('pricing_model')) === ServicePricingModel::PricePerMeter->value,
                         )
                         ->required(
-                            fn (Forms\Get $get): bool => $get('type') ===
-                                ServiceType::Commercial->value &&
-                                $get('pricing_model') ===
-                                    ServicePricingModel::PricePerMeter->value,
+                            fn (Forms\Get $get): bool => self::resolveServiceTypeValue($get('type')) === ServiceType::Commercial->value
+                                && self::resolvePricingModelValue($get('pricing_model')) === ServicePricingModel::PricePerMeter->value,
                         ),
 
                     Forms\Components\TextInput::make('price_per_meter')
@@ -143,16 +152,12 @@ class ServiceResource extends Resource
                             return (string) $state;
                         })
                         ->visible(
-                            fn (Forms\Get $get): bool => $get('type') ===
-                                ServiceType::Commercial->value &&
-                                $get('pricing_model') ===
-                                    ServicePricingModel::PricePerMeter->value,
+                            fn (Forms\Get $get): bool => self::resolveServiceTypeValue($get('type')) === ServiceType::Commercial->value
+                                && self::resolvePricingModelValue($get('pricing_model')) === ServicePricingModel::PricePerMeter->value,
                         )
                         ->required(
-                            fn (Forms\Get $get): bool => $get('type') ===
-                                ServiceType::Commercial->value &&
-                                $get('pricing_model') ===
-                                    ServicePricingModel::PricePerMeter->value,
+                            fn (Forms\Get $get): bool => self::resolveServiceTypeValue($get('type')) === ServiceType::Commercial->value
+                                && self::resolvePricingModelValue($get('pricing_model')) === ServicePricingModel::PricePerMeter->value,
                         ),
                 ])
                 ->columns(1),
