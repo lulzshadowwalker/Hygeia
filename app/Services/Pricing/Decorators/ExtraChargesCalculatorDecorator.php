@@ -10,6 +10,8 @@ use Brick\Money\Money;
 
 class ExtraChargesCalculatorDecorator implements BookingPriceCalculator
 {
+    private const CLEANING_SUPPLIES_SURCHARGE = '2000';
+
     public function __construct(private readonly BookingPriceCalculator $calculator) {}
 
     public function calculate(BookingPricingData $data): BookingPriceBreakdown
@@ -21,6 +23,13 @@ class ExtraChargesCalculatorDecorator implements BookingPriceCalculator
             if ($extra->amount !== null) {
                 $extrasAmount = $extrasAmount->plus($extra->amount, RoundingMode::HALF_UP);
             }
+        }
+
+        if (! $data->hasCleaningMaterials) {
+            $extrasAmount = $extrasAmount->plus(
+                Money::of(self::CLEANING_SUPPLIES_SURCHARGE, $breakdown->currency),
+                RoundingMode::HALF_UP
+            );
         }
 
         $combinedExtras = $breakdown->extrasAmount->plus($extrasAmount, RoundingMode::HALF_UP);

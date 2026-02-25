@@ -3,8 +3,8 @@
 namespace App\Http\Requests\V1;
 
 use App\Enums\BookingUrgency;
-use App\Enums\ServiceType;
 use App\Http\Requests\BaseFormRequest;
+use App\Models\Pricing;
 use App\Models\Service;
 use Illuminate\Validation\Rules\Enum;
 
@@ -18,7 +18,8 @@ class StoreBookingRequest extends BaseFormRequest
     public function rules(): array
     {
         return [
-            'data.attributes.hasCleaningMaterials' => 'required|boolean',
+            'data.attributes.hasCleaningMaterials' => 'nullable|boolean',
+            'data.attributes.hasCleaningSupplies' => 'nullable|boolean',
             'data.attributes.urgency' => [
                 'required',
                 new Enum(BookingUrgency::class),
@@ -60,6 +61,16 @@ class StoreBookingRequest extends BaseFormRequest
     public function withValidator($validator): void
     {
         $validator->after(function ($validator) {
+            if (
+                ! $this->has('data.attributes.hasCleaningMaterials')
+                && ! $this->has('data.attributes.hasCleaningSupplies')
+            ) {
+                $validator->errors()->add(
+                    'data.attributes.hasCleaningMaterials',
+                    'The has cleaning materials field is required.'
+                );
+            }
+
             $serviceId = $this->input('data.relationships.service.data.id');
 
             if (! $serviceId) {
@@ -72,21 +83,66 @@ class StoreBookingRequest extends BaseFormRequest
                 return;
             }
 
-            if ($service->type === ServiceType::Residential) {
-                if (empty($this->input('data.attributes.area'))) {
+            $pricingId = $this->input('data.relationships.pricing.data.id');
+            $area = $this->input('data.attributes.area');
+
+            if ($service->usesAreaRangePricing()) {
+                if (empty($pricingId)) {
+                    $validator->errors()->add(
+                        'data.relationships.pricing.data.id',
+                        'The pricing field is required for this service.'
+                    );
+                }
+
+                if ($area !== null && $area !== '') {
                     $validator->errors()->add(
                         'data.attributes.area',
-                        'The area field is required for residential services.'
+                        'The area field is not allowed for area-range priced services.'
                     );
+                }
+
+                if (! empty($pricingId)) {
+                    $pricingBelongsToService = Pricing::query()
+                        ->whereKey($pricingId)
+                        ->where('service_id', $service->id)
+                        ->exists();
+
+                    if (! $pricingBelongsToService) {
+                        $validator->errors()->add(
+                            'data.relationships.pricing.data.id',
+                            'The selected pricing does not belong to the selected service.'
+                        );
+                    }
                 }
 
                 return;
             }
 
-            if (empty($this->input('data.relationships.pricing.data.id'))) {
+            if ($area === null || $area === '') {
+                $validator->errors()->add(
+                    'data.attributes.area',
+                    'The area field is required for per-meter priced services.'
+                );
+            }
+
+            if (! empty($pricingId)) {
                 $validator->errors()->add(
                     'data.relationships.pricing.data.id',
-                    'The pricing field is required for this service type.'
+                    'The pricing field is not allowed for per-meter priced services.'
+                );
+            }
+
+            if ($service->min_area !== null && is_numeric($area) && (float) $area < $service->min_area) {
+                $validator->errors()->add(
+                    'data.attributes.area',
+                    'The area must be at least '.$service->min_area.' for this service.'
+                );
+            }
+
+            if ($service->price_per_meter === null) {
+                $validator->errors()->add(
+                    'data.relationships.service.data.id',
+                    'The selected service is not configured for per-meter pricing.'
                 );
             }
         });
@@ -94,7 +150,11 @@ class StoreBookingRequest extends BaseFormRequest
 
     public function hasCleaningMaterials(): bool
     {
-        return $this->input('data.attributes.hasCleaningMaterials', false);
+        if ($this->has('data.attributes.hasCleaningMaterials')) {
+            return (bool) $this->input('data.attributes.hasCleaningMaterials');
+        }
+
+        return (bool) $this->input('data.attributes.hasCleaningSupplies', true);
     }
 
     public function urgency(): BookingUrgency

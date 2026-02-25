@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Services\Pricing;
 
-use App\Enums\ServiceType;
 use App\Models\Extra;
 use App\Models\Promocode;
 use App\Models\Service;
@@ -19,9 +18,9 @@ class PromoCodeCalculatorDecoratorTest extends TestCase
 
     public function test_it_applies_percentage_discount_and_caps_it_by_max_discount_amount(): void
     {
-        $service = Service::factory()->create([
-            'type' => ServiceType::Residential,
+        $service = Service::factory()->commercialPerMeter()->create([
             'price_per_meter' => 100,
+            'min_area' => 10,
         ]);
 
         $extras = Extra::factory()->count(2)->create([
@@ -43,6 +42,7 @@ class PromoCodeCalculatorDecoratorTest extends TestCase
             pricing: null,
             area: 100,
             extras: $extras,
+            hasCleaningMaterials: true,
             promocode: $promocode,
             currency: 'HUF',
         ));
@@ -55,9 +55,9 @@ class PromoCodeCalculatorDecoratorTest extends TestCase
 
     public function test_it_clamps_discount_to_subtotal_when_max_discount_exceeds_subtotal(): void
     {
-        $service = Service::factory()->create([
-            'type' => ServiceType::Residential,
+        $service = Service::factory()->commercialPerMeter()->create([
             'price_per_meter' => 100,
+            'min_area' => 10,
         ]);
 
         $promocode = Promocode::factory()->create([
@@ -75,6 +75,7 @@ class PromoCodeCalculatorDecoratorTest extends TestCase
             pricing: null,
             area: 10,
             extras: collect(),
+            hasCleaningMaterials: true,
             promocode: $promocode,
             currency: 'HUF',
         ));

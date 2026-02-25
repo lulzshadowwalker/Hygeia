@@ -85,14 +85,22 @@ class BookingController extends ApiController
 
         return DB::transaction(function () use ($request) {
             $service = \App\Models\Service::findOrFail($request->serviceId());
-            $pricingId = null;
             $pricing = null;
+            $pricingId = null;
+            $area = null;
+            $pricePerMeter = null;
             $promocodeId = null;
             $promocode = null;
 
-            if ($service->type !== \App\Enums\ServiceType::Residential) {
-                $pricing = Pricing::findOrFail($request->pricingId());
+            if ($service->usesAreaRangePricing()) {
+                $pricing = Pricing::query()
+                    ->whereKey($request->pricingId())
+                    ->where('service_id', $service->id)
+                    ->firstOrFail();
                 $pricingId = $pricing->id;
+            } else {
+                $area = $request->area();
+                $pricePerMeter = $service->price_per_meter;
             }
 
             if ($request->promocode()) {
@@ -122,6 +130,7 @@ class BookingController extends ApiController
                     pricing: $pricing,
                     area: $request->area(),
                     extras: $extras,
+                    hasCleaningMaterials: $request->hasCleaningMaterials(),
                     promocode: $promocode,
                     currency: $service->currency ?? 'HUF',
                 ));
@@ -147,8 +156,8 @@ class BookingController extends ApiController
                 'pricing_id' => $pricingId,
                 'promocode_id' => $promocodeId,
                 'selected_amount' => $breakdown->selectedAmount,
-                'area' => $request->area(),
-                'price_per_meter' => $service->price_per_meter,
+                'area' => $area,
+                'price_per_meter' => $pricePerMeter,
                 'urgency' => $request->urgency()->value,
                 'scheduled_at' => $request->scheduledAt(),
                 'has_cleaning_material' => $request->hasCleaningMaterials(),

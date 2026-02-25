@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\ServicePricingModel;
 use App\Enums\ServiceType;
 use App\Filament\Resources\PricingResource\Pages;
 use App\Models\Pricing;
@@ -35,7 +36,9 @@ class PricingResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('service_id')
                             ->label('Service')
-                            ->relationship('service', 'name', fn (Builder $query) => $query->where('type', '!=', ServiceType::Residential))
+                            ->relationship('service', 'name', fn (Builder $query) => $query
+                                ->where('pricing_model', ServicePricingModel::AreaRange->value)
+                                ->orWhere('type', ServiceType::Residential->value))
                             ->searchable()
                             ->preload()
                             ->required(),

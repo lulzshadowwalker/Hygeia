@@ -4,7 +4,6 @@ namespace App\Filament\Resources;
 
 use App\Enums\BookingStatus;
 use App\Enums\BookingUrgency;
-use App\Enums\ServiceType;
 use App\Filament\Resources\BookingResource\Pages;
 use App\Filament\Resources\BookingResource\RelationManagers;
 use App\Models\Booking;
@@ -22,6 +21,7 @@ use Filament\Tables;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use InvalidArgumentException;
 
 class BookingResource extends Resource
 {
@@ -80,7 +80,7 @@ class BookingResource extends Resource
                                 }
                                 $service = Service::find($serviceId);
 
-                                return $service && $service->type === ServiceType::Residential;
+                                return $service && $service->usesPricePerMeterPricing();
                             })
                             ->required(function (callable $get) {
                                 $serviceId = $get('service_id');
@@ -89,7 +89,7 @@ class BookingResource extends Resource
                                 }
                                 $service = Service::find($serviceId);
 
-                                return $service && $service->type === ServiceType::Residential;
+                                return $service && $service->usesPricePerMeterPricing();
                             })
                             ->live(onBlur: true)
                             ->afterStateUpdated(function ($state, callable $set, callable $get) {
@@ -101,11 +101,11 @@ class BookingResource extends Resource
                             ->visible(function (callable $get) {
                                 $serviceId = $get('service_id');
                                 if (! $serviceId) {
-                                    return true;
+                                    return false;
                                 }
                                 $service = Service::find($serviceId);
 
-                                return ! $service || $service->type !== ServiceType::Residential;
+                                return $service && $service->usesAreaRangePricing();
                             })
                             ->options(function (callable $get) {
                                 $serviceId = $get('service_id');
@@ -131,7 +131,7 @@ class BookingResource extends Resource
                                 }
                                 $service = Service::find($serviceId);
 
-                                return ! $service || $service->type !== ServiceType::Residential;
+                                return $service && $service->usesAreaRangePricing();
                             })
                             ->reactive()
                             ->afterStateUpdated(function ($state, callable $set, callable $get) {
@@ -175,7 +175,7 @@ class BookingResource extends Resource
 
                         Forms\Components\Toggle::make('has_cleaning_material')
                             ->label('Client has cleaning materials')
-                            ->default(false),
+                            ->default(true),
 
                         Forms\Components\TextInput::make('amount')
                             ->label('Total Amount')
@@ -355,11 +355,7 @@ class BookingResource extends Resource
         $promocode = null;
         $area = $get('area');
 
-        if ($service->type === ServiceType::Residential) {
-            if (! $area) {
-                return;
-            }
-        } else {
+        if ($service->usesAreaRangePricing()) {
             $pricingId = $get('pricing_id');
             if (! $pricingId) {
                 return;
@@ -369,6 +365,11 @@ class BookingResource extends Resource
             if (! $pricing) {
                 return;
             }
+            $area = null;
+        } else {
+            if ($area === null || $area === '') {
+                return;
+            }
         }
 
         $promocodeId = $get('promocode_id');
@@ -376,14 +377,22 @@ class BookingResource extends Resource
             $promocode = Promocode::find($promocodeId);
         }
 
-        $breakdown = app(BookingPricingEngine::class)->calculate(new BookingPricingData(
-            service: $service,
-            pricing: $pricing,
-            area: $area !== null ? (float) $area : null,
-            extras: collect(),
-            promocode: $promocode,
-            currency: $service->currency ?? 'HUF',
-        ));
+        try {
+            $breakdown = app(BookingPricingEngine::class)->calculate(new BookingPricingData(
+                service: $service,
+                pricing: $pricing,
+                area: $area !== null ? (float) $area : null,
+                extras: collect(),
+                hasCleaningMaterials: $get('has_cleaning_material') ?? true,
+                promocode: $promocode,
+                currency: $service->currency ?? 'HUF',
+            ));
+        } catch (InvalidArgumentException) {
+            $set('selected_amount', null);
+            $set('amount', null);
+
+            return;
+        }
 
         $set('selected_amount', $breakdown->selectedAmount->getAmount()->toScale(2, RoundingMode::HALF_UP)->__toString());
         $set('amount', $breakdown->totalAmount->getAmount()->toScale(2, RoundingMode::HALF_UP)->__toString());

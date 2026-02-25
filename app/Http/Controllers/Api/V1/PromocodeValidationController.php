@@ -55,6 +55,7 @@ class PromocodeValidationController extends ApiController
                 pricing: $pricing,
                 area: $request->area(),
                 extras: $extras,
+                hasCleaningMaterials: $request->hasCleaningMaterials(),
                 promocode: $validation->promocode,
                 currency: $service->currency ?? 'HUF',
             ));

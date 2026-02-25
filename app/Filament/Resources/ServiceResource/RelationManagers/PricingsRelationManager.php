@@ -2,18 +2,29 @@
 
 namespace App\Filament\Resources\ServiceResource\RelationManagers;
 
+use App\Models\Service;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class PricingsRelationManager extends RelationManager
 {
     protected static string $relationship = 'pricings';
 
     protected static ?string $recordTitleAttribute = 'amount';
+
+    public static function canViewForRecord(Model $ownerRecord, string $pageClass): bool
+    {
+        if (! $ownerRecord instanceof Service) {
+            return false;
+        }
+
+        return $ownerRecord->usesAreaRangePricing();
+    }
 
     public function form(Form $form): Form
     {

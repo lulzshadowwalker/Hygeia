@@ -3,8 +3,8 @@
 namespace Tests\Feature\Http\Controllers\Api\V1;
 
 use App\Enums\Role;
-use App\Enums\ServiceType;
 use App\Models\Client;
+use App\Models\Pricing;
 use App\Models\Service;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -14,11 +14,13 @@ class BookingControllerAreaTest extends TestCase
 {
     use RefreshDatabase, WithRoles;
 
-    public function test_client_can_create_booking_for_residential_service_with_area(): void
+    public function test_client_can_create_booking_for_residential_service_with_pricing_tier(): void
     {
-        $service = Service::factory()->create([
-            'type' => ServiceType::Residential,
-            'price_per_meter' => 100,
+        $service = Service::factory()->residential()->create();
+        $pricing = Pricing::factory()->for($service)->create([
+            'amount' => 4200,
+            'min_area' => 0,
+            'max_area' => 80,
         ]);
 
         $client = Client::factory()->create();
@@ -30,7 +32,6 @@ class BookingControllerAreaTest extends TestCase
                     'attributes' => [
                         'hasCleaningMaterials' => true,
                         'urgency' => 'flexible',
-                        'area' => 50,
                         'location' => [
                             'description' => '123 Main St, Springfield',
                             'lat' => 40.712776,
@@ -42,7 +43,7 @@ class BookingControllerAreaTest extends TestCase
                             'data' => ['id' => $service->id],
                         ],
                         'pricing' => [
-                            'data' => null,
+                            'data' => ['id' => $pricing->id],
                         ],
                         'extras' => [
                             'data' => [],
@@ -51,28 +52,26 @@ class BookingControllerAreaTest extends TestCase
                 ],
             ])
             ->assertCreated()
-            ->assertJsonPath('data.attributes.amount', '5000.00')
-            ->assertJsonPath('data.attributes.selectedAmount', '5000.00')
+            ->assertJsonPath('data.attributes.amount', '4200.00')
+            ->assertJsonPath('data.attributes.selectedAmount', '4200.00')
             ->assertJsonPath('data.attributes.currency', 'HUF')
-            ->assertJsonPath('data.attributes.area', 50)
-            ->assertJsonPath('data.attributes.pricePerMeter', '100.00');
+            ->assertJsonPath('data.attributes.area', 0)
+            ->assertJsonPath('data.attributes.pricePerMeter', '');
 
         $this->assertDatabaseHas('bookings', [
             'service_id' => $service->id,
-            'area' => 50,
-            'price_per_meter' => '100.00',
-            'selected_amount' => '5000.00',
-            'amount' => '5000.00',
+            'pricing_id' => $pricing->id,
+            'area' => null,
+            'price_per_meter' => null,
+            'selected_amount' => '4200.00',
+            'amount' => '4200.00',
             'currency' => 'HUF',
         ]);
     }
 
-    public function test_client_cannot_create_booking_for_residential_service_without_area(): void
+    public function test_client_cannot_create_booking_for_residential_service_without_pricing(): void
     {
-        $service = Service::factory()->create([
-            'type' => ServiceType::Residential,
-            'price_per_meter' => 100,
-        ]);
+        $service = Service::factory()->residential()->create();
 
         $client = Client::factory()->create();
         $client->user->assignRole(Role::Client);
@@ -93,15 +92,44 @@ class BookingControllerAreaTest extends TestCase
                         'service' => [
                             'data' => ['id' => $service->id],
                         ],
-                        'pricing' => [
-                            'data' => null,
-                        ],
                         'extras' => [
                             'data' => [],
                         ],
                     ],
                 ],
             ])
+            ->assertJsonValidationErrors(['data.relationships.pricing.data.id']);
+    }
+
+    public function test_client_cannot_create_booking_for_residential_service_with_area_payload(): void
+    {
+        $service = Service::factory()->residential()->create();
+        $pricing = Pricing::factory()->for($service)->create([
+            'amount' => 3600,
+        ]);
+
+        $client = Client::factory()->create();
+        $client->user->assignRole(Role::Client);
+
+        $this->actingAs($client->user)
+            ->postJson(route('api.v1.bookings.store'), [
+                'data' => [
+                    'attributes' => [
+                        'hasCleaningMaterials' => true,
+                        'urgency' => 'flexible',
+                        'area' => 30,
+                    ],
+                    'relationships' => [
+                        'service' => [
+                            'data' => ['id' => $service->id],
+                        ],
+                        'pricing' => [
+                            'data' => ['id' => $pricing->id],
+                        ],
+                    ],
+                ],
+            ])
+            ->assertUnprocessable()
             ->assertJsonValidationErrors(['data.attributes.area']);
     }
 }
