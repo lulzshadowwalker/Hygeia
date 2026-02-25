@@ -124,6 +124,24 @@ class ServiceResource extends Resource
                         ->label('Price per Meter')
                         ->numeric()
                         ->prefix('HUF')
+                        ->afterStateHydrated(function ($state, callable $set): void {
+                            if ($state instanceof Money) {
+                                $set('price_per_meter', $state->getAmount()->toScale(2)->__toString());
+
+                                return;
+                            }
+
+                            if (is_array($state) && isset($state['amount'])) {
+                                $set('price_per_meter', (string) $state['amount']);
+                            }
+                        })
+                        ->dehydrateStateUsing(function ($state): ?string {
+                            if ($state === null || $state === '') {
+                                return null;
+                            }
+
+                            return (string) $state;
+                        })
                         ->visible(
                             fn (Forms\Get $get): bool => $get('type') ===
                                 ServiceType::Commercial->value &&
