@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ExtraResource\Pages;
 use App\Models\Extra;
+use Brick\Money\Money;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -42,6 +43,24 @@ class ExtraResource extends Resource
                         ->label('Price')
                         ->numeric()
                         ->prefix('HUF')
+                        ->afterStateHydrated(function ($state, callable $set): void {
+                            if ($state instanceof Money) {
+                                $set('amount', $state->getAmount()->toScale(2)->__toString());
+
+                                return;
+                            }
+
+                            if (is_array($state) && isset($state['amount'])) {
+                                $set('amount', (string) $state['amount']);
+                            }
+                        })
+                        ->dehydrateStateUsing(function ($state): ?string {
+                            if ($state === null || $state === '') {
+                                return null;
+                            }
+
+                            return (string) $state;
+                        })
                         ->required()
                         ->placeholder('Additional cost for this service'),
                 ])
