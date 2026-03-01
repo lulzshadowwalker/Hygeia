@@ -6,6 +6,7 @@ use App\Enums\ServicePricingModel;
 use App\Enums\ServiceType;
 use App\Filament\Resources\PricingResource\Pages;
 use App\Models\Pricing;
+use Brick\Money\Money;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -76,6 +77,24 @@ class PricingResource extends Resource
                         ->label('Price')
                         ->numeric()
                         ->prefix('HUF')
+                        ->afterStateHydrated(function ($state, callable $set): void {
+                            if ($state instanceof Money) {
+                                $set('amount', $state->getAmount()->toScale(2)->__toString());
+
+                                return;
+                            }
+
+                            if (is_array($state) && isset($state['amount'])) {
+                                $set('amount', (string) $state['amount']);
+                            }
+                        })
+                        ->dehydrateStateUsing(function ($state): ?string {
+                            if ($state === null || $state === '') {
+                                return null;
+                            }
+
+                            return (string) $state;
+                        })
                         ->required()
                         ->placeholder('Base price for this area range'),
                 ])
